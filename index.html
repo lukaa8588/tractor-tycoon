@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d1a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon.png">
+  <title>Tractor Tycoon</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0d1a0a;overflow:hidden;font-family:'Segoe UI',sans-serif}
+    canvas{display:block}
+
+    /* ── HUD ── */
+    #hud{
+      position:fixed;top:16px;left:50%;transform:translateX(-50%);
+      background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
+      border:1px solid rgba(255,255,255,.15);border-radius:28px;
+      padding:8px 28px;color:#fff;font-size:1.5rem;font-weight:800;
+      display:flex;align-items:center;gap:10px;
+      user-select:none;pointer-events:none;z-index:10
+    }
+    #hud .lbl{font-size:1rem;opacity:.7;font-weight:500}
+
+    /* ── Кнопки правый верхний угол ── */
+    .corner-btn{
+      position:fixed;right:24px;
+      width:52px;height:52px;
+      backdrop-filter:blur(10px);
+      border-radius:50%;
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;z-index:20;
+      transition:all .2s;
+    }
+    #shop-btn{
+      top:16px;
+      background:rgba(30,90,15,.85);
+      border:1px solid rgba(100,220,60,.35);
+      color:#c8ff80;font-size:1.55rem;
+      box-shadow:0 4px 24px rgba(80,200,40,.18);
+    }
+    #shop-btn:hover{background:rgba(40,120,20,.9);transform:translateY(2px) scale(1.08);
+      box-shadow:0 8px 30px rgba(80,200,40,.35)}
+    #map-btn{
+      top:76px;
+      background:rgba(15,50,90,.85);
+      border:1px solid rgba(60,160,255,.35);
+      color:#80c8ff;font-size:1.45rem;
+      box-shadow:0 4px 24px rgba(40,120,255,.18);
+    }
+    #map-btn:hover{background:rgba(20,70,130,.9);transform:translateY(2px) scale(1.08);
+      box-shadow:0 8px 30px rgba(40,120,255,.35)}
+
+    /* ── Мини-карта ── */
+    #minimap-wrap{
+      position:fixed;right:90px;top:16px;
+      background:rgba(5,12,4,.88);backdrop-filter:blur(12px);
+      border:1px solid rgba(60,160,80,.3);border-radius:16px;
+      padding:14px;z-index:25;
+      display:none;flex-direction:column;gap:8px;
+      box-shadow:0 8px 40px rgba(0,0,0,.5);
+    }
+    #minimap-wrap.open{display:flex}
+    #minimap-wrap h3{
+      color:rgba(255,255,255,.55);font-size:.72rem;font-weight:600;
+      letter-spacing:.06em;text-transform:uppercase;text-align:center;
+    }
+    #minimap{border-radius:6px;image-rendering:pixelated}
+
+    /* ── Джойстик ── */
+    #joystick-zone {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 5; touch-action: none;
+    }
+    #joystick-base {
+      position: absolute; width: 100px; height: 100px;
+      background: rgba(255, 255, 255, 0.15); border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%; pointer-events: none;
+      display: none; transform: translate(-50%, -50%);
+    }
+    #joystick-knob {
+      position: absolute; width: 40px; height: 40px;
+      background: rgba(255, 255, 255, 0.6); border-radius: 50%;
+      top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;
+    }
+
+    /* ── Панель прокачки ── */
+    #shop{
+      position:fixed;right:0;top:0;bottom:0;width:360px;
+      background:rgba(8,18,6,.92);backdrop-filter:blur(20px);
+      border-left:1px solid rgba(100,220,60,.2);
+      z-index:30;display:flex;flex-direction:column;
+      transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    #shop.open{transform:translateX(0)}
+
+    .shop-header{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:22px 24px 18px;border-bottom:1px solid rgba(255,255,255,.07);
+    }
+    .shop-header h2{color:#c8ff80;font-size:1.25rem;font-weight:800;letter-spacing:.04em}
+    .shop-header .balance{
+      display:flex;align-items:center;gap:6px;
+      background:rgba(255,255,255,.07);border-radius:12px;
+      padding:5px 12px;color:#f0e060;font-weight:700;font-size:.95rem;
+    }
+    .shop-close{
+      background:rgba(255,255,255,.08);border:none;border-radius:10px;
+      color:#888;font-size:1.1rem;cursor:pointer;padding:6px 10px;
+      transition:all .15s;margin-left:12px;
+    }
+    .shop-close:hover{background:rgba(255,80,80,.2);color:#f88}
+
+    /* ── Карточки улучшений ── */
+    .shop-list{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+    .shop-list::-webkit-scrollbar{width:4px}
+    .shop-list::-webkit-scrollbar-thumb{background:rgba(100,220,60,.3);border-radius:2px}
+
+    .upg-card{
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;padding:16px;
+      display:flex;flex-direction:column;gap:12px;
+      transition:border-color .2s, background .2s;
+    }
+    .upg-card.affordable{border-color:rgba(100,220,60,.3);background:rgba(100,220,60,.05)}
+    .upg-card.maxed{border-color:rgba(255,215,0,.25);background:rgba(255,215,0,.05)}
+
+    .upg-top{display:flex;align-items:center;gap:12px}
+    .upg-icon{
+      width:44px;height:44px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.4rem;flex-shrink:0;
+    }
+    .upg-info{flex:1}
+    .upg-name{color:#e8f8e0;font-weight:700;font-size:.95rem;margin-bottom:3px}
+    .upg-desc{color:rgba(255,255,255,.45);font-size:.78rem}
+
+    /* Уровень — точки */
+    .upg-dots{display:flex;gap:5px;align-items:center}
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      border:1.5px solid rgba(255,255,255,.2);
+      transition:all .2s;
+    }
+    .dot.filled{background:#6ab82a;border-color:#6ab82a;box-shadow:0 0 6px #6ab82a80}
+    .dot.filled.gold{background:#f0c030;border-color:#f0c030;box-shadow:0 0 6px #f0c03080}
+
+    /* Кнопка купить */
+    .upg-footer{display:flex;align-items:center;justify-content:space-between}
+    .upg-stat{color:rgba(255,255,255,.5);font-size:.78rem}
+    .upg-stat span{color:#a0e060;font-weight:700}
+
+    .buy-btn{
+      background:rgba(80,180,30,.2);
+      border:1px solid rgba(80,180,30,.4);
+      color:#a0e060;border-radius:12px;
+      padding:7px 16px;cursor:pointer;
+      font-size:.85rem;font-weight:700;
+      display:flex;align-items:center;gap:6px;
+      transition:all .2s;white-space:nowrap;
+    }
+    .buy-btn:hover:not(:disabled){
+      background:rgba(80,180,30,.4);
+      transform:translateY(-1px);
+      box-shadow:0 4px 14px rgba(80,180,30,.3);
+    }
+    .buy-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+    .buy-btn.maxed-btn{
+      background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.3);
+      color:#f0c030;cursor:default
+    }
+
+
+    /* ── Мобильная адаптация ── */
+    @media (max-width: 600px) {
+      #shop {
+        width: 100%;
+        border-left: none;
+      }
+      #minimap-wrap {
+        right: 16px;
+        top: 136px; /* Под кнопками магазина и карты */
+        padding: 10px;
+      }
+      #minimap {
+        width: 130px;
+        height: 130px;
+      }
+      .shop-item {
+        padding: 10px;
+      }
+    }
+  </style>
+  <script src="yandex-sdk.js"></script>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<!-- ── Джойстик ── -->
+<div id="joystick-zone">
+  <div id="joystick-base">
+    <div id="joystick-knob"></div>
+  </div>
+</div>
+
+<div id="hud">🌾 <span id="sc">0</span><span class="lbl" id="lbl-hay">hay</span></div>
+<button id="shop-btn" class="corner-btn" onclick="toggleShop()" title="Upgrades">🛒</button>
+<button id="map-btn"  class="corner-btn" onclick="toggleMap()"  title="Map">🗺️</button>
+
+<!-- ── Мини-карта ── -->
+<div id="minimap-wrap">
+  <h3 id="map-title">🗺️ Map</h3>
+  <canvas id="minimap" width="200" height="200"></canvas>
+</div>
+
+<!-- ── Панель прокачки ── -->
+<div id="shop">
+  <div class="shop-header">
+    <h2 id="shop-title">🛒 Upgrades</h2>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="balance">🌾 <span id="bal">0</span></div>
+      <button class="shop-close" onclick="toggleShop()">✕</button>
+    </div>
+  </div>
+  <div style="padding: 0 16px;">
+    <button id="booster-btn-text" class="buy-btn" style="width: 100%; justify-content: center; background: rgba(255,180,30,.2); border-color: rgba(255,180,30,.4); color: #f0c030;" onclick="triggerBooster()">
+      📺 Watch Ad for +1000 🌾
+    </button>
+  </div>
+  <div class="shop-list" id="shop-list"></div>
+</div>
+
+<script>
+'use strict';
+
+// ── МУЛЬТИЯЗЫЧНОСТЬ ──────────────────────────────────────────
+const i18n = {
+  ru: {
+    title: "Трактор Магнат",
+    hay: "сена",
+    shopBtn: "Улучшения",
+    mapBtn: "Карта",
+    mapTitle: "🗺️ Карта",
+    shopTitle: "🛒 Прокачка",
+    boosterBtn: "📺 Реклама: +1000 🌾",
+    maxLabel: "МАКС",
+    buyHay: "сена",
+    statSpeed: "Скорость",
+    statWidth: "Ширина",
+    statGrow: "Время роста",
+    statBonus: "Сена с блока",
+    upgrades: {
+      speed: { name: "Двигатель", desc: "Увеличивает скорость трактора" },
+      width: { name: "Косилка", desc: "Увеличивает ширину скоса" },
+      grow:  { name: "Удобрения", desc: "Трава растет быстрее" },
+      bonus: { name: "Амбар", desc: "Больше сена с каждого блока" }
+    }
+  },
+  en: {
+    title: "Tractor Tycoon",
+    hay: "hay",
+    shopBtn: "Upgrades",
+    mapBtn: "Map",
+    mapTitle: "🗺️ Map",
+    shopTitle: "🛒 Upgrades",
+    boosterBtn: "📺 Watch Ad for +1000 🌾",
+    maxLabel: "MAX",
+    buyHay: "hay",
+    statSpeed: "Speed",
+    statWidth: "Width",
+    statGrow: "Grow time",
+    statBonus: "Hay per block",
+    upgrades: {
+      speed: { name: "Engine", desc: "Increases tractor speed" },
+      width: { name: "Mower", desc: "Increases harvest width" },
+      grow:  { name: "Fertilizer", desc: "Grass grows faster" },
+      bonus: { name: "Barn", desc: "More hay per harvested block" }
+    }
+  }
+};
+
+let currentLang = 'ru'; // Default to Russian
+
+function t(key, subKey) {
+  if (subKey) return i18n[currentLang][key][subKey];
+  return i18n[currentLang][key];
+}
+
+function updateLanguage(lang) {
+  if (lang && i18n[lang]) currentLang = lang;
+  
+  document.title = t('title');
+  document.getElementById('lbl-hay').textContent = t('hay');
+  document.getElementById('shop-btn').title = t('shopBtn');
+  document.getElementById('map-btn').title = t('mapBtn');
+  document.getElementById('map-title').textContent = t('mapTitle');
+  document.getElementById('shop-title').textContent = t('shopTitle');
+  document.getElementById('booster-btn-text').textContent = t('boosterBtn');
+  
+  if (shopOpen) renderShop();
+}
+
+// ── КОНФИГ ───────────────────────────────────────────────────
+const T    = 32;
+const MW   = 100;
+const MH   = 100;
+const BRD  = 17;
+const LRP  = 0.12;
+const GROW_BASE = 10000; // мс (базовое время роста)
+
+// Базовые значения (без прокачки)
+const BASE_SPD = 200;
+const BASE_PW  = 12; // 12px на уровне 0 (меньше тайла 32px, режет строго 1 блок)
+const BASE_PH  = 35;
+
+// Состояния: F=лес, H=сено, G=растёт
+const F=0, H=1, G=2;
+
+// ── ПРОКАЧКА ─────────────────────────────────────────────────
+const UPGRADES = [
+  {
+    id:'speed', icon:'⚡',
+    iconBg:'rgba(255,180,30,.15)',
+    maxLevel:5,
+    cost:[10,30,70,150,320],
+    statKey:'statSpeed',
+    statFn:(lvl)=>`${BASE_SPD + lvl*50} px/s`,
+  },
+  {
+    id:'width', icon:'⚙️',
+    iconBg:'rgba(80,160,255,.15)',
+    maxLevel:5,
+    cost:[15,40,100,220,480],
+    statKey:'statWidth',
+    statFn:(lvl)=>`${1 + lvl} bl.`,
+  },
+  {
+    id:'grow', icon:'🌿',
+    iconBg:'rgba(40,200,80,.15)',
+    maxLevel:5,
+    cost:[20,55,120,260,550],
+    statKey:'statGrow',
+    statFn:(lvl)=>`${((GROW_BASE - lvl*1500)/1000).toFixed(1)} s`,
+  },
+  {
+    id:'bonus', icon:'🏚️',
+    iconBg:'rgba(255,215,0,.12)',
+    maxLevel:4,
+    cost:[50,140,350,800],
+    statKey:'statBonus',
+    statFn:(lvl)=>`${1 + lvl} 🌾`,
+  },
+];
+
+const upgLvl = {speed:0, width:0, grow:0, bonus:0};
+
+// Применяем эффекты прокачки
+function getSpeed()     { return BASE_SPD + upgLvl.speed * 50; }
+function getMowW()      { return BASE_PW  + upgLvl.width * 28; } // +28px за уровень (ровно +1 блок к ширине)
+function getMowH()      { return BASE_PH; }
+function getGrowTime()  { return Math.max(2000, GROW_BASE - upgLvl.grow * 1500); }
+function getScoreBonus(){ return upgLvl.bonus; }
+
+// ── МАГАЗИН ──────────────────────────────────────────────────
+let shopOpen = false;
+
+function toggleShop() {
+  shopOpen = !shopOpen;
+  document.getElementById('shop').classList.toggle('open', shopOpen);
+  renderShop();
+}
+
+function renderShop() {
+  const list = document.getElementById('shop-list');
+  document.getElementById('bal').textContent = score;
+  list.innerHTML = '';
+
+  UPGRADES.forEach(upg => {
+    const lvl = upgLvl[upg.id];
+    const maxed = lvl >= upg.maxLevel;
+    const cost = maxed ? null : upg.cost[lvl];
+    const canBuy = !maxed && score >= cost;
+
+    const card = document.createElement('div');
+    card.className = 'upg-card' + (maxed ? ' maxed' : canBuy ? ' affordable' : '');
+
+    // Точки уровня
+    const dots = Array.from({length: upg.maxLevel}, (_, i) =>
+      `<div class="dot${i < lvl ? (maxed ? ' filled gold' : ' filled') : ''}"></div>`
+    ).join('');
+
+    card.innerHTML = `
+      <div class="upg-top">
+        <div class="upg-icon" style="background:${upg.iconBg}">${upg.icon}</div>
+        <div class="upg-info">
+          <div class="upg-name">${t('upgrades', upg.id).name}</div>
+          <div class="upg-desc">${t('upgrades', upg.id).desc}</div>
+        </div>
+      </div>
+      <div class="upg-dots">${dots}
+        <span style="margin-left:6px;color:rgba(255,255,255,.3);font-size:.75rem">
+          ${maxed ? `<span style="color:#f0c030">${t('maxLabel')}</span>` : `${lvl} / ${upg.maxLevel}`}
+        </span>
+      </div>
+      <div class="upg-footer">
+        <div class="upg-stat">${t(upg.statKey)}: <span>${upg.statFn(lvl)}</span></div>
+        ${maxed
+          ? `<button class="buy-btn maxed-btn" disabled>✓ ${t('maxLabel')}</button>`
+          : `<button class="buy-btn" ${canBuy?'':'disabled'} onclick="buy('${upg.id}')">
+               🌾 ${cost} <span style="font-size:.7rem;opacity:.6">${t('buyHay')}</span>
+             </button>`
+        }
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function buy(id) {
+  const upg = UPGRADES.find(u => u.id === id);
+  const lvl = upgLvl[id];
+  if (lvl >= upg.maxLevel) return;
+  const cost = upg.cost[lvl];
+  if (score < cost) return;
+  score -= cost;
+  upgLvl[id]++;
+  scEl.textContent = score;
+  if (typeof saveProgress === 'function') saveProgress(score, upgLvl);
+  renderShop();
+}
+
+function triggerBooster() {
+  if (typeof showRewardedBooster === 'function') {
+    showRewardedBooster(() => {
+      score += 1000;
+      scEl.textContent = score;
+      if (shopOpen) document.getElementById('bal').textContent = score;
+      if (typeof saveProgress === 'function') saveProgress(score, upgLvl);
+    });
+  }
+}
+
+// Tab открывает/закрывает магазин
+window.addEventListener('keydown', e => {
+  if (e.code === 'Tab') { e.preventDefault(); toggleShop(); }
+});
+
+// ── ДАННЫЕ КАРТЫ ─────────────────────────────────────────────
+const gState  = new Uint8Array(MW * MH);
+const gCutAt  = new Float64Array(MW * MH);
+const growSet = new Set();
+
+// ── КЭШ КАРТЫ (OFFSCREEN CANVAS) ─────────────────────────────
+const mapCv = document.createElement('canvas');
+mapCv.width = MW * T;
+mapCv.height = MH * T;
+const mapCx = mapCv.getContext('2d', { alpha: false });
+
+function initGrid() {
+  for (let gy = 0; gy < MH; gy++)
+    for (let gx = 0; gx < MW; gx++) {
+      const i = gy*MW+gx;
+      gState[i] = (gx<BRD||gx>=MW-BRD||gy<BRD||gy>=MH-BRD) ? F : H;
+      renderCellToMap(gx, gy, 0);
+    }
+}
+
+function blocked(gx, gy) {
+  if (gx<0||gx>=MW||gy<0||gy>=MH) return true;
+  return gState[gy*MW+gx]===F;
+}
+
+// ── ИГРОК ────────────────────────────────────────────────────
+let px=MW/2*T, py=MH/2*T, pAng=0;
+let camX=px, camY=py;
+let score=0;
+const scEl=document.getElementById('sc');
+
+// ── ВВОД ─────────────────────────────────────────────────────
+const K={};
+window.addEventListener('keydown', e => {
+  K[e.code]=true;
+  if(e.code==='Tab'||/^Arrow/.test(e.code))e.preventDefault();
+});
+window.addEventListener('keyup', e=>{ K[e.code]=false });
+
+// Виртуальный плавающий джойстик
+let joyActive = false;
+let joyDX = 0, joyDY = 0;
+let jBaseX = 0, jBaseY = 0;
+let jTouchId = null;
+const MAX_RADIUS = 50;
+
+const jZone = document.getElementById('joystick-zone');
+const jBase = document.getElementById('joystick-base');
+const jKnob = document.getElementById('joystick-knob');
+
+jZone.addEventListener('touchstart', (e) => {
+  if (joyActive || shopOpen) return;
+  const t = e.changedTouches[0];
+  jTouchId = t.identifier;
+  joyActive = true;
+  jBaseX = t.clientX;
+  jBaseY = t.clientY;
+  jBase.style.display = 'block';
+  jBase.style.left = jBaseX + 'px';
+  jBase.style.top = jBaseY + 'px';
+  jKnob.style.transform = 'translate(-50%, -50%)';
+  joyDX = 0; joyDY = 0;
+}, {passive: false});
+
+jZone.addEventListener('touchmove', (e) => {
+  if (!joyActive) return;
+  e.preventDefault();
+  for (let i = 0; i < e.changedTouches.length; i++) {
+    const t = e.changedTouches[i];
+    if (t.identifier === jTouchId) {
+      let dx = t.clientX - jBaseX;
+      let dy = t.clientY - jBaseY;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist > MAX_RADIUS) {
+        dx = (dx / dist) * MAX_RADIUS;
+        dy = (dy / dist) * MAX_RADIUS;
+      }
+      jKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+      joyDX = dx / MAX_RADIUS;
+      joyDY = dy / MAX_RADIUS;
+    }
+  }
+}, {passive: false});
+
+function stopJoy(e) {
+  for (let i = 0; i < e.changedTouches.length; i++) {
+    if (e.changedTouches[i].identifier === jTouchId) {
+      joyActive = false;
+      jTouchId = null;
+      joyDX = 0; joyDY = 0;
+      jBase.style.display = 'none';
+    }
+  }
+}
+jZone.addEventListener('touchend', stopJoy);
+jZone.addEventListener('touchcancel', stopJoy);
+
+// ── CANVAS ───────────────────────────────────────────────────
+const cv=document.getElementById('c');
+const cx=cv.getContext('2d');
+let CW=0,CH=0;
+function resize(){CW=cv.width=innerWidth;CH=cv.height=innerHeight}
+window.addEventListener('resize',resize);
+resize();
+
+// ── ХЭШ ─────────────────────────────────────────────────────
+function h(a,b,s){
+  let v=(a*73856093)^(b*19349663)^(s*83492791);
+  v=Math.imul(v^(v>>>16),0x45d9f3b);
+  v=Math.imul(v^(v>>>16),0x45d9f3b);
+  return((v^(v>>>16))&0x7FFFFFFF)/0x7FFFFFFF;
+}
+
+// ── РИСОВАНИЕ ────────────────────────────────────────────────
+function renderCellToMap(gx,gy,now){
+  const i=gy*MW+gx;
+  const st=gState[i];
+  const h1=h(gx,gy,1),h2=h(gx,gy,2),h3=h(gx,gy,3);
+  const sx = gx * T, sy = gy * T;
+  
+  mapCx.save();
+  mapCx.beginPath();
+  mapCx.rect(sx, sy, T, T);
+  mapCx.clip();
+  
+  if(st===F){ drawForestMap(sx,sy,h1,h2,h3,gx,gy); }
+  else if(st===H){ drawStalksMap(sx,sy,1,h1,h2,h3,gx,gy); }
+  else {
+    const p=Math.min(1,(now-gCutAt[i])/getGrowTime());
+    drawGrowingMap(sx,sy,p,h1,h2,h3,gx,gy);
+  }
+  
+  mapCx.restore();
+}
+
+function drawForestMap(sx,sy,h1,h2,h3,gx,gy){
+  mapCx.fillStyle=`hsl(125,42%,${11+h1*6}%)`;
+  mapCx.fillRect(sx,sy,T,T);
+  if(h2>0.28){
+    const cr=sx+T*.5+(h3-.5)*5, cy2=sy+T*.5+(h(gx,gy,4)-.5)*5;
+    const r=T*(.27+h(gx,gy,5)*.14);
+    mapCx.fillStyle='rgba(0,0,0,.22)';mapCx.fillRect(cr-r+2,cy2-r*.7+2,r*2,r*1.4);
+    mapCx.fillStyle=`hsl(${115+h1*22},52%,${11+h2*8}%)`;mapCx.fillRect(cr-r,cy2-r*.7,r*2,r*1.4);
+    mapCx.fillStyle=`hsl(${120+h1*18},56%,${18+h3*9}%)`;mapCx.fillRect(cr-r*.55,cy2-r*.65,r*.9,r*.8);
+    mapCx.fillStyle=`hsl(28,45%,${14+h1*9}%)`;mapCx.fillRect(cr-T*.06,cy2+r*.4,T*.12,r*.7);
+  } else {
+    const r=T*(.28+h3*.12);
+    mapCx.fillStyle=`hsl(130,44%,${8+h2*5}%)`;
+    mapCx.fillRect(sx+T/2-r,sy+T/2-r*.7,r*2,r*1.4);
+  }
+}
+
+function drawGrowingMap(sx,sy,p,h1,h2,h3,gx,gy){
+  mapCx.fillStyle=`hsl(30,50%,${23+h1*8}%)`;
+  mapCx.fillRect(sx,sy,T,T);
+  for(let i=0;i<3;i++){
+    const px2=h(gx*3+i,gy*5+i,60+i);
+    const py2=h(gx*7+i,gy*2+i,70+i);
+    const pr =h(gx+i,  gy+i,  80+i);
+    mapCx.fillStyle=`rgba(0,0,0,${.07+pr*.07})`;
+    mapCx.fillRect(sx+2+px2*(T-7),sy+2+py2*(T-7),3+pr*5,2+pr*4);
+  }
+  if(p>0.03) drawStalksMap(sx,sy,p,h1,h2,h3,gx,gy);
+  mapCx.fillStyle='rgba(0,0,0,.05)';mapCx.fillRect(sx,sy,T,1);mapCx.fillRect(sx,sy,1,T);
+}
+
+function drawStalksMap(sx,sy,p,h1,h2,h3,gx,gy){
+  if(p>=0.99){
+    mapCx.fillStyle=`hsl(${44+h1*12},80%,${57+h2*12}%)`;
+    mapCx.fillRect(sx,sy,T,T);
+  }
+  const cnt=4+(h3*4)|0;
+  for(let i=0;i<cnt;i++){
+    const hx =h(gx*7+i,gy*3+i,10+i);
+    const hh2=h(gx*3+i,gy*9+i,20+i);
+    const hc =h(gx*5+i,gy*2+i,30+i);
+    const stx=sx+3+hx*(T-6);
+    const maxH=T*(.22+hh2*.45);
+    const hp=p<.33?(p/.33)*.33:p<.66?.33+(p-.33)/.34*.34:.67+(p-.66)/.34*.33;
+    const sth=maxH*Math.min(1,hp);
+    const colorT=Math.max(0,(p-.33)/.67);
+    const hue=110-colorT*66;
+    const light=32+colorT*30;
+    const alpha=.38+hc*.42;
+    mapCx.fillStyle=`hsla(${hue},75%,${light}%,${alpha})`;
+    mapCx.fillRect(stx,sy+T-3-sth,1,sth);
+    if(p>.35){
+      const tA=Math.min(1,(p-.35)/.3)*alpha;
+      mapCx.fillStyle=`hsla(${hue-8},78%,${light-5}%,${tA})`;
+      mapCx.fillRect(stx-1,sy+T-3-sth-3,3,4);
+    }
+  }
+  mapCx.fillStyle='rgba(0,0,0,.05)';mapCx.fillRect(sx,sy,T,1);mapCx.fillRect(sx,sy,1,T);
+}
+
+function drawPlayer(){
+  const PW=getMowW(), PH=getMowH();
+  const sx = Math.round(px - camX + CW/2);
+  const sy = Math.round(py - camY + CH/2);
+
+  // Константные размеры самого трактора
+  const bodyW = 24;
+  const bodyH = 35;
+
+  cx.save();
+  cx.translate(sx,sy);
+  cx.rotate(pAng+Math.PI/2);
+
+  // Тень под трактором и ковшом
+  cx.fillStyle='rgba(0,0,0,.28)';
+  cx.fillRect(-bodyW/2+4,-bodyH/2+4,bodyW,bodyH);
+  cx.fillRect(-PW/2+4, -bodyH/2 - 10+4, PW, 7);
+
+  // 🚜 Металлический ковш/жатка спереди (ширина PW растягивается при апгрейдах)
+  // Крепления ковша к трактору
+  cx.fillStyle = '#555555';
+  cx.fillRect(-6, -bodyH/2 - 4, 3, 5);
+  cx.fillRect(3, -bodyH/2 - 4, 3, 5);
+
+  // Сам ковш (основная балка)
+  cx.fillStyle = '#b0b8c0';
+  cx.fillRect(-PW/2, -bodyH/2 - 10, PW, 7);
+
+  // Боковые защитные щитки
+  cx.fillStyle = '#606870';
+  cx.fillRect(-PW/2 - 2, -bodyH/2 - 12, 2, 10);
+  cx.fillRect( PW/2,     -bodyH/2 - 12, 2, 10);
+
+  // Желто-черные предупреждающие полосы на ковше
+  cx.fillStyle = '#e0a800';
+  const stripeStep = 6;
+  const stripeW = 2;
+  const numStripes = Math.floor(PW / stripeStep);
+  const patternW = (numStripes - 1) * stripeStep + stripeW;
+  const offsetX = (PW - patternW) / 2;
+  for(let i=0; i<numStripes; i++) {
+    cx.fillRect(-PW/2 + offsetX + i*stripeStep, -bodyH/2 - 10, stripeW, 7);
+  }
+
+  // 🚜 Сам трактор (остается красивым и пропорциональным!)
+  // Красный кузов
+  cx.fillStyle='#cc2200';
+  cx.fillRect(-bodyW/2,-bodyH/2,bodyW,bodyH);
+
+  // Желтый капот
+  cx.fillStyle='#ffb81c';
+  cx.fillRect(-bodyW/2+3,-bodyH/2+3,bodyW-6,bodyH*.42);
+
+  // Синее лобовое стекло
+  cx.fillStyle='#87ceeb';
+  cx.fillRect(-bodyW/2+6,-bodyH/2+6,bodyW-12,bodyH*.24);
+
+  // Колеса (не растягиваются, крепятся по бокам кузова)
+  cx.fillStyle='#111';
+  const ww=5,wh=bodyH*.30|0;
+  cx.fillRect(-bodyW/2-ww, -bodyH/2+6,     ww,wh);
+  cx.fillRect( bodyW/2,    -bodyH/2+6,     ww,wh);
+  cx.fillRect(-bodyW/2-ww,  bodyH/2-6-wh,  ww,wh);
+  cx.fillRect( bodyW/2,     bodyH/2-6-wh,  ww,wh);
+
+  cx.restore();
+}
+
+// ── РЕНДЕР ───────────────────────────────────────────────────
+function render(now){
+  cx.clearRect(0,0,CW,CH);
+  
+  // Рисуем кэшированную карту за один вызов!
+  const sx = Math.round(camX - CW/2);
+  const sy = Math.round(camY - CH/2);
+  cx.drawImage(mapCv, -sx, -sy);
+  
+  drawPlayer();
+}
+
+// ── UPDATE ───────────────────────────────────────────────────
+function update(dt,now){
+  const SPD=getSpeed();
+  let dx=0,dy=0;
+  
+  if(K['KeyW'])dy-=1;if(K['KeyS'])dy+=1;
+  if(K['KeyA'])dx-=1;if(K['KeyD'])dx+=1;
+  if(dx&&dy){dx*=.7071;dy*=.7071}
+  
+  if(joyActive) {
+    dx = joyDX;
+    dy = joyDY;
+  }
+  
+  if(dx||dy) {
+    // Избегаем тряски (jitter) при очень слабом отклонении джойстика
+    if (!joyActive || Math.hypot(dx, dy) > 0.15) {
+      pAng = Math.atan2(dy, dx);
+    }
+  }
+
+  const nx=px+dx*SPD*dt; if(!col(nx,py))px=nx;
+  const ny=py+dy*SPD*dt; if(!col(px,ny))py=ny;
+
+  camX+=(px-camX)*LRP; camY+=(py-camY)*LRP;
+  camX=Math.max(BRD*T,Math.min((MW-BRD)*T,camX));
+  camY=Math.max(BRD*T,Math.min((MH-BRD)*T,camY));
+
+  // Покос на основе близости клеток к лезвию ковша
+  const PW = getMowW();
+  const cutterDist = 35 / 2 + 6; // расстояние от центра до ковша спереди
+  const cutterX = px + Math.cos(pAng) * cutterDist;
+  const cutterY = py + Math.sin(pAng) * cutterDist;
+
+  // Концы отрезка лезвия ковша
+  const sDX = -Math.sin(pAng) * (PW / 2);
+  const sDY =  Math.cos(pAng) * (PW / 2);
+  const x1 = cutterX + sDX, y1 = cutterY + sDY;
+  const x2 = cutterX - sDX, y2 = cutterY - sDY;
+
+  // Функция расстояния от точки (cx, cy) до отрезка (x1, y1)-(x2, y2)
+  function distToSeg(cx, cy, x1, y1, x2, y2) {
+    const dx = x2 - x1;
+    const dy = y2 - y1;
+    const l2 = dx * dx + dy * dy;
+    if (l2 === 0) return Math.sqrt((cx - x1) ** 2 + (cy - y1) ** 2);
+    let t = ((cx - x1) * dx + (cy - y1) * dy) / l2;
+    t = Math.max(0, Math.min(1, t));
+    return Math.sqrt((cx - (x1 + t * dx)) ** 2 + (cy - (y1 + t * dy)) ** 2);
+  }
+
+  // Область поиска кандидатов вокруг ковша (одинаковая во всех направлениях)
+  const rX = Math.ceil(PW / 2) + T;
+  const rY = Math.ceil(PW / 2) + T;
+  const gx0 = Math.max(0,    Math.floor((cutterX - rX) / T));
+  const gx1 = Math.min(MW-1, Math.floor((cutterX + rX) / T));
+  const gy0 = Math.max(0,    Math.floor((cutterY - rY) / T));
+  const gy1 = Math.min(MH-1, Math.floor((cutterY + rY) / T));
+
+  const candidates = [];
+  for (let gy = gy0; gy <= gy1; gy++) {
+    for (let gx = gx0; gx <= gx1; gx++) {
+      const cellI = gy * MW + gx;
+      if (gState[cellI] === H) {
+        const cxVal = gx * T + T / 2;
+        const cyVal = gy * T + T / 2;
+        const d = distToSeg(cxVal, cyVal, x1, y1, x2, y2);
+        if (d < 22) { // Порог касания (радиус ячейки + небольшой запас)
+          candidates.push({ i: cellI, dist: d });
+        }
+      }
+    }
+  }
+
+  // Сортируем кандидатов по близости
+  candidates.sort((a, b) => a.dist - b.dist);
+
+  // Ограничиваем сбор N ближайшими блоками (где N = Уровень косилки + 1)
+  const maxCollect = 1 + upgLvl.width; 
+  const toCollect = candidates.slice(0, maxCollect);
+
+  for (const c of toCollect) {
+    const i = c.i;
+    gState[i] = G;
+    gCutAt[i] = now;
+    growSet.add(i);
+    const gained = 1 + getScoreBonus();
+    score += gained;
+    scEl.textContent = score;
+    if (shopOpen) document.getElementById('bal').textContent = score;
+    renderCellToMap(i % MW, Math.floor(i / MW), now);
+  }
+
+  // Рост
+  for(const i of growSet){
+    const gx = i % MW;
+    const gy = Math.floor(i / MW);
+    if(now-gCutAt[i]>=getGrowTime()){
+      gState[i]=H; gCutAt[i]=0; growSet.delete(i);
+    }
+    renderCellToMap(gx, gy, now);
+  }
+}
+
+function col(x,y){
+  // Фиксированный размер кузова для столкновений (чтобы косилка не упиралась в стены)
+  const bodyW=24, bodyH=35;
+  const hw=bodyW/2-1,hh=bodyH/2-1;
+  const x0=(x-hw)/T|0,x1=(x+hw)/T|0;
+  const y0=(y-hh)/T|0,y1=(y+hh)/T|0;
+  for(let gy=y0;gy<=y1;gy++)
+    for(let gx=x0;gx<=x1;gx++)
+      if(blocked(gx,gy))return true;
+  return false;
+}
+
+// ── GAME LOOP ────────────────────────────────────────────────
+let lastT=0;
+function loop(now){
+  const dt=Math.min((now-lastT)/1000,.05);
+  lastT=now;
+  update(dt,now);
+  render(now);
+  requestAnimationFrame(loop);
+}
+
+// ── МИНИ-КАРТА ───────────────────────────────────────────────
+let mapOpen = false;
+const mmCanvas = document.getElementById('minimap');
+const mmCtx    = mmCanvas.getContext('2d');
+const MM = 2; // px на тайл (200px / 100 тайлов)
+
+function toggleMap() {
+  mapOpen = !mapOpen;
+  document.getElementById('minimap-wrap').classList.toggle('open', mapOpen);
+  if (mapOpen) drawMinimap();
+}
+
+function drawMinimap() {
+  if (!mapOpen) return;
+  const img = mmCtx.createImageData(MW * MM, MH * MM);
+  const d = img.data;
+
+  for (let gy = 0; gy < MH; gy++) {
+    for (let gx = 0; gx < MW; gx++) {
+      const st = gState[gy * MW + gx];
+      let r, g2, b;
+      if      (st === F) { r=22;  g2=55;  b=18; }   // лес — тёмно-зелёный
+      else if (st === H) { r=220; g2=175; b=20; }   // сено — золотой
+      else               { r=100; g2=75;  b=35; }   // растёт — коричневый
+
+      for (let dy = 0; dy < MM; dy++)
+        for (let dx = 0; dx < MM; dx++) {
+          const pi = ((gy*MM+dy)*MW*MM + (gx*MM+dx)) * 4;
+          d[pi]=r; d[pi+1]=g2; d[pi+2]=b; d[pi+3]=255;
+        }
+    }
+  }
+  mmCtx.putImageData(img, 0, 0);
+
+  // Трактор на карте — белая точка размером с блок сена (2х2 пикселя)
+  const mpx = Math.round((px / T) * MM);
+  const mpy = Math.round((py / T) * MM);
+  mmCtx.fillStyle = '#ffffff';
+  mmCtx.fillRect(mpx - 1, mpy - 1, MM, MM);
+}
+
+// Обновляем мини-карту каждые 200мс (не каждый кадр — экономим ресурсы)
+setInterval(() => { if (mapOpen) drawMinimap(); }, 200);
+
+if (typeof initYandexGame === 'function') {
+  initYandexGame((cloudData, lang) => {
+    updateLanguage(lang);
+    if (cloudData && typeof cloudData.score !== 'undefined') {
+      score = cloudData.score;
+      if (cloudData.upgLvl) {
+        Object.assign(upgLvl, cloudData.upgLvl);
+      }
+      scEl.textContent = score;
+    }
+    
+    // Autosave every 30 seconds
+    setInterval(() => {
+      if (typeof saveProgress === 'function') saveProgress(score, upgLvl);
+    }, 30000);
+    
+    initGrid();
+    lastT=performance.now();
+    requestAnimationFrame(loop);
+  });
+} else {
+  initGrid();
+  lastT=performance.now();
+  requestAnimationFrame(loop);
+}
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log("Service Worker Registered"))
+    .catch(err => console.error("SW Registration failed", err));
+}
+</script>
+</body>
+</html>

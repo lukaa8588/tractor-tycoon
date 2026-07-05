@@ -1,0 +1,18 @@
+{
+  "name": "Tractor Tycoon",
+  "short_name": "Tractor",
+  "description": "Idle farming collector game",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "background_color": "#0d1a0a",
+  "theme_color": "#0d1a0a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

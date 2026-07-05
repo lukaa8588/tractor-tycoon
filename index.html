@@ -72,17 +72,30 @@
     }
     #newgame-btn:hover{background:rgba(120,30,30,.9);transform:translateY(2px) scale(1.08);
       box-shadow:0 8px 30px rgba(255,60,60,.3)}
-    #audio-btn{
-      top:196px;
-      background:rgba(80,80,20,.85);
-      border:1px solid rgba(255,255,80,.3);
-      color:#ffff90;font-size:1.3rem;
-      box-shadow:0 4px 24px rgba(255,255,60,.15);
+    #settings-btn{
+      position:fixed;top:16px;left:16px;
+      width:52px;height:52px;backdrop-filter:blur(10px);
+      border-radius:50%;display:flex;align-items:center;justify-content:center;
+      cursor:pointer;z-index:20;transition:all .2s;
+      background:rgba(60,60,60,.85);border:1px solid rgba(150,150,150,.35);
+      color:#fff;font-size:1.55rem;box-shadow:0 4px 24px rgba(0,0,0,.18);
     }
-    #audio-btn.muted{background:rgba(50,50,50,.85);border-color:rgba(150,150,150,.3);color:#aaa;box-shadow:none;}
-    #audio-btn:hover{background:rgba(120,120,30,.9);transform:translateY(2px) scale(1.08);
-      box-shadow:0 8px 30px rgba(255,255,60,.3)}
-    #audio-btn.muted:hover{background:rgba(70,70,70,.9)}
+    #settings-btn:hover{background:rgba(90,90,90,.9);transform:translateY(2px) scale(1.08);
+      box-shadow:0 8px 30px rgba(0,0,0,.35)}
+
+    /* ── Настройки ── */
+    #settings-modal {
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);
+      width:320px;background:rgba(15,20,15,.95);backdrop-filter:blur(10px);
+      border:2px solid rgba(150,150,150,.3);border-radius:12px;
+      padding:20px;z-index:150;display:none;opacity:0;transition:all .3s;
+      color:#fff;box-shadow:0 10px 40px rgba(0,0,0,.8);font-family:'Segoe UI',sans-serif;
+    }
+    #settings-modal.open { display:block; opacity:1; transform:translate(-50%,-50%) scale(1); }
+    .settings-row { margin-bottom: 16px; }
+    .settings-row label { display:block; margin-bottom:6px; font-weight:bold; }
+    .settings-row input[type="range"] { width: 100%; }
+    .settings-row-flex { display:flex; justify-content:space-between; align-items:center; }
 
     /* ── Надпись дня ── */
     #day-label{
@@ -291,7 +304,24 @@
 <button id="shop-btn" class="corner-btn" onclick="toggleShop()" title="Прокачка">🛒</button>
 <button id="map-btn"  class="corner-btn" onclick="toggleMap()"  title="Карта">🗺️</button>
 <button id="rest-btn" class="corner-btn" onclick="startNight()" title="Отдыхать">🌙</button>
-<button id="audio-btn" class="corner-btn" onclick="toggleAudio()" title="Звук">🎵</button>
+<button id="settings-btn" onclick="toggleSettings()" title="Настройки">⚙️</button>
+
+<div id="settings-modal">
+  <h2 id="settings-title" style="margin-top:0;text-align:center;margin-bottom:20px;">⚙️ Настройки</h2>
+  <div class="settings-row">
+    <label id="lbl-music-vol">Музыка</label>
+    <input type="range" id="ui-vol-music" min="0" max="1" step="0.05" value="0.5" oninput="updateVolumesUI()">
+  </div>
+  <div class="settings-row">
+    <label id="lbl-sfx-vol">Звуки</label>
+    <input type="range" id="ui-vol-sfx" min="0" max="1" step="0.05" value="0.2" oninput="updateVolumesUI()">
+  </div>
+  <div class="settings-row settings-row-flex">
+    <label id="lbl-vibration" style="margin:0;">Вибрация</label>
+    <input type="checkbox" id="ui-vibration" style="transform:scale(1.5);" onchange="toggleVibration()">
+  </div>
+  <button id="close-settings-btn" onclick="toggleSettings()" style="width:100%;padding:10px;margin-top:10px;background:rgba(80,160,255,0.2);border:1px solid rgba(80,160,255,0.5);color:#fff;border-radius:6px;cursor:pointer;font-weight:bold;">Закрыть</button>
+</div>
 
 <!-- ── Секретная Панель Разработчика ── -->
 <div id="dev-panel">
@@ -391,6 +421,11 @@ const i18n = {
     newGameConfirm: "Начать новую игру? Весь прогресс будет сброшен.",
     dayText: "День",
     nightText: "Ночь...",
+    settingsTitle: "⚙️ Настройки",
+    musicVol: "Музыка",
+    sfxVol: "Звуки",
+    vibration: "Вибрация",
+    closeBtn: "Закрыть",
     upgrades: {
       speed: { name: "Двигатель", desc: "Увеличивает скорость трактора" },
       width: { name: "Косилка",   desc: "Увеличивает ширину скоса" },
@@ -418,6 +453,11 @@ const i18n = {
     newGameConfirm: "Start a new game? All progress will be reset.",
     dayText: "Day",
     nightText: "Night...",
+    settingsTitle: "⚙️ Settings",
+    musicVol: "Music",
+    sfxVol: "SFX",
+    vibration: "Vibration",
+    closeBtn: "Close",
     upgrades: {
       speed: { name: "Engine",     desc: "Increases tractor speed" },
       width: { name: "Mower",      desc: "Increases harvest width" },
@@ -446,14 +486,21 @@ function updateLanguage(lang) {
   document.getElementById('booster-btn-text').textContent = t('boosterBtn');
   document.getElementById('rest-btn').title = t('restBtn');
   
+  document.getElementById('settings-btn').title = t('settingsTitle');
+  document.getElementById('settings-title').textContent = t('settingsTitle');
+  document.getElementById('lbl-music-vol').textContent = t('musicVol');
+  document.getElementById('lbl-sfx-vol').textContent = t('sfxVol');
+  document.getElementById('lbl-vibration').textContent = t('vibration');
+  document.getElementById('close-settings-btn').textContent = t('closeBtn');
+  
   if (shopOpen) renderShop();
 }
 
 // ── АУДИО ДВИЖОК (8-bit Web Audio API) ───────────────────────
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let audioMuted = false;
-let musicVol = 0.3;
-let sfxVol = 0.5;
+let musicVol = 0.5;
+let sfxVol = 0.2;
 
 // Узлы громкости
 const masterGain = audioCtx.createGain();
@@ -496,9 +543,48 @@ function toggleAudio() {
 function updateVolumes() {
   musicVol = parseFloat(document.getElementById('vol-music').value);
   sfxVol = parseFloat(document.getElementById('vol-sfx').value);
+  document.getElementById('ui-vol-music').value = musicVol;
+  document.getElementById('ui-vol-sfx').value = sfxVol;
   musicGain.gain.value = musicVol;
   sfxGain.gain.value = sfxVol;
   if (!audioMuted) playClick();
+}
+
+let settingsOpen = false;
+let vibrationEnabled = false;
+
+function toggleSettings() {
+  playClick();
+  settingsOpen = !settingsOpen;
+  const modal = document.getElementById('settings-modal');
+  if (settingsOpen) {
+    modal.style.display = 'block';
+    setTimeout(() => modal.classList.add('open'), 10);
+  } else {
+    modal.classList.remove('open');
+    setTimeout(() => modal.style.display = 'none', 300);
+  }
+}
+
+function updateVolumesUI() {
+  musicVol = parseFloat(document.getElementById('ui-vol-music').value);
+  sfxVol = parseFloat(document.getElementById('ui-vol-sfx').value);
+  musicGain.gain.value = musicVol;
+  sfxGain.gain.value = sfxVol;
+  document.getElementById('vol-music').value = musicVol;
+  document.getElementById('vol-sfx').value = sfxVol;
+  if (!audioMuted) playClick();
+}
+
+function toggleVibration() {
+  vibrationEnabled = document.getElementById('ui-vibration').checked;
+  if (vibrationEnabled) vibrate(50);
+}
+
+function vibrate(ms) {
+  if (vibrationEnabled && navigator.vibrate) {
+    navigator.vibrate(ms);
+  }
 }
 
 function playTone(freq, type, duration, volScale = 1) {
@@ -517,17 +603,27 @@ function playTone(freq, type, duration, volScale = 1) {
   osc.stop(audioCtx.currentTime + duration);
 }
 
-function playClick() { playTone(400, 'triangle', 0.05, 0.2); }
-function playCut() { playTone(120, 'square', 0.08, 0.5); }
+function playClick() { playTone(400, 'triangle', 0.05, 0.2); vibrate(15); }
+function playCut() { playTone(120, 'square', 0.08, 0.5); vibrate(5); }
 
-// Более спокойная и медленная мелодия
+// Более длинная и разнообразная кантри-мелодия
 const melody = [
-  {f: 261.63, d: 0.4}, {f: 329.63, d: 0.4}, {f: 392.00, d: 0.4}, {f: 523.25, d: 0.8},
-  {f: 0, d: 0.4},
-  {f: 440.00, d: 0.4}, {f: 349.23, d: 0.4}, {f: 261.63, d: 0.8},
-  {f: 0, d: 1.2},
-  {f: 392.00, d: 0.4}, {f: 329.63, d: 0.4}, {f: 261.63, d: 0.8},
-  {f: 0, d: 0.8}
+  // Фраза 1 (куплет)
+  {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.4}, {f: 523.25, d: 0.4},
+  {f: 392.00, d: 0.4}, {f: 329.63, d: 0.4}, {f: 261.63, d: 0.4}, {f: 196.00, d: 0.4},
+  {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.4}, {f: 440.00, d: 0.4},
+  {f: 392.00, d: 0.8}, {f: 0, d: 0.4},
+  // Фраза 2
+  {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.4}, {f: 523.25, d: 0.4},
+  {f: 587.33, d: 0.4}, {f: 523.25, d: 0.4}, {f: 440.00, d: 0.4}, {f: 392.00, d: 0.4},
+  {f: 349.23, d: 0.4}, {f: 392.00, d: 0.4}, {f: 261.63, d: 0.8},
+  {f: 0, d: 0.8},
+  // Припев
+  {f: 523.25, d: 0.4}, {f: 523.25, d: 0.2}, {f: 440.00, d: 0.2}, {f: 392.00, d: 0.4}, {f: 329.63, d: 0.4},
+  {f: 261.63, d: 0.4}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.2}, {f: 440.00, d: 0.8},
+  {f: 523.25, d: 0.4}, {f: 440.00, d: 0.4}, {f: 392.00, d: 0.4}, {f: 329.63, d: 0.4},
+  {f: 261.63, d: 0.4}, {f: 196.00, d: 0.4}, {f: 261.63, d: 1.2},
+  {f: 0, d: 1.2}
 ];
 let noteIdx = 0;
 

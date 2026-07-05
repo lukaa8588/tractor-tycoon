@@ -269,7 +269,7 @@
 <button id="map-btn"  class="corner-btn" onclick="toggleMap()"  title="Карта">🗺️</button>
 <button id="rest-btn" class="corner-btn" onclick="startNight()" title="Отдыхать">🌙</button>
 <button id="newgame-btn" class="corner-btn" onclick="newGame()" title="Новая игра">🔄</button>
-<button id="audio-btn" class="corner-btn muted" onclick="toggleAudio()" title="Звук">🔇</button>
+<button id="audio-btn" class="corner-btn" onclick="toggleAudio()" title="Звук">🎵</button>
 
 <!-- ── Секретная Панель Разработчика ── -->
 <div id="dev-panel">
@@ -405,7 +405,7 @@ function updateLanguage(lang) {
 
 // ── АУДИО ДВИЖОК (8-bit Web Audio API) ───────────────────────
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-let audioMuted = true;
+let audioMuted = false;
 let musicVol = 0.3;
 let sfxVol = 0.5;
 
@@ -417,7 +417,16 @@ const sfxGain = audioCtx.createGain();
 musicGain.connect(masterGain);
 sfxGain.connect(masterGain);
 masterGain.connect(audioCtx.destination);
-masterGain.gain.value = 0; // Начинаем с выключенным звуком
+masterGain.gain.value = 1; // Звук включен по умолчанию
+
+// Автоматический запуск звука по первому клику (требование браузеров)
+const startAudioOnInteract = () => {
+  if (!audioMuted) initAudio();
+  window.removeEventListener('click', startAudioOnInteract);
+  window.removeEventListener('keydown', startAudioOnInteract);
+};
+window.addEventListener('click', startAudioOnInteract);
+window.addEventListener('keydown', startAudioOnInteract);
 
 // Шум мотора (непрерывный)
 let engineOsc = null;

@@ -617,7 +617,7 @@ function playTone(freq, type, duration, volScale = 1) {
 }
 
 function playClick() { playTone(400, 'triangle', 0.05, 0.2); vibrate(15); }
-function playCut() { playTone(120, 'triangle', 0.08, 0.04); vibrate(5); }
+function playCut() { playTone(120, 'triangle', 0.08, 0.015); vibrate(3); }
 
 // Более длинная и разнообразная кантри-мелодия
 const melody = [
@@ -1370,8 +1370,13 @@ function update(dt,now){
   }
 
   camX+=(px-camX)*LRP; camY+=(py-camY)*LRP;
-  camX=Math.max(BRD*T,Math.min((MW-BRD)*T,camX));
-  camY=Math.max(BRD*T,Math.min((MH-BRD)*T,camY));
+  
+  // Идеальное ограничение камеры: не даём ей выйти за пределы карты,
+  // чтобы не было черной "пустоты" по краям экрана.
+  const halfW = MW * T / 2;
+  const halfH = MH * T / 2;
+  camX = Math.max(Math.min(CW/2, halfW), Math.min(Math.max(MW*T - CW/2, halfW), camX));
+  camY = Math.max(Math.min(CH/2, halfH), Math.min(Math.max(MH*T - CH/2, halfH), camY));
 
   // ОГРОМНАЯ ОПТИМИЗАЦИЯ: Мы больше не перерисовываем все скошенные пеньки каждый кадр!
   // Они статичны до наступления ночи.

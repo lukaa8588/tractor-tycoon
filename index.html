@@ -1114,8 +1114,8 @@ function update(dt,now){
   }
 
   // Область поиска кандидатов вокруг ковша (одинаковая во всех направлениях)
-  const rX = Math.ceil(PW / 2) + T;
-  const rY = Math.ceil(PW / 2) + T;
+  const rX = Math.ceil(PW / 2) + T * 2; // Увеличен радиус поиска для поворотов
+  const rY = Math.ceil(PW / 2) + T * 2;
   const gx0 = Math.max(0,    Math.floor((cutterX - rX) / T));
   const gx1 = Math.min(MW-1, Math.floor((cutterX + rX) / T));
   const gy0 = Math.max(0,    Math.floor((cutterY - rY) / T));
@@ -1129,7 +1129,7 @@ function update(dt,now){
         const cxVal = gx * T + T / 2;
         const cyVal = gy * T + T / 2;
         const d = distToSeg(cxVal, cyVal, x1, y1, x2, y2);
-        if (d < 22) { // Порог касания (радиус ячейки + небольшой запас)
+        if (d < 38) { // Увеличен порог касания (чтобы не пропускать на поворотах)
           candidates.push({ i: cellI, dist: d });
         }
       }

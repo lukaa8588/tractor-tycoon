@@ -689,7 +689,7 @@ const UPGRADES = [
     maxLevel:5,
     cost:[80,220,550,1200,2800],
     statKey:'statWidth',
-    statFn:(lvl)=>`${1 + lvl} bl.`,
+    statFn:(lvl)=>`${1 + lvl} 🟩`,
   },
   {
     id:'stamina', icon:'🔋',
@@ -697,7 +697,7 @@ const UPGRADES = [
     maxLevel:5,
     cost:[100,280,650,1500,3500],
     statKey:'statStamina',
-    statFn:(lvl)=>`+${lvl*60}s`,
+    statFn:(lvl)=>`${45 + lvl*60} ⚡`,
   },
   {
     id:'bonus', icon:'🏚️',
@@ -705,7 +705,7 @@ const UPGRADES = [
     maxLevel:4,
     cost:[200,600,1500,3500],
     statKey:'statBonus',
-    statFn:(lvl)=>`+${lvl} 🌾`,
+    statFn:(lvl)=>`${1 + lvl} 🌾`,
   },
 ];
 

@@ -320,6 +320,10 @@
     <label id="lbl-vibration" style="margin:0;">Вибрация</label>
     <input type="checkbox" id="ui-vibration" style="transform:scale(1.5);" onchange="toggleVibration()">
   </div>
+  <div class="settings-row settings-row-flex">
+    <label id="lbl-lang" style="margin:0;">Язык / Language</label>
+    <button id="ui-lang-btn" onclick="toggleLanguage()" style="padding:4px 12px;background:rgba(80,160,255,0.2);border:1px solid rgba(80,160,255,0.5);color:#fff;border-radius:6px;cursor:pointer;font-weight:bold;">RU / EN</button>
+  </div>
   <button id="close-settings-btn" onclick="toggleSettings()" style="width:100%;padding:10px;margin-top:10px;background:rgba(80,160,255,0.2);border:1px solid rgba(80,160,255,0.5);color:#fff;border-radius:6px;cursor:pointer;font-weight:bold;">Закрыть</button>
 </div>
 
@@ -425,6 +429,7 @@ const i18n = {
     musicVol: "Музыка",
     sfxVol: "Звуки",
     vibration: "Вибрация",
+    langToggle: "Язык",
     closeBtn: "Закрыть",
     upgrades: {
       speed: { name: "Двигатель", desc: "Увеличивает скорость трактора" },
@@ -457,6 +462,7 @@ const i18n = {
     musicVol: "Music",
     sfxVol: "SFX",
     vibration: "Vibration",
+    langToggle: "Language",
     closeBtn: "Close",
     upgrades: {
       speed: { name: "Engine",     desc: "Increases tractor speed" },
@@ -491,6 +497,7 @@ function updateLanguage(lang) {
   document.getElementById('lbl-music-vol').textContent = t('musicVol');
   document.getElementById('lbl-sfx-vol').textContent = t('sfxVol');
   document.getElementById('lbl-vibration').textContent = t('vibration');
+  document.getElementById('lbl-lang').textContent = t('langToggle');
   document.getElementById('close-settings-btn').textContent = t('closeBtn');
   
   if (shopOpen) renderShop();
@@ -538,6 +545,12 @@ function toggleAudio() {
   btn.textContent = audioMuted ? '🔇' : '🎵';
   btn.classList.toggle('muted', audioMuted);
   if (!audioMuted) initAudio();
+}
+
+function toggleLanguage() {
+  playClick();
+  currentLang = currentLang === 'ru' ? 'en' : 'ru';
+  updateLanguage(currentLang);
 }
 
 function updateVolumes() {
@@ -692,7 +705,7 @@ const UPGRADES = [
     maxLevel:4,
     cost:[200,600,1500,3500],
     statKey:'statBonus',
-    statFn:(lvl)=>`+${1 + lvl} 🌾`,
+    statFn:(lvl)=>`+${lvl} 🌾`,
   },
 ];
 
@@ -778,6 +791,7 @@ function buy(id) {
   if (score < cost) return;
   score -= cost;
   upgLvl[id]++;
+  if (id === 'stamina') updateMaxStamina();
   scEl.textContent = score;
   if (typeof saveProgress === 'function') saveProgress(score, upgLvl);
   renderShop();
@@ -985,19 +999,38 @@ function renderCellToMap(gx,gy,now){
 }
 
 function drawForestMap(sx,sy,h1,h2,h3,gx,gy){
-  mapCx.fillStyle=`hsl(125,42%,${11+h1*6}%)`;
-  mapCx.fillRect(sx,sy,T,T);
-  if(h2>0.28){
-    const cr=sx+T*.5+(h3-.5)*5, cy2=sy+T*.5+(h(gx,gy,4)-.5)*5;
-    const r=T*(.27+h(gx,gy,5)*.14);
-    mapCx.fillStyle='rgba(0,0,0,.22)';mapCx.fillRect(cr-r+2,cy2-r*.7+2,r*2,r*1.4);
-    mapCx.fillStyle=`hsl(${115+h1*22},52%,${11+h2*8}%)`;mapCx.fillRect(cr-r,cy2-r*.7,r*2,r*1.4);
-    mapCx.fillStyle=`hsl(${120+h1*18},56%,${18+h3*9}%)`;mapCx.fillRect(cr-r*.55,cy2-r*.65,r*.9,r*.8);
-    mapCx.fillStyle=`hsl(28,45%,${14+h1*9}%)`;mapCx.fillRect(cr-T*.06,cy2+r*.4,T*.12,r*.7);
-  } else {
-    const r=T*(.28+h3*.12);
-    mapCx.fillStyle=`hsl(130,44%,${8+h2*5}%)`;
-    mapCx.fillRect(sx+T/2-r,sy+T/2-r*.7,r*2,r*1.4);
+  // Обычная трава снаружи забора
+  mapCx.fillStyle = `hsl(100, 40%, ${25 + h1 * 10}%)`; 
+  mapCx.fillRect(sx, sy, T, T);
+  
+  // Определяем, находится ли эта клетка на границе с полем
+  const isLeftFence = (gx === BRD - 1 && gy >= BRD - 1 && gy <= MH - BRD);
+  const isRightFence = (gx === MW - BRD && gy >= BRD - 1 && gy <= MH - BRD);
+  const isTopFence = (gy === BRD - 1 && gx >= BRD - 1 && gx <= MW - BRD);
+  const isBottomFence = (gy === MH - BRD && gx >= BRD - 1 && gx <= MW - BRD);
+
+  if (!isLeftFence && !isRightFence && !isTopFence && !isBottomFence) {
+    if (h2 > 0.8) {
+       mapCx.fillStyle = `hsl(110, 40%, ${15 + h3 * 10}%)`;
+       mapCx.fillRect(sx + 4, sy + 4, T - 8, T - 8);
+    }
+    return;
+  }
+
+  // Рисуем деревянный забор!
+  mapCx.fillStyle = `hsl(30, 40%, ${30 + h2 * 10}%)`; // Дерево
+
+  if (isTopFence || isBottomFence) {
+    mapCx.fillRect(sx, sy + T/2 - 3, T, 6);
+    if (gx % 2 === 0) {
+      mapCx.fillRect(sx + T/2 - 4, sy + 2, 8, T - 4);
+    }
+  }
+  if (isLeftFence || isRightFence) {
+    mapCx.fillRect(sx + T/2 - 3, sy, 6, T);
+    if (gy % 2 === 0) {
+      mapCx.fillRect(sx + 2, sy + T/2 - 4, T - 4, 8);
+    }
   }
 }
 
@@ -1523,7 +1556,7 @@ function drawMinimap() {
     for (let gx = 0; gx < MW; gx++) {
       const st = gState[gy * MW + gx];
       let r, g2, b;
-      if      (st === F) { r=22;  g2=55;  b=18; }   // лес — тёмно-зелёный
+      if      (st === F) { r=139; g2=90;  b=43; }   // забор — деревянный (#8B5A2B)
       else if (st === H) { r=220; g2=175; b=20; }   // сено — золотой
       else               { r=100; g2=75;  b=35; }   // растёт — коричневый
 

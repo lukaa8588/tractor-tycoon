@@ -1131,16 +1131,19 @@ function update(dt,now){
     }
   }
 
-  if (playedCutThisFrame) playCut();
+  if (playedCutThisFrame) {
+    playCut();
+    // Обновляем текст счёта один раз за кадр, а не при каждой скошенной травинке (убирает лаги)
+    scEl.textContent = score;
+    if (shopOpen) document.getElementById('bal').textContent = score;
+  }
 
   camX+=(px-camX)*LRP; camY+=(py-camY)*LRP;
   camX=Math.max(BRD*T,Math.min((MW-BRD)*T,camX));
   camY=Math.max(BRD*T,Math.min((MH-BRD)*T,camY));
 
-  // Авторост УБРАН — обновляем только анимацию скошенных пеньков
-  for(const i of growSet){
-    renderCellToMap(i % MW, Math.floor(i / MW), now);
-  }
+  // ОГРОМНАЯ ОПТИМИЗАЦИЯ: Мы больше не перерисовываем все скошенные пеньки каждый кадр!
+  // Они статичны до наступления ночи.
 }
 
 // ── ФУНКЦИЯ ПОКОСА ───────────────────────────────────────────
@@ -1199,8 +1202,7 @@ function mowAt(tx, ty, tAng, now) {
     gCutAt[i] = now;
     growSet.add(i);
     score += 1 + getScoreBonus();
-    scEl.textContent = score;
-    if (shopOpen) document.getElementById('bal').textContent = score;
+    // DOM 업데이트 우бираем отсюда, чтобы не лагало
     renderCellToMap(i % MW, Math.floor(i / MW), now);
   }
   return didCut;

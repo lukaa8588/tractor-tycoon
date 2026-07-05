@@ -968,10 +968,12 @@ function drawPlayer(){
   if (showHitboxes) {
     // Хитбокс трактора (круг)
     cx.save();
-    cx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
-    cx.lineWidth = 2;
+    cx.strokeStyle = '#ff00ff'; // Яркий пурпурный (неоновый)
+    cx.fillStyle = 'rgba(255, 0, 255, 0.2)'; // Полупрозрачная заливка
+    cx.lineWidth = 4;
     cx.beginPath();
     cx.arc(sx, sy, 14, 0, Math.PI * 2); // col использует радиус 14
+    cx.fill();
     cx.stroke();
     
     // Линия среза ковша
@@ -984,7 +986,8 @@ function drawPlayer(){
     const cutterCx = sx + Math.cos(pAng) * cutterDist;
     const cutterCy = sy + Math.sin(pAng) * cutterDist;
     
-    cx.strokeStyle = 'rgba(0, 255, 255, 0.8)';
+    cx.strokeStyle = '#00ff00'; // Яркий неоновый зелёный
+    cx.lineWidth = 5; // Более толстая линия для ковша
     cx.beginPath();
     cx.moveTo(cutterCx + sDX, cutterCy + sDY);
     cx.lineTo(cutterCx - sDX, cutterCy - sDY);

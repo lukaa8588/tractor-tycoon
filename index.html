@@ -826,73 +826,18 @@ function initGrid() {
   for (let gy = 0; gy < MH; gy++)
     for (let gx = 0; gx < MW; gx++) {
       const i = gy*MW+gx;
-    gState[(homeY + 15)*MW + x] = PATH;
-  }
-
-  // Блокируем зону дома и ангара (состояние HOUSE / HANGAR)
-  for(let y = homeY - 8; y < homeY - 3; y++) {
-    for(let x = homeX - 6; x < homeX - 1; x++) gState[y*MW + x] = HOUSE;
-  }
-  for(let y = homeY - 9; y < homeY - 2; y++) {
-    for(let x = homeX + 2; x < homeX + 10; x++) gState[y*MW + x] = HANGAR;
-  }
-
-  // Рендерим базовые тайлы
-  for (let gy = 0; gy < MH; gy++) {
-    for (let gx = 0; gx < MW; gx++) {
+      gState[i] = (gx<BRD||gx>=MW-BRD||gy<BRD||gy>=MH-BRD) ? F : H;
       renderCellToMap(gx, gy, 0);
     }
-  }
-
-  // Рисуем красивые большие постройки ПОВЕРХ карты (один раз!)
-  // ДОМ
-  const hX = (homeX - 6) * T;
-  const hY = (homeY - 8) * T;
-  const hW = 5 * T;
-  const hH = 5 * T;
-  mapCx.fillStyle = 'rgba(0,0,0,0.3)';
-  mapCx.fillRect(hX + 10, hY + 10, hW, hH);
-  mapCx.fillStyle = '#e3c298';
-  mapCx.fillRect(hX, hY, hW, hH);
-  mapCx.fillStyle = '#d35400';
-  mapCx.beginPath();
-  mapCx.moveTo(hX - 10, hY + hH/2);
-  mapCx.lineTo(hX + hW/2, hY - 30);
-  mapCx.lineTo(hX + hW + 10, hY + hH/2);
-  mapCx.lineTo(hX + hW + 10, hY + hH + 10);
-  mapCx.lineTo(hX - 10, hY + hH + 10);
-  mapCx.fill();
-  mapCx.fillStyle = '#7f8c8d';
-  mapCx.fillRect(hX + hW - 40, hY - 40, 20, 50);
-
-  // АНГАР
-  const aX = (homeX + 2) * T;
-  const aY = (homeY - 9) * T;
-  const aW = 8 * T;
-  const aH = 7 * T;
-  mapCx.fillStyle = 'rgba(0,0,0,0.3)';
-  mapCx.fillRect(aX + 10, aY + 10, aW, aH);
-  mapCx.fillStyle = '#95a5a6';
-  mapCx.fillRect(aX, aY, aW, aH);
-  mapCx.fillStyle = '#7f8c8d';
-  mapCx.beginPath();
-  mapCx.moveTo(aX, aY);
-  mapCx.quadraticCurveTo(aX + aW/2, aY - 60, aX + aW, aY);
-  mapCx.fill();
-  mapCx.fillStyle = '#34495e';
-  mapCx.fillRect(aX + aW/2 - 40, aY + aH - 80, 80, 80);
-  mapCx.fillStyle = '#2c3e50';
-  mapCx.fillRect(aX + aW/2 - 2, aY + aH - 80, 4, 80);
 }
 
 function blocked(gx, gy) {
   if (gx<0||gx>=MW||gy<0||gy>=MH) return true;
-  const st = gState[gy*MW+gx];
-  return st===F || st===HOUSE || st===HANGAR;
+  return gState[gy*MW+gx]===F;
 }
 
 // ── ИГРОК ────────────────────────────────────────────────────
-let px=(Math.floor(MW/2) + 5)*T, py=(Math.floor(MH/2) + 2)*T, pAng=Math.PI;
+let px=MW/2*T, py=MH/2*T, pAng=0;
 let camX=px, camY=py;
 let score=0;
 const floatTexts = []; // Всплывающий текст сена

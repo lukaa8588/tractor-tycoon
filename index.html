@@ -864,6 +864,17 @@ window.addEventListener('keydown', e => {
 });
 window.addEventListener('keyup', e=>{ K[e.code]=false });
 
+// Сброс всех клавиш и джойстика при потере фокуса окном (чтобы трактор не залипал)
+window.addEventListener('blur', () => {
+  for (let key in K) K[key] = false;
+  if (joyActive) {
+    joyActive = false;
+    jTouchId = null;
+    joyDX = 0; joyDY = 0;
+    document.getElementById('joystick-base').style.display = 'none';
+  }
+});
+
 // ── ПАНЕЛЬ РАЗРАБОТЧИКА ──────────────────────────────────────
 let devPanelOpen = false;
 let showHitboxes = false;

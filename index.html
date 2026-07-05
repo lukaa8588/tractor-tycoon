@@ -53,6 +53,35 @@
     }
     #map-btn:hover{background:rgba(20,70,130,.9);transform:translateY(2px) scale(1.08);
       box-shadow:0 8px 30px rgba(40,120,255,.35)}
+    #rest-btn{
+      top:136px;
+      background:rgba(40,20,80,.85);
+      border:1px solid rgba(160,100,255,.35);
+      color:#d0a0ff;font-size:1.45rem;
+      box-shadow:0 4px 24px rgba(120,60,255,.18);
+    }
+    #rest-btn:hover:not(:disabled){background:rgba(60,30,120,.9);transform:translateY(2px) scale(1.08);
+      box-shadow:0 8px 30px rgba(120,60,255,.35)}
+    #rest-btn:disabled{opacity:.4;cursor:not-allowed}
+    #newgame-btn{
+      top:196px;
+      background:rgba(80,20,20,.85);
+      border:1px solid rgba(255,80,80,.3);
+      color:#ff9090;font-size:1.3rem;
+      box-shadow:0 4px 24px rgba(255,60,60,.15);
+    }
+    #newgame-btn:hover{background:rgba(120,30,30,.9);transform:translateY(2px) scale(1.08);
+      box-shadow:0 8px 30px rgba(255,60,60,.3)}
+
+    /* ── Надпись дня ── */
+    #day-label{
+      position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+      font-size:3.5rem;font-weight:900;color:#fff;letter-spacing:.05em;
+      text-shadow:0 0 40px rgba(255,210,80,.9),0 2px 12px rgba(0,0,0,.9);
+      pointer-events:none;opacity:0;transition:opacity .6s;
+      z-index:100;font-family:'Segoe UI',sans-serif;
+    }
+    #day-label.visible{opacity:1}
 
     /* ── Мини-карта ── */
     #minimap-wrap{
@@ -207,20 +236,23 @@
   </div>
 </div>
 
-<div id="hud">🌾 <span id="sc">0</span><span class="lbl" id="lbl-hay">hay</span></div>
-<button id="shop-btn" class="corner-btn" onclick="toggleShop()" title="Upgrades">🛒</button>
-<button id="map-btn"  class="corner-btn" onclick="toggleMap()"  title="Map">🗺️</button>
+<div id="hud">🌾 <span id="sc">0</span><span class="lbl" id="lbl-hay">сена</span></div>
+<div id="day-label"></div>
+<button id="shop-btn" class="corner-btn" onclick="toggleShop()" title="Прокачка">🛒</button>
+<button id="map-btn"  class="corner-btn" onclick="toggleMap()"  title="Карта">🗺️</button>
+<button id="rest-btn" class="corner-btn" onclick="startNight()" title="Отдыхать">🌙</button>
+<button id="newgame-btn" class="corner-btn" onclick="newGame()" title="Новая игра">🔄</button>
 
 <!-- ── Мини-карта ── -->
 <div id="minimap-wrap">
-  <h3 id="map-title">🗺️ Map</h3>
+  <h3 id="map-title">🗺️ Карта</h3>
   <canvas id="minimap" width="200" height="200"></canvas>
 </div>
 
 <!-- ── Панель прокачки ── -->
 <div id="shop">
   <div class="shop-header">
-    <h2 id="shop-title">🛒 Upgrades</h2>
+    <h2 id="shop-title">🛒 Прокачка</h2>
     <div style="display:flex;align-items:center;gap:8px">
       <div class="balance">🌾 <span id="bal">0</span></div>
       <button class="shop-close" onclick="toggleShop()">✕</button>
@@ -228,7 +260,7 @@
   </div>
   <div style="padding: 0 16px;">
     <button id="booster-btn-text" class="buy-btn" style="width: 100%; justify-content: center; background: rgba(255,180,30,.2); border-color: rgba(255,180,30,.4); color: #f0c030;" onclick="triggerBooster()">
-      📺 Watch Ad for +1000 🌾
+      📺 Реклама: +1000 🌾
     </button>
   </div>
   <div class="shop-list" id="shop-list"></div>
@@ -242,7 +274,7 @@ const i18n = {
   ru: {
     title: "Трактор Магнат",
     hay: "сена",
-    shopBtn: "Улучшения",
+    shopBtn: "Прокачка",
     mapBtn: "Карта",
     mapTitle: "🗺️ Карта",
     shopTitle: "🛒 Прокачка",
@@ -251,13 +283,18 @@ const i18n = {
     buyHay: "сена",
     statSpeed: "Скорость",
     statWidth: "Ширина",
-    statGrow: "Время роста",
+    statFertilizer: "Бонус сена",
     statBonus: "Сена с блока",
+    restBtn: "🌙 Отдыхать",
+    newGameBtn: "🔄 Новая игра",
+    newGameConfirm: "Начать новую игру? Весь прогресс будет сброшен.",
+    dayText: "День",
+    nightText: "Ночь...",
     upgrades: {
       speed: { name: "Двигатель", desc: "Увеличивает скорость трактора" },
-      width: { name: "Косилка", desc: "Увеличивает ширину скоса" },
-      grow:  { name: "Удобрения", desc: "Трава растет быстрее" },
-      bonus: { name: "Амбар", desc: "Больше сена с каждого блока" }
+      width: { name: "Косилка",   desc: "Увеличивает ширину скоса" },
+      grow:  { name: "Удобрения", desc: "Больше сена при скосе" },
+      bonus: { name: "Амбар",     desc: "Ещё больше сена с каждого блока" }
     }
   },
   en: {
@@ -272,13 +309,18 @@ const i18n = {
     buyHay: "hay",
     statSpeed: "Speed",
     statWidth: "Width",
-    statGrow: "Grow time",
+    statFertilizer: "Hay bonus",
     statBonus: "Hay per block",
+    restBtn: "🌙 Rest",
+    newGameBtn: "🔄 New Game",
+    newGameConfirm: "Start a new game? All progress will be reset.",
+    dayText: "Day",
+    nightText: "Night...",
     upgrades: {
-      speed: { name: "Engine", desc: "Increases tractor speed" },
-      width: { name: "Mower", desc: "Increases harvest width" },
-      grow:  { name: "Fertilizer", desc: "Grass grows faster" },
-      bonus: { name: "Barn", desc: "More hay per harvested block" }
+      speed: { name: "Engine",     desc: "Increases tractor speed" },
+      width: { name: "Mower",      desc: "Increases harvest width" },
+      grow:  { name: "Fertilizer", desc: "More hay when cutting" },
+      bonus: { name: "Barn",       desc: "Even more hay per block" }
     }
   }
 };
@@ -300,6 +342,8 @@ function updateLanguage(lang) {
   document.getElementById('map-title').textContent = t('mapTitle');
   document.getElementById('shop-title').textContent = t('shopTitle');
   document.getElementById('booster-btn-text').textContent = t('boosterBtn');
+  document.getElementById('rest-btn').title = t('restBtn');
+  document.getElementById('newgame-btn').title = t('newGameBtn');
   
   if (shopOpen) renderShop();
 }
@@ -310,7 +354,7 @@ const MW   = 100;
 const MH   = 100;
 const BRD  = 17;
 const LRP  = 0.12;
-const GROW_BASE = 10000; // мс (базовое время роста)
+// GROW_BASE удалён — авторост заменён системой дней
 
 // Базовые значения (без прокачки)
 const BASE_SPD = 200;
@@ -326,7 +370,7 @@ const UPGRADES = [
     id:'speed', icon:'⚡',
     iconBg:'rgba(255,180,30,.15)',
     maxLevel:5,
-    cost:[10,30,70,150,320],
+    cost:[50,150,350,800,1800],
     statKey:'statSpeed',
     statFn:(lvl)=>`${BASE_SPD + lvl*50} px/s`,
   },
@@ -334,7 +378,7 @@ const UPGRADES = [
     id:'width', icon:'⚙️',
     iconBg:'rgba(80,160,255,.15)',
     maxLevel:5,
-    cost:[15,40,100,220,480],
+    cost:[80,220,550,1200,2800],
     statKey:'statWidth',
     statFn:(lvl)=>`${1 + lvl} bl.`,
   },
@@ -342,17 +386,17 @@ const UPGRADES = [
     id:'grow', icon:'🌿',
     iconBg:'rgba(40,200,80,.15)',
     maxLevel:5,
-    cost:[20,55,120,260,550],
-    statKey:'statGrow',
-    statFn:(lvl)=>`${((GROW_BASE - lvl*1500)/1000).toFixed(1)} s`,
+    cost:[100,280,650,1500,3500],
+    statKey:'statFertilizer',
+    statFn:(lvl)=>`+${lvl} 🌾`,
   },
   {
     id:'bonus', icon:'🏚️',
     iconBg:'rgba(255,215,0,.12)',
     maxLevel:4,
-    cost:[50,140,350,800],
+    cost:[200,600,1500,3500],
     statKey:'statBonus',
-    statFn:(lvl)=>`${1 + lvl} 🌾`,
+    statFn:(lvl)=>`+${1 + lvl} 🌾`,
   },
 ];
 
@@ -360,10 +404,10 @@ const upgLvl = {speed:0, width:0, grow:0, bonus:0};
 
 // Применяем эффекты прокачки
 function getSpeed()     { return BASE_SPD + upgLvl.speed * 50; }
-function getMowW()      { return BASE_PW  + upgLvl.width * 28; } // +28px за уровень (ровно +1 блок к ширине)
+function getMowW()      { return BASE_PW  + upgLvl.width * 28; }
 function getMowH()      { return BASE_PH; }
-function getGrowTime()  { return Math.max(2000, GROW_BASE - upgLvl.grow * 1500); }
-function getScoreBonus(){ return upgLvl.bonus; }
+// Удобрения + Амбар дают суммарный бонус сена с каждого блока
+function getScoreBonus(){ return upgLvl.bonus + upgLvl.grow; }
 
 // ── МАГАЗИН ──────────────────────────────────────────────────
 let shopOpen = false;
@@ -478,6 +522,14 @@ function blocked(gx, gy) {
 let px=MW/2*T, py=MH/2*T, pAng=0;
 let camX=px, camY=py;
 let score=0;
+
+// ── СИСТЕМА ДНЕЙ И НОЧЕЙ ─────────────────────────────────────
+let currentDay = 1;
+let isNight = false;
+let nightAlpha = 0;
+let nightPhase = ''; // 'darkening' | 'brightening'
+let nightStartTime = 0;
+const NIGHT_DURATION = 1800; // мс на одну фазу (темнение / рассвет)
 const scEl=document.getElementById('sc');
 
 // ── ВВОД ─────────────────────────────────────────────────────
@@ -717,11 +769,50 @@ function render(now){
   cx.clearRect(0,0,CW,CH);
   
   // Рисуем кэшированную карту за один вызов!
-  const sx = Math.round(camX - CW/2);
-  const sy = Math.round(camY - CH/2);
-  cx.drawImage(mapCv, -sx, -sy);
+  const mapSx = Math.round(camX - CW/2);
+  const mapSy = Math.round(camY - CH/2);
+  cx.drawImage(mapCv, -mapSx, -mapSy);
   
-  drawPlayer();
+  if (!isNight || nightAlpha < 0.85) drawPlayer();
+
+  // ── Ночной оверлей ───────────────────────────────────────────
+  if (nightAlpha > 0) {
+    // Тёмное небо
+    cx.fillStyle = `rgba(0,8,30,${nightAlpha})`;
+    cx.fillRect(0, 0, CW, CH);
+
+    // Звёзды появляются по мере затемнения
+    const starA = Math.max(0, (nightAlpha - 0.55) / 0.45);
+    if (starA > 0) {
+      cx.fillStyle = `rgba(255,255,255,${starA})`;
+      const stars=[[80,45],[190,70],[320,28],[460,95],[150,170],[290,140],[510,55],[75,190],
+                   [400,40],[230,200],[550,130],[140,110],[370,175],[490,220],[60,250]];
+      for (const [sx2,sy2] of stars) cx.fillRect(sx2,sy2,starA>0.5?2:1,starA>0.5?2:1);
+      
+      // Луна
+      const moonA = Math.max(0, (nightAlpha - 0.7) / 0.3);
+      if (moonA > 0) {
+        cx.fillStyle = `rgba(240,240,200,${moonA})`;
+        cx.beginPath();
+        cx.arc(CW - 120, 70, 28 * moonA, 0, Math.PI * 2);
+        cx.fill();
+        cx.fillStyle = `rgba(0,8,30,${moonA * 0.85})`;
+        cx.beginPath();
+        cx.arc(CW - 110, 62, 24 * moonA, 0, Math.PI * 2);
+        cx.fill();
+      }
+    }
+
+    // Текст «Ночь...» на пике темноты
+    if (nightPhase === 'darkening' && nightAlpha > 0.8) {
+      const ta = (nightAlpha - 0.8) / 0.2;
+      cx.fillStyle = `rgba(180,160,255,${ta})`;
+      cx.font = `bold ${Math.round(CW * 0.045)}px 'Segoe UI', sans-serif`;
+      cx.textAlign = 'center';
+      cx.fillText(t('nightText'), CW/2, CH/2 + 60);
+      cx.textAlign = 'left';
+    }
+  }
 }
 
 // ── UPDATE ───────────────────────────────────────────────────
@@ -817,14 +908,10 @@ function update(dt,now){
     renderCellToMap(i % MW, Math.floor(i / MW), now);
   }
 
-  // Рост
+  // Авторост УБРАН — трава вырастает только после ночи (кнопка «Отдыхать»)
+  // Обновляем отрисовку скошенных клеток каждый кадр (анимация роста)
   for(const i of growSet){
-    const gx = i % MW;
-    const gy = Math.floor(i / MW);
-    if(now-gCutAt[i]>=getGrowTime()){
-      gState[i]=H; gCutAt[i]=0; growSet.delete(i);
-    }
-    renderCellToMap(gx, gy, now);
+    renderCellToMap(i % MW, Math.floor(i / MW), now);
   }
 }
 
@@ -838,6 +925,76 @@ function col(x,y){
     for(let gx=x0;gx<=x1;gx++)
       if(blocked(gx,gy))return true;
   return false;
+}
+
+// ── НОЧЬ И РАССВЕТ ───────────────────────────────────────────
+function startNight() {
+  if (isNight) return;
+  isNight = true;
+  nightPhase = 'darkening';
+  nightStartTime = performance.now();
+  document.getElementById('rest-btn').disabled = true;
+  animateNight();
+}
+
+function animateNight() {
+  const now = performance.now();
+  const elapsed = now - nightStartTime;
+
+  if (nightPhase === 'darkening') {
+    nightAlpha = Math.min(0.93, elapsed / NIGHT_DURATION);
+    if (elapsed >= NIGHT_DURATION) {
+      nightAlpha = 0.93;
+      // ── РАССВЕТ: всё поле вырастает заново ───────────────────
+      currentDay++;
+      growSet.clear();
+      for (let i = 0; i < gState.length; i++) {
+        if (gState[i] === G) {
+          gState[i] = H;
+          gCutAt[i] = 0;
+          renderCellToMap(i % MW, Math.floor(i / MW), 0);
+        }
+      }
+      // Показываем номер дня
+      const dayEl = document.getElementById('day-label');
+      dayEl.textContent = `${t('dayText')} ${currentDay}`;
+      dayEl.classList.add('visible');
+      // Сохраняем прогресс
+      if (typeof saveProgress === 'function') saveProgress(score, upgLvl, currentDay);
+      nightPhase = 'brightening';
+      nightStartTime = now;
+    }
+  } else if (nightPhase === 'brightening') {
+    nightAlpha = 0.93 * (1 - Math.min(1, elapsed / NIGHT_DURATION));
+    if (elapsed >= NIGHT_DURATION) {
+      nightAlpha = 0;
+      isNight = false;
+      nightPhase = '';
+      document.getElementById('rest-btn').disabled = false;
+      // Скрываем надпись через 1.5 сек
+      setTimeout(() => {
+        document.getElementById('day-label').classList.remove('visible');
+      }, 1500);
+    }
+  }
+
+  if (nightPhase) requestAnimationFrame(animateNight);
+}
+
+// ── НОВАЯ ИГРА ────────────────────────────────────────────────
+function newGame() {
+  const msg = i18n[currentLang].newGameConfirm;
+  if (!confirm(msg)) return;
+  score = 0;
+  currentDay = 1;
+  Object.keys(upgLvl).forEach(k => upgLvl[k] = 0);
+  scEl.textContent = 0;
+  px = MW/2*T; py = MH/2*T; pAng = 0;
+  camX = px; camY = py;
+  growSet.clear();
+  initGrid();
+  if (shopOpen) renderShop();
+  if (typeof saveProgress === 'function') saveProgress(0, {speed:0,width:0,grow:0,bonus:0}, 1);
 }
 
 // ── GAME LOOP ────────────────────────────────────────────────
@@ -899,15 +1056,14 @@ if (typeof initYandexGame === 'function') {
     updateLanguage(lang);
     if (cloudData && typeof cloudData.score !== 'undefined') {
       score = cloudData.score;
-      if (cloudData.upgLvl) {
-        Object.assign(upgLvl, cloudData.upgLvl);
-      }
+      if (cloudData.upgLvl) Object.assign(upgLvl, cloudData.upgLvl);
+      if (cloudData.currentDay) currentDay = cloudData.currentDay;
       scEl.textContent = score;
     }
     
     // Autosave every 30 seconds
     setInterval(() => {
-      if (typeof saveProgress === 'function') saveProgress(score, upgLvl);
+      if (typeof saveProgress === 'function') saveProgress(score, upgLvl, currentDay);
     }, 30000);
     
     initGrid();

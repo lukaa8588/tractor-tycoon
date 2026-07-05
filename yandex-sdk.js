@@ -28,6 +28,8 @@ function initYandexGame(onReady) {
         setData: (data) => {
           console.log("[Mock SDK] Saving player data to localStorage...", data);
           localStorage.setItem('mockYsdkData', JSON.stringify(data));
+          return Promise.resolve();
+        }
       }),
       environment: {
         i18n: { lang: 'ru' }
@@ -88,11 +90,12 @@ function initPlayerAndStart(onReady) {
   });
 }
 
-function saveProgress(score, upgLvl) {
+function saveProgress(score, upgLvl, currentDay) {
   if (!window.ysdkPlayer) return;
   const data = {
     score: score,
-    upgLvl: upgLvl
+    upgLvl: upgLvl,
+    currentDay: currentDay || 1
   };
   window.ysdkPlayer.setData(data).then(() => {
     console.log("Progress saved to Yandex Cloud");

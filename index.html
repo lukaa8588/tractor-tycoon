@@ -617,7 +617,7 @@ function playTone(freq, type, duration, volScale = 1) {
 }
 
 function playClick() { playTone(400, 'triangle', 0.05, 0.2); vibrate(15); }
-function playCut() { playTone(120, 'square', 0.08, 0.5); vibrate(5); }
+function playCut() { playTone(120, 'square', 0.08, 0.12); vibrate(5); }
 
 // Более длинная и разнообразная кантри-мелодия
 const melody = [
@@ -842,6 +842,7 @@ function blocked(gx, gy) {
 let px=MW/2*T, py=MH/2*T, pAng=0;
 let camX=px, camY=py;
 let score=0;
+const floatTexts = []; // Всплывающий текст сена
 
 // ── СИСТЕМА ДНЕЙ И НОЧЕЙ ─────────────────────────────────────
 let currentDay = 1;
@@ -1193,7 +1194,24 @@ function render(now){
   const mapSy = Math.round(camY - CH/2);
   cx.drawImage(mapCv, -mapSx, -mapSy);
   
-  if (!isNight || nightAlpha < 0.85) drawPlayer();
+  if (!isNight || nightAlpha < 0.85) {
+    // Всплывающий текст поверх карты, но под трактором
+    cx.save();
+    cx.translate(-mapSx, -mapSy);
+    cx.font = 'bold 16px "Segoe UI", sans-serif';
+    cx.textAlign = 'center';
+    cx.lineWidth = 3;
+    for (const ft of floatTexts) {
+      cx.globalAlpha = ft.life;
+      cx.strokeStyle = 'rgba(0,0,0,' + ft.life + ')';
+      cx.fillStyle = 'rgba(255,235,59,' + ft.life + ')'; // #ffeb3b
+      cx.strokeText(ft.text, ft.x, ft.y);
+      cx.fillText(ft.text, ft.x, ft.y);
+    }
+    cx.restore();
+
+    drawPlayer();
+  }
 
   // ── Ночной оверлей ───────────────────────────────────────────
   if (nightAlpha > 0) {
@@ -1250,6 +1268,14 @@ function render(now){
 
 // ── UPDATE ───────────────────────────────────────────────────
 function update(dt,now){
+  // Обновление всплывающего текста
+  for (let i = floatTexts.length - 1; i >= 0; i--) {
+    const ft = floatTexts[i];
+    ft.y -= 30 * dt;
+    ft.life -= dt * 1.5;
+    if (ft.life <= 0) floatTexts.splice(i, 1);
+  }
+
   const SPD=getSpeed();
   let dx=0,dy=0;
   
@@ -1411,7 +1437,17 @@ function mowAt(tx, ty, tAng, now) {
     gState[i] = G;
     gCutAt[i] = now;
     growSet.add(i);
-    score += 1 + getScoreBonus();
+    const amount = 1 + getScoreBonus();
+    score += amount;
+    
+    // Всплывающий текст
+    floatTexts.push({
+      x: (i % MW) * T + T / 2 + (Math.random() * 10 - 5),
+      y: Math.floor(i / MW) * T + T / 2 + (Math.random() * 10 - 5),
+      text: '+' + amount,
+      life: 1.0
+    });
+
     // DOM 업데이트 УБРАН отсюда, перерисовка только одного блока
     renderCellToMap(i % MW, Math.floor(i / MW), now);
   }

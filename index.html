@@ -327,9 +327,10 @@
     <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('width')">Max ⚙️</div>
   </div>
   <div style="display:flex;gap:8px">
-    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('grow')">Max 🌿</div>
+    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('stamina')">Max 🔋</div>
     <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('bonus')">Max 🏚️</div>
   </div>
+  <div class="dev-btn" style="background:rgba(180,40,40,0.8);margin-top:8px" onclick="newGame()">СБРОС ИГРЫ</div>
 </div>
 
 <!-- ── Шкала Выносливости ── -->
@@ -1303,6 +1304,8 @@ function startNight() {
   animateNight();
 }
 
+let staminaAtNightStart = 0;
+
 function animateNight() {
   const now = performance.now();
   const elapsed = now - nightStartTime;
@@ -1316,15 +1319,20 @@ function animateNight() {
       nightPhase = 'midnight';
       nightStartTime = now;
       
-      // ВОССТАНАВЛИВАЕМ ВЫНОСЛИВОСТЬ НОЧЬЮ
-      currentStamina = maxStamina;
-      document.getElementById('stamina-fill').style.width = '100%';
-      document.getElementById('stamina-text').textContent = '100%';
-      document.getElementById('stamina-fill').style.backgroundColor = '#33ff33';
+      staminaAtNightStart = currentStamina;
       document.getElementById('stamina-wrap').classList.remove('flashing');
     }
   } else if (nightPhase === 'midnight') {
-    // В полночь всё замерло, просто ждём
+    // Плавная анимация восстановления выносливости пока спим
+    const progress = Math.min(1, elapsed / MIDNIGHT_DUR);
+    currentStamina = staminaAtNightStart + (maxStamina - staminaAtNightStart) * progress;
+    const pct = currentStamina / maxStamina;
+    const stFill = document.getElementById('stamina-fill');
+    stFill.style.width = (pct * 100) + '%';
+    stFill.style.backgroundColor = '#33ff33';
+    document.getElementById('stamina-text').textContent = Math.ceil(pct * 100) + '%';
+
+    // В полночь всё замерло, просто ждём рассвета
     if (elapsed >= MIDNIGHT_DUR) {
       // ── РАССВЕТ: всё поле вырастает заново ───────────────────
       currentDay++;

@@ -287,6 +287,14 @@
     <label>Хитбоксы</label>
     <input type="checkbox" id="show-hitbox" onchange="toggleHitbox()" style="transform:scale(1.5);">
   </div>
+  <div class="dev-row">
+    <label>Радиус трактора</label>
+    <input type="range" id="hitbox-radius" class="dev-slider" min="5" max="30" step="1" value="14" oninput="updateHitboxes()">
+  </div>
+  <div class="dev-row">
+    <label>Ковш (Чит-Ширина)</label>
+    <input type="range" id="cutter-width" class="dev-slider" min="-20" max="200" step="2" value="0" oninput="updateHitboxes()">
+  </div>
   
   <hr style="border:1px solid #ffffff15;margin:8px 0">
   
@@ -560,7 +568,7 @@ const upgLvl = {speed:0, width:0, grow:0, bonus:0};
 
 // Применяем эффекты прокачки
 function getSpeed()     { return BASE_SPD + upgLvl.speed * 50; }
-function getMowW()      { return BASE_PW  + upgLvl.width * 28; }
+function getMowW()      { return BASE_PW  + upgLvl.width * 28 + (window.devCutterWidth || 0); }
 function getMowH()      { return BASE_PH; }
 // Удобрения + Амбар дают суммарный бонус сена с каждого блока
 function getScoreBonus(){ return upgLvl.bonus + upgLvl.grow; }
@@ -704,6 +712,8 @@ window.addEventListener('keyup', e=>{ K[e.code]=false });
 // ── ПАНЕЛЬ РАЗРАБОТЧИКА ──────────────────────────────────────
 let devPanelOpen = false;
 let showHitboxes = false;
+window.devTractorRadius = 14;
+window.devCutterWidth = 0;
 
 function toggleDevPanel() {
   playClick();
@@ -713,6 +723,11 @@ function toggleDevPanel() {
 
 function toggleHitbox() {
   showHitboxes = document.getElementById('show-hitbox').checked;
+}
+
+function updateHitboxes() {
+  window.devTractorRadius = parseFloat(document.getElementById('hitbox-radius').value);
+  window.devCutterWidth = parseFloat(document.getElementById('cutter-width').value);
 }
 
 function devAddHay() {
@@ -972,7 +987,7 @@ function drawPlayer(){
     cx.fillStyle = 'rgba(255, 0, 255, 0.2)'; // Полупрозрачная заливка
     cx.lineWidth = 4;
     cx.beginPath();
-    cx.arc(sx, sy, 14, 0, Math.PI * 2); // col использует радиус 14
+    cx.arc(sx, sy, window.devTractorRadius, 0, Math.PI * 2);
     cx.fill();
     cx.stroke();
     
@@ -1149,11 +1164,9 @@ function update(dt,now){
 }
 
 function col(x,y){
-  // Фиксированный размер кузова для столкновений (чтобы косилка не упиралась в стены)
-  const bodyW=24, bodyH=35;
-  const hw=bodyW/2-1,hh=bodyH/2-1;
-  const x0=(x-hw)/T|0,x1=(x+hw)/T|0;
-  const y0=(y-hh)/T|0,y1=(y+hh)/T|0;
+  const r = window.devTractorRadius;
+  const x0=(x-r)/T|0,x1=(x+r)/T|0;
+  const y0=(y-r)/T|0,y1=(y+r)/T|0;
   for(let gy=y0;gy<=y1;gy++)
     for(let gx=x0;gx<=x1;gx++)
       if(blocked(gx,gy))return true;

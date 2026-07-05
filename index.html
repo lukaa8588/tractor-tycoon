@@ -940,11 +940,19 @@ function startNight() {
 function animateNight() {
   const now = performance.now();
   const elapsed = now - nightStartTime;
+  const FADE_DUR = 2500; // 2.5 секунды темнеет/светлеет
+  const MIDNIGHT_DUR = 2000; // 2 секунды абсолютной ночи
 
   if (nightPhase === 'darkening') {
-    nightAlpha = Math.min(0.93, elapsed / NIGHT_DURATION);
-    if (elapsed >= NIGHT_DURATION) {
+    nightAlpha = Math.min(0.93, elapsed / FADE_DUR);
+    if (elapsed >= FADE_DUR) {
       nightAlpha = 0.93;
+      nightPhase = 'midnight';
+      nightStartTime = now;
+    }
+  } else if (nightPhase === 'midnight') {
+    // В полночь всё замерло, просто ждём
+    if (elapsed >= MIDNIGHT_DUR) {
       // ── РАССВЕТ: всё поле вырастает заново ───────────────────
       currentDay++;
       growSet.clear();
@@ -961,20 +969,21 @@ function animateNight() {
       dayEl.classList.add('visible');
       // Сохраняем прогресс
       if (typeof saveProgress === 'function') saveProgress(score, upgLvl, currentDay);
+      
       nightPhase = 'brightening';
       nightStartTime = now;
     }
   } else if (nightPhase === 'brightening') {
-    nightAlpha = 0.93 * (1 - Math.min(1, elapsed / NIGHT_DURATION));
-    if (elapsed >= NIGHT_DURATION) {
+    nightAlpha = 0.93 * (1 - Math.min(1, elapsed / FADE_DUR));
+    if (elapsed >= FADE_DUR) {
       nightAlpha = 0;
       isNight = false;
       nightPhase = '';
       document.getElementById('rest-btn').disabled = false;
-      // Скрываем надпись через 1.5 сек
+      // Скрываем надпись через 2 сек после полного рассвета
       setTimeout(() => {
         document.getElementById('day-label').classList.remove('visible');
-      }, 1500);
+      }, 2000);
     }
   }
 

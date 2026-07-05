@@ -659,8 +659,8 @@ function playMusicSequence() {
 
 // ── КОНФИГ ───────────────────────────────────────────────────
 const T    = 32;
-const MW   = 100;
-const MH   = 100;
+const MW   = 160;
+const MH   = 160;
 const BRD  = 17;
 const LRP  = 0.12;
 // GROW_BASE удалён — авторост заменён системой дней
@@ -670,8 +670,8 @@ const BASE_SPD = 200;
 const BASE_PW  = 12; // 12px на уровне 0 (меньше тайла 32px, режет строго 1 блок)
 const BASE_PH  = 35;
 
-// Состояния: F=лес, H=сено, G=растёт
-const F=0, H=1, G=2;
+// Состояния: F=лес(забор), H=сено, G=растёт, PATH=тропа, HOUSE=дом, HANGAR=ангар, GRASS=трава
+const F=0, H=1, G=2, PATH=3, HOUSE=4, HANGAR=5, GRASS=6;
 
 // ── ПРОКАЧКА ─────────────────────────────────────────────────
 const UPGRADES = [
@@ -825,21 +825,94 @@ mapCv.height = MH * T;
 const mapCx = mapCv.getContext('2d', { alpha: false });
 
 function initGrid() {
-  for (let gy = 0; gy < MH; gy++)
+  const homeX = Math.floor(MW / 2);
+  const homeY = Math.floor(MH / 2);
+  const homeRadius = 15;
+
+  for (let gy = 0; gy < MH; gy++) {
     for (let gx = 0; gx < MW; gx++) {
       const i = gy*MW+gx;
-      gState[i] = (gx<BRD||gx>=MW-BRD||gy<BRD||gy>=MH-BRD) ? F : H;
+      let st = H;
+      if (gx < BRD || gx >= MW - BRD || gy < BRD || gy >= MH - BRD) st = F;
+      else if (Math.abs(gx - homeX) < homeRadius && Math.abs(gy - homeY) < homeRadius) st = GRASS;
+      gState[i] = st;
+    }
+  }
+
+  // Тропинки
+  for (let y = homeY - 2; y <= homeY + 15; y++) {
+    gState[y*MW + homeX - 3] = PATH;
+    gState[y*MW + homeX + 6] = PATH;
+  }
+  for (let x = homeX - 3; x <= homeX + 6; x++) {
+    gState[(homeY - 2)*MW + x] = PATH;
+    gState[(homeY + 15)*MW + x] = PATH;
+  }
+
+  // Блокируем зону дома и ангара (состояние HOUSE / HANGAR)
+  for(let y = homeY - 8; y < homeY - 3; y++) {
+    for(let x = homeX - 6; x < homeX - 1; x++) gState[y*MW + x] = HOUSE;
+  }
+  for(let y = homeY - 9; y < homeY - 2; y++) {
+    for(let x = homeX + 2; x < homeX + 10; x++) gState[y*MW + x] = HANGAR;
+  }
+
+  // Рендерим базовые тайлы
+  for (let gy = 0; gy < MH; gy++) {
+    for (let gx = 0; gx < MW; gx++) {
       renderCellToMap(gx, gy, 0);
     }
+  }
+
+  // Рисуем красивые большие постройки ПОВЕРХ карты (один раз!)
+  // ДОМ
+  const hX = (homeX - 6) * T;
+  const hY = (homeY - 8) * T;
+  const hW = 5 * T;
+  const hH = 5 * T;
+  mapCx.fillStyle = 'rgba(0,0,0,0.3)';
+  mapCx.fillRect(hX + 10, hY + 10, hW, hH);
+  mapCx.fillStyle = '#e3c298';
+  mapCx.fillRect(hX, hY, hW, hH);
+  mapCx.fillStyle = '#d35400';
+  mapCx.beginPath();
+  mapCx.moveTo(hX - 10, hY + hH/2);
+  mapCx.lineTo(hX + hW/2, hY - 30);
+  mapCx.lineTo(hX + hW + 10, hY + hH/2);
+  mapCx.lineTo(hX + hW + 10, hY + hH + 10);
+  mapCx.lineTo(hX - 10, hY + hH + 10);
+  mapCx.fill();
+  mapCx.fillStyle = '#7f8c8d';
+  mapCx.fillRect(hX + hW - 40, hY - 40, 20, 50);
+
+  // АНГАР
+  const aX = (homeX + 2) * T;
+  const aY = (homeY - 9) * T;
+  const aW = 8 * T;
+  const aH = 7 * T;
+  mapCx.fillStyle = 'rgba(0,0,0,0.3)';
+  mapCx.fillRect(aX + 10, aY + 10, aW, aH);
+  mapCx.fillStyle = '#95a5a6';
+  mapCx.fillRect(aX, aY, aW, aH);
+  mapCx.fillStyle = '#7f8c8d';
+  mapCx.beginPath();
+  mapCx.moveTo(aX, aY);
+  mapCx.quadraticCurveTo(aX + aW/2, aY - 60, aX + aW, aY);
+  mapCx.fill();
+  mapCx.fillStyle = '#34495e';
+  mapCx.fillRect(aX + aW/2 - 40, aY + aH - 80, 80, 80);
+  mapCx.fillStyle = '#2c3e50';
+  mapCx.fillRect(aX + aW/2 - 2, aY + aH - 80, 4, 80);
 }
 
 function blocked(gx, gy) {
   if (gx<0||gx>=MW||gy<0||gy>=MH) return true;
-  return gState[gy*MW+gx]===F;
+  const st = gState[gy*MW+gx];
+  return st===F || st===HOUSE || st===HANGAR;
 }
 
 // ── ИГРОК ────────────────────────────────────────────────────
-let px=MW/2*T, py=MH/2*T, pAng=0;
+let px=(Math.floor(MW/2) + 5)*T, py=(Math.floor(MH/2) + 2)*T, pAng=Math.PI;
 let camX=px, camY=py;
 let score=0;
 const floatTexts = []; // Всплывающий текст сена
@@ -1002,9 +1075,18 @@ function renderCellToMap(gx,gy,now){
   
   if(st===F){ drawForestMap(sx,sy,h1,h2,h3,gx,gy); }
   else if(st===H){ drawStalksMap(sx,sy,1,h1,h2,h3,gx,gy); }
-  else {
-    // Растёт только ночью, поэтому прогресс всегда 0 (только пеньки)
-    drawGrowingMap(sx,sy,0,h1,h2,h3,gx,gy);
+  else if(st===G){ drawGrowingMap(sx,sy,0,h1,h2,h3,gx,gy); }
+  else if(st===GRASS || st===HOUSE || st===HANGAR){ 
+    mapCx.fillStyle = `hsl(100, 40%, ${25 + h1 * 5}%)`; 
+    mapCx.fillRect(sx, sy, T, T);
+  }
+  else if(st===PATH){
+    mapCx.fillStyle = `hsl(35, 30%, ${45 + h1 * 10}%)`; 
+    mapCx.fillRect(sx, sy, T, T);
+    if (h2 > 0.7) {
+      mapCx.fillStyle = 'rgba(0,0,0,0.1)';
+      mapCx.fillRect(sx + 4, sy + 4, 4, 4);
+    }
   }
   
   mapCx.restore();
@@ -1608,9 +1690,13 @@ function drawMinimap() {
     for (let gx = 0; gx < MW; gx++) {
       const st = gState[gy * MW + gx];
       let r, g2, b;
-      if      (st === F) { r=139; g2=90;  b=43; }   // забор — деревянный (#8B5A2B)
-      else if (st === H) { r=220; g2=175; b=20; }   // сено — золотой
-      else               { r=100; g2=75;  b=35; }   // растёт — коричневый
+      if      (st === F) { r=139; g2=90;  b=43; }   // забор
+      else if (st === H) { r=220; g2=175; b=20; }   // сено
+      else if (st === G) { r=100; g2=75;  b=35; }   // растёт
+      else if (st === PATH){ r=180; g2=150; b=100;} // тропинка
+      else if (st === HOUSE){ r=139; g2=69; b=19; } // дом
+      else if (st === HANGAR){ r=100; g2=110; b=120;} // ангар
+      else               { r=60;  g2=110; b=40; }   // трава (GRASS)
 
       for (let dy = 0; dy < MM; dy++)
         for (let dx = 0; dx < MM; dx++) {

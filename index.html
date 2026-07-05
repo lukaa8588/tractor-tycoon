@@ -94,6 +94,29 @@
     }
     #day-label.visible{opacity:1}
 
+    /* ── Шкала Выносливости ── */
+    #stamina-wrap {
+      position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+      width:260px;height:24px;background:rgba(0,0,0,0.7);
+      border:2px solid rgba(255,255,255,0.2);border-radius:12px;
+      overflow:hidden;z-index:20;display:flex;align-items:center;
+    }
+    #stamina-fill {
+      height:100%;background:#33ff33;width:100%;
+      transition:background-color 0.3s;
+    }
+    #stamina-text {
+      position:absolute;width:100%;text-align:center;
+      color:#fff;font-weight:bold;font-size:0.85rem;
+      text-shadow:1px 1px 2px #000;pointer-events:none;
+    }
+    @keyframes flash-red {
+      0% { box-shadow: 0 0 10px #ff3333, inset 0 0 10px #ff3333; }
+      50% { box-shadow: 0 0 20px #ff3333, inset 0 0 20px #ff3333; }
+      100% { box-shadow: 0 0 10px #ff3333, inset 0 0 10px #ff3333; }
+    }
+    #stamina-wrap.flashing { animation: flash-red 1s infinite; border-color: #ff3333; }
+
     /* ── Мини-карта ── */
     #minimap-wrap{
       position:fixed;right:90px;top:16px;
@@ -309,6 +332,12 @@
   </div>
 </div>
 
+<!-- ── Шкала Выносливости ── -->
+<div id="stamina-wrap">
+  <div id="stamina-fill"></div>
+  <div id="stamina-text">100%</div>
+</div>
+
 <!-- ── Мини-карта ── -->
 <div id="minimap-wrap">
   <h3 id="map-title">🗺️ Карта</h3>
@@ -350,6 +379,7 @@ const i18n = {
     statSpeed: "Скорость",
     statWidth: "Ширина",
     statFertilizer: "Бонус сена",
+    statStamina: "Выносливость",
     statBonus: "Сена с блока",
     restBtn: "🌙 Отдыхать",
     newGameBtn: "🔄 Новая игра",
@@ -359,7 +389,7 @@ const i18n = {
     upgrades: {
       speed: { name: "Двигатель", desc: "Увеличивает скорость трактора" },
       width: { name: "Косилка",   desc: "Увеличивает ширину скоса" },
-      grow:  { name: "Удобрения", desc: "Больше сена при скосе" },
+      stamina: { name: "Бак",     desc: "Увеличивает запас хода" },
       bonus: { name: "Амбар",     desc: "Ещё больше сена с каждого блока" }
     }
   },
@@ -376,6 +406,7 @@ const i18n = {
     statSpeed: "Speed",
     statWidth: "Width",
     statFertilizer: "Hay bonus",
+    statStamina: "Stamina",
     statBonus: "Hay per block",
     restBtn: "🌙 Rest",
     newGameBtn: "🔄 New Game",
@@ -385,7 +416,7 @@ const i18n = {
     upgrades: {
       speed: { name: "Engine",     desc: "Increases tractor speed" },
       width: { name: "Mower",      desc: "Increases harvest width" },
-      grow:  { name: "Fertilizer", desc: "More hay when cutting" },
+      stamina: { name: "Fuel Tank",desc: "Increases drive time" },
       bonus: { name: "Barn",       desc: "Even more hay per block" }
     }
   }
@@ -547,12 +578,12 @@ const UPGRADES = [
     statFn:(lvl)=>`${1 + lvl} bl.`,
   },
   {
-    id:'grow', icon:'🌿',
+    id:'stamina', icon:'🔋',
     iconBg:'rgba(40,200,80,.15)',
     maxLevel:5,
     cost:[100,280,650,1500,3500],
-    statKey:'statFertilizer',
-    statFn:(lvl)=>`+${lvl} 🌾`,
+    statKey:'statStamina',
+    statFn:(lvl)=>`+${lvl*25}s`,
   },
   {
     id:'bonus', icon:'🏚️',
@@ -564,14 +595,21 @@ const UPGRADES = [
   },
 ];
 
-const upgLvl = {speed:0, width:0, grow:0, bonus:0};
+const upgLvl = {speed:0, width:0, stamina:0, bonus:0};
 
 // Применяем эффекты прокачки
 function getSpeed()     { return BASE_SPD + upgLvl.speed * 50; }
 function getMowW()      { return BASE_PW  + upgLvl.width * 28 + (window.devCutterWidth || 0); }
 function getMowH()      { return BASE_PH; }
-// Удобрения + Амбар дают суммарный бонус сена с каждого блока
-function getScoreBonus(){ return upgLvl.bonus + upgLvl.grow; }
+// Амбар дает бонус сена с каждого блока
+function getScoreBonus(){ return upgLvl.bonus; }
+
+// ── ВЫНОСЛИВОСТЬ ──────────────────────────────────────────────
+let maxStamina = 45; // Базовые 45 секунд
+let currentStamina = 45;
+function updateMaxStamina() {
+  maxStamina = 45 + upgLvl.stamina * 25;
+}
 
 // ── МАГАЗИН ──────────────────────────────────────────────────
 let shopOpen = false;
@@ -1120,9 +1158,28 @@ function update(dt,now){
     const forwardX = Math.cos(pAng);
     const forwardY = Math.sin(pAng);
     
+    // ТРАТА ВЫНОСЛИВОСТИ
+    currentStamina -= dt;
+    if (currentStamina < 0) currentStamina = 0;
+    
+    let pct = currentStamina / maxStamina;
+    const stFill = document.getElementById('stamina-fill');
+    stFill.style.width = (pct * 100) + '%';
+    document.getElementById('stamina-text').textContent = Math.ceil(pct * 100) + '%';
+    
+    let spdMult = 1.0;
+    if (pct <= 0.15) {
+      stFill.style.backgroundColor = '#ff3333';
+      document.getElementById('stamina-wrap').classList.add('flashing');
+      spdMult = Math.max(0.1, pct / 0.15); // от 1.0 до 0.1 (10% скорости)
+    } else {
+      stFill.style.backgroundColor = '#33ff33';
+      document.getElementById('stamina-wrap').classList.remove('flashing');
+    }
+    
     // Общий вектор движения за этот кадр
-    const moveX = forwardX * SPD * dt;
-    const moveY = forwardY * SPD * dt;
+    const moveX = forwardX * (SPD * spdMult) * dt;
+    const moveY = forwardY * (SPD * spdMult) * dt;
     
     // ── МИКРО-ШАГИ (чтобы не пропускать траву на поворотах и высокой скорости) ──
     const moveDist = Math.hypot(moveX, moveY);
@@ -1258,6 +1315,13 @@ function animateNight() {
       nightAlpha = 0.93;
       nightPhase = 'midnight';
       nightStartTime = now;
+      
+      // ВОССТАНАВЛИВАЕМ ВЫНОСЛИВОСТЬ НОЧЬЮ
+      currentStamina = maxStamina;
+      document.getElementById('stamina-fill').style.width = '100%';
+      document.getElementById('stamina-text').textContent = '100%';
+      document.getElementById('stamina-fill').style.backgroundColor = '#33ff33';
+      document.getElementById('stamina-wrap').classList.remove('flashing');
     }
   } else if (nightPhase === 'midnight') {
     // В полночь всё замерло, просто ждём
@@ -1306,6 +1370,9 @@ function newGame() {
   score = 0;
   currentDay = 1;
   Object.keys(upgLvl).forEach(k => upgLvl[k] = 0);
+  updateMaxStamina();
+  currentStamina = maxStamina;
+  
   scEl.textContent = 0;
   px = MW/2*T; py = MH/2*T; pAng = 0;
   camX = px; camY = py;
@@ -1375,8 +1442,17 @@ if (typeof initYandexGame === 'function') {
     updateLanguage(lang);
     if (cloudData && typeof cloudData.score !== 'undefined') {
       score = cloudData.score;
-      if (cloudData.upgLvl) Object.assign(upgLvl, cloudData.upgLvl);
+      if (cloudData.upgLvl) {
+        Object.assign(upgLvl, cloudData.upgLvl);
+        // Миграция старого сохранения Удобрений в Выносливость
+        if (typeof cloudData.upgLvl.grow !== 'undefined') {
+          upgLvl.stamina = cloudData.upgLvl.grow;
+          delete cloudData.upgLvl.grow;
+        }
+      }
       if (cloudData.currentDay) currentDay = cloudData.currentDay;
+      updateMaxStamina();
+      currentStamina = maxStamina;
       scEl.textContent = score;
     }
     

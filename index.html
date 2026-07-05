@@ -629,8 +629,8 @@ function renderCellToMap(gx,gy,now){
   if(st===F){ drawForestMap(sx,sy,h1,h2,h3,gx,gy); }
   else if(st===H){ drawStalksMap(sx,sy,1,h1,h2,h3,gx,gy); }
   else {
-    const p=Math.min(1,(now-gCutAt[i])/getGrowTime());
-    drawGrowingMap(sx,sy,p,h1,h2,h3,gx,gy);
+    // Растёт только ночью, поэтому прогресс всегда 0 (только пеньки)
+    drawGrowingMap(sx,sy,0,h1,h2,h3,gx,gy);
   }
   
   mapCx.restore();

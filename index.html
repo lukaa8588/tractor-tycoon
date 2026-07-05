@@ -380,7 +380,7 @@
 <!-- ── Мини-карта ── -->
 <div id="minimap-wrap">
   <h3 id="map-title">🗺️ Карта</h3>
-  <canvas id="minimap" width="200" height="200"></canvas>
+  <canvas id="minimap" width="320" height="320"></canvas>
 </div>
 
 <!-- ── Панель прокачки ── -->
@@ -1096,35 +1096,33 @@ function drawForestMap(sx,sy,h1,h2,h3,gx,gy){
   // Обычная трава снаружи забора
   mapCx.fillStyle = `hsl(100, 40%, ${25 + h1 * 10}%)`; 
   mapCx.fillRect(sx, sy, T, T);
-  
-  // Определяем, находится ли эта клетка на границе с полем
-  const isLeftFence = (gx === BRD - 1 && gy >= BRD - 1 && gy <= MH - BRD);
-  const isRightFence = (gx === MW - BRD && gy >= BRD - 1 && gy <= MH - BRD);
-  const isTopFence = (gy === BRD - 1 && gx >= BRD - 1 && gx <= MW - BRD);
-  const isBottomFence = (gy === MH - BRD && gx >= BRD - 1 && gx <= MW - BRD);
-
-  if (!isLeftFence && !isRightFence && !isTopFence && !isBottomFence) {
-    if (h2 > 0.8) {
-       mapCx.fillStyle = `hsl(110, 40%, ${15 + h3 * 10}%)`;
-       mapCx.fillRect(sx + 4, sy + 4, T - 8, T - 8);
-    }
-    return;
-  }
 
   // Рисуем деревянный забор!
   mapCx.fillStyle = `hsl(30, 40%, ${30 + h2 * 10}%)`; // Дерево
 
-  if (isTopFence || isBottomFence) {
+  // Проверяем соседей, чтобы правильно нарисовать столбики и перекладины
+  const topF = gy > 0 && gState[(gy-1)*MW + gx] === F;
+  const botF = gy < MH-1 && gState[(gy+1)*MW + gx] === F;
+  const leftF = gx > 0 && gState[gy*MW + (gx-1)] === F;
+  const rightF = gx < MW-1 && gState[gy*MW + (gx+1)] === F;
+
+  if (leftF || rightF) {
+    // Горизонтальный забор
     mapCx.fillRect(sx, sy + T/2 - 3, T, 6);
     if (gx % 2 === 0) {
       mapCx.fillRect(sx + T/2 - 4, sy + 2, 8, T - 4);
     }
   }
-  if (isLeftFence || isRightFence) {
+  if (topF || botF) {
+    // Вертикальный забор
     mapCx.fillRect(sx + T/2 - 3, sy, 6, T);
     if (gy % 2 === 0) {
       mapCx.fillRect(sx + 2, sy + T/2 - 4, T - 4, 8);
     }
+  }
+  if (!topF && !botF && !leftF && !rightF) {
+    // Одиночный столбик (на всякий случай)
+    mapCx.fillRect(sx + T/2 - 4, sy + 2, 8, T - 4);
   }
 }
 

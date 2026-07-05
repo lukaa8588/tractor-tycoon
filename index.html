@@ -1032,11 +1032,24 @@ function render(now){
     const starA = Math.max(0, (nightAlpha - 0.55) / 0.45);
     if (starA > 0) {
       cx.fillStyle = `rgba(255,255,255,${starA})`;
-      const stars=[[80,45],[190,70],[320,28],[460,95],[150,170],[290,140],[510,55],[75,190],
-                   [400,40],[230,200],[550,130],[140,110],[370,175],[490,220],[60,250]];
-      for (const [sx2,sy2] of stars) cx.fillRect(sx2,sy2,starA>0.5?2:1,starA>0.5?2:1);
       
-      // Луна
+      // Генерируем звёзды один раз и кэшируем, чтобы они заполняли весь экран
+      if (!window.nightStarsCache) {
+        window.nightStarsCache = [];
+        for (let i = 0; i < 200; i++) {
+          window.nightStarsCache.push({
+            x: Math.random(), 
+            y: Math.random(), 
+            s: Math.random() > 0.85 ? 2 : 1 
+          });
+        }
+      }
+      
+      for (const st of window.nightStarsCache) {
+        cx.fillRect(st.x * CW, st.y * CH, st.s, st.s);
+      }
+      
+      // Луна (всегда в правом верхнем углу)
       const moonA = Math.max(0, (nightAlpha - 0.7) / 0.3);
       if (moonA > 0) {
         cx.fillStyle = `rgba(240,240,200,${moonA})`;

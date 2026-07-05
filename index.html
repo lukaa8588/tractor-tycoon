@@ -318,6 +318,10 @@
     <label>Ковш (Чит-Ширина)</label>
     <input type="range" id="cutter-width" class="dev-slider" min="-20" max="200" step="2" value="0" oninput="updateHitboxes()">
   </div>
+  <div class="dev-row">
+    <label>Множитель цен в магазине</label>
+    <input type="range" id="price-mult" class="dev-slider" min="0" max="10" step="0.1" value="1" oninput="window.devPriceMult=parseFloat(this.value);if(shopOpen)renderShop();">
+  </div>
   
   <hr style="border:1px solid #ffffff15;margin:8px 0">
   
@@ -630,7 +634,8 @@ function renderShop() {
   UPGRADES.forEach(upg => {
     const lvl = upgLvl[upg.id];
     const maxed = lvl >= upg.maxLevel;
-    const cost = maxed ? null : upg.cost[lvl];
+    const baseCost = maxed ? null : upg.cost[lvl];
+    const cost = maxed ? null : Math.floor(baseCost * (window.devPriceMult !== undefined ? window.devPriceMult : 1.0));
     const canBuy = !maxed && score >= cost;
 
     const card = document.createElement('div');
@@ -1159,8 +1164,8 @@ function update(dt,now){
     const forwardX = Math.cos(pAng);
     const forwardY = Math.sin(pAng);
     
-    // ТРАТА ВЫНОСЛИВОСТИ
-    currentStamina -= dt;
+    // ТРАТА ВЫНОСЛИВОСТИ (теперь тратится в 1.5 раза быстрее)
+    currentStamina -= dt * 1.5;
     if (currentStamina < 0) currentStamina = 0;
     
     let pct = currentStamina / maxStamina;

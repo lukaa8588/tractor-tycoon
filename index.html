@@ -1146,6 +1146,16 @@ function update(dt,now){
   // Они статичны до наступления ночи.
 }
 
+// Быстрая функция дистанции (в квадрате), чтобы не вызывать медленный Math.sqrt тысячи раз
+function distToSegSq(cx, cy, x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const l2 = dx * dx + dy * dy;
+  if (l2 === 0) return (cx - x1)**2 + (cy - y1)**2;
+  let t = ((cx - x1) * dx + (cy - y1) * dy) / l2;
+  t = Math.max(0, Math.min(1, t));
+  return (cx - (x1 + t * dx))**2 + (cy - (y1 + t * dy))**2;
+}
+
 // ── ФУНКЦИЯ ПОКОСА ───────────────────────────────────────────
 function mowAt(tx, ty, tAng, now) {
   let didCut = false;
@@ -1159,16 +1169,6 @@ function mowAt(tx, ty, tAng, now) {
   const x1 = cutterX + sDX, y1 = cutterY + sDY;
   const x2 = cutterX - sDX, y2 = cutterY - sDY;
 
-  function distToSeg(cx, cy, x1, y1, x2, y2) {
-    const dx = x2 - x1;
-    const dy = y2 - y1;
-    const l2 = dx * dx + dy * dy;
-    if (l2 === 0) return Math.sqrt((cx - x1) ** 2 + (cy - y1) ** 2);
-    let t = ((cx - x1) * dx + (cy - y1) * dy) / l2;
-    t = Math.max(0, Math.min(1, t));
-    return Math.sqrt((cx - (x1 + t * dx)) ** 2 + (cy - (y1 + t * dy)) ** 2);
-  }
-
   const rX = Math.ceil(PW / 2) + T * 2;
   const rY = Math.ceil(PW / 2) + T * 2;
   const gx0 = Math.max(0,    Math.floor((cutterX - rX) / T));
@@ -1177,32 +1177,37 @@ function mowAt(tx, ty, tAng, now) {
   const gy1 = Math.min(MH-1, Math.floor((cutterY + rY) / T));
 
   const candidates = [];
+  const distSqLimit = 38 * 38; // Увеличенный порог (без извлечения корня)
+
   for (let gy = gy0; gy <= gy1; gy++) {
     for (let gx = gx0; gx <= gx1; gx++) {
       const cellI = gy * MW + gx;
       if (gState[cellI] === H) {
         const cxVal = gx * T + T / 2;
         const cyVal = gy * T + T / 2;
-        const d = distToSeg(cxVal, cyVal, x1, y1, x2, y2);
-        if (d < 38) {
-          candidates.push({ i: cellI, dist: d });
+        const d2 = distToSegSq(cxVal, cyVal, x1, y1, x2, y2);
+        if (d2 < distSqLimit) {
+          candidates.push({ i: cellI, d2: d2 });
         }
       }
     }
   }
 
-  candidates.sort((a, b) => a.dist - b.dist);
+  // Ограничиваем сбор N ближайшими блоками (чтобы не лагало)
   const maxCollect = 1 + upgLvl.width; 
-  const toCollect = candidates.slice(0, maxCollect);
-
-  for (const c of toCollect) {
+  if (candidates.length > maxCollect) {
+    candidates.sort((a, b) => a.d2 - b.d2);
+  }
+  
+  const len = Math.min(candidates.length, maxCollect);
+  for (let k = 0; k < len; k++) {
     didCut = true;
-    const i = c.i;
+    const i = candidates[k].i;
     gState[i] = G;
     gCutAt[i] = now;
     growSet.add(i);
     score += 1 + getScoreBonus();
-    // DOM 업데이트 우бираем отсюда, чтобы не лагало
+    // DOM 업데이트 УБРАН отсюда, перерисовка только одного блока
     renderCellToMap(i % MW, Math.floor(i / MW), now);
   }
   return didCut;

@@ -833,8 +833,21 @@ function initGrid() {
     for (let gx = 0; gx < MW; gx++) {
       const i = gy*MW+gx;
       let st = H;
-      if (gx < BRD || gx >= MW - BRD || gy < BRD || gy >= MH - BRD) st = F;
-      else if (Math.abs(gx - homeX) < homeRadius && Math.abs(gy - homeY) < homeRadius) st = GRASS;
+
+      const isFence = (gx === BRD - 1 || gx === MW - BRD || gy === BRD - 1 || gy === MH - 30);
+      const isOutside = (gx < BRD - 1 || gx > MW - BRD || gy < BRD - 1 || gy > MH - 30);
+
+      if (isOutside) {
+        st = GRASS;
+      } else if (isFence) {
+        st = F;
+      }
+
+      // Ворота в заборе для выезда трактора
+      if (isFence && gy === MH - 30 && Math.abs(gx - homeX) <= 4) {
+        st = PATH;
+      }
+
       gState[i] = st;
     }
   }

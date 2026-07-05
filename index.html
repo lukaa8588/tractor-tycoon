@@ -1076,33 +1076,86 @@ function update(dt,now){
     dy = joyDY;
   }
   
-  if(dx||dy) {
-    // Избегаем тряски (jitter) при очень слабом отклонении джойстика
+  let targetAngle = pAng;
+  let isMoving = false;
+  
+  if (dx || dy) {
+    // Избегаем тряски джойстика
     if (!joyActive || Math.hypot(dx, dy) > 0.15) {
-      pAng = Math.atan2(dy, dx);
+      targetAngle = Math.atan2(dy, dx);
+      isMoving = true;
+    }
+  }
+  
+  let playedCutThisFrame = false;
+
+  // Плавный поворот и движение по дуге ("как машина")
+  if (isMoving) {
+    let diff = targetAngle - pAng;
+    // Нормализуем разницу углов от -PI до PI
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    
+    const turnSpeed = 5.0; // Скорость поворота руля
+    if (Math.abs(diff) < turnSpeed * dt) {
+      pAng = targetAngle;
+    } else {
+      pAng += Math.sign(diff) * turnSpeed * dt;
+    }
+    
+    // Движемся ВПЕРЕД туда, куда смотрит трактор (автомобильная физика)
+    const forwardX = Math.cos(pAng);
+    const forwardY = Math.sin(pAng);
+    
+    // Общий вектор движения за этот кадр
+    const moveX = forwardX * SPD * dt;
+    const moveY = forwardY * SPD * dt;
+    
+    // ── МИКРО-ШАГИ (чтобы не пропускать траву на поворотах и высокой скорости) ──
+    const moveDist = Math.hypot(moveX, moveY);
+    const stepDist = 8; // Идеальная точность: проверяем ковш каждые 8 пикселей!
+    const steps = Math.max(1, Math.ceil(moveDist / stepDist));
+    
+    const stepX = moveX / steps;
+    const stepY = moveY / steps;
+    
+    for (let s = 0; s < steps; s++) {
+      // Шаг трактора
+      const nx = px + stepX; if (!col(nx, py)) px = nx;
+      const ny = py + stepY; if (!col(px, ny)) py = ny;
+      
+      // Сразу косим траву в новой промежуточной точке
+      if (mowAt(px, py, pAng, now)) {
+        playedCutThisFrame = true;
+      }
     }
   }
 
-  const nx=px+dx*SPD*dt; if(!col(nx,py))px=nx;
-  const ny=py+dy*SPD*dt; if(!col(px,ny))py=ny;
+  if (playedCutThisFrame) playCut();
 
   camX+=(px-camX)*LRP; camY+=(py-camY)*LRP;
   camX=Math.max(BRD*T,Math.min((MW-BRD)*T,camX));
   camY=Math.max(BRD*T,Math.min((MH-BRD)*T,camY));
 
-  // Покос на основе близости клеток к лезвию ковша
-  const PW = getMowW();
-  const cutterDist = 35 / 2 + 6; // расстояние от центра до ковша спереди
-  const cutterX = px + Math.cos(pAng) * cutterDist;
-  const cutterY = py + Math.sin(pAng) * cutterDist;
+  // Авторост УБРАН — обновляем только анимацию скошенных пеньков
+  for(const i of growSet){
+    renderCellToMap(i % MW, Math.floor(i / MW), now);
+  }
+}
 
-  // Концы отрезка лезвия ковша
-  const sDX = -Math.sin(pAng) * (PW / 2);
-  const sDY =  Math.cos(pAng) * (PW / 2);
+// ── ФУНКЦИЯ ПОКОСА ───────────────────────────────────────────
+function mowAt(tx, ty, tAng, now) {
+  let didCut = false;
+  const PW = getMowW();
+  const cutterDist = 35 / 2 + 6;
+  const cutterX = tx + Math.cos(tAng) * cutterDist;
+  const cutterY = ty + Math.sin(tAng) * cutterDist;
+
+  const sDX = -Math.sin(tAng) * (PW / 2);
+  const sDY =  Math.cos(tAng) * (PW / 2);
   const x1 = cutterX + sDX, y1 = cutterY + sDY;
   const x2 = cutterX - sDX, y2 = cutterY - sDY;
 
-  // Функция расстояния от точки (cx, cy) до отрезка (x1, y1)-(x2, y2)
   function distToSeg(cx, cy, x1, y1, x2, y2) {
     const dx = x2 - x1;
     const dy = y2 - y1;
@@ -1113,8 +1166,7 @@ function update(dt,now){
     return Math.sqrt((cx - (x1 + t * dx)) ** 2 + (cy - (y1 + t * dy)) ** 2);
   }
 
-  // Область поиска кандидатов вокруг ковша (одинаковая во всех направлениях)
-  const rX = Math.ceil(PW / 2) + T * 2; // Увеличен радиус поиска для поворотов
+  const rX = Math.ceil(PW / 2) + T * 2;
   const rY = Math.ceil(PW / 2) + T * 2;
   const gx0 = Math.max(0,    Math.floor((cutterX - rX) / T));
   const gx1 = Math.min(MW-1, Math.floor((cutterX + rX) / T));
@@ -1129,38 +1181,29 @@ function update(dt,now){
         const cxVal = gx * T + T / 2;
         const cyVal = gy * T + T / 2;
         const d = distToSeg(cxVal, cyVal, x1, y1, x2, y2);
-        if (d < 38) { // Увеличен порог касания (чтобы не пропускать на поворотах)
+        if (d < 38) {
           candidates.push({ i: cellI, dist: d });
         }
       }
     }
   }
 
-  // Сортируем кандидатов по близости
   candidates.sort((a, b) => a.dist - b.dist);
-
-  // Ограничиваем сбор N ближайшими блоками (где N = Уровень косилки + 1)
   const maxCollect = 1 + upgLvl.width; 
   const toCollect = candidates.slice(0, maxCollect);
 
   for (const c of toCollect) {
+    didCut = true;
     const i = c.i;
     gState[i] = G;
     gCutAt[i] = now;
     growSet.add(i);
-    const gained = 1 + getScoreBonus();
-    score += gained;
+    score += 1 + getScoreBonus();
     scEl.textContent = score;
     if (shopOpen) document.getElementById('bal').textContent = score;
     renderCellToMap(i % MW, Math.floor(i / MW), now);
-    playCut(); // Звук срезания травы
   }
-
-  // Авторост УБРАН — трава вырастает только после ночи (кнопка «Отдыхать»)
-  // Обновляем отрисовку скошенных клеток каждый кадр (анимация роста)
-  for(const i of growSet){
-    renderCellToMap(i % MW, Math.floor(i / MW), now);
-  }
+  return didCut;
 }
 
 function col(x,y){

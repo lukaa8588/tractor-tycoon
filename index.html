@@ -473,8 +473,8 @@ function playTone(freq, type, duration, volScale = 1) {
   osc.stop(audioCtx.currentTime + duration);
 }
 
-function playClick() { playTone(600, 'square', 0.1, 0.4); }
-function playCut() { playTone(120, 'square', 0.08, 0.6); }
+function playClick() { playTone(400, 'triangle', 0.05, 0.2); }
+function playCut() { playTone(120, 'square', 0.08, 0.5); }
 
 // Более спокойная и медленная мелодия
 const melody = [
@@ -957,22 +957,22 @@ function drawPlayer(){
   cx.restore();
 
   // Тень под трактором
-  ctx.save();
-  ctx.translate(cx,cy);
-  ctx.rotate(pAng);
-    ctx.fillStyle='rgba(0,0,0,.15)';
-    ctx.beginPath();ctx.ellipse(-8,14, 16,8, 0,0,PI2);ctx.fill();
-    ctx.beginPath();ctx.ellipse(8,14, 16,8, 0,0,PI2);ctx.fill();
-  ctx.restore();
+  cx.save();
+  cx.translate(sx, sy);
+  cx.rotate(pAng);
+    cx.fillStyle='rgba(0,0,0,.15)';
+    cx.beginPath();cx.ellipse(-8,14, 16,8, 0,0,PI2);cx.fill();
+    cx.beginPath();cx.ellipse(8,14, 16,8, 0,0,PI2);cx.fill();
+  cx.restore();
   
   if (showHitboxes) {
     // Хитбокс трактора (круг)
-    ctx.save();
-    ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 14, 0, Math.PI * 2); // col использует радиус 14
-    ctx.stroke();
+    cx.save();
+    cx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+    cx.lineWidth = 2;
+    cx.beginPath();
+    cx.arc(sx, sy, 14, 0, Math.PI * 2); // col использует радиус 14
+    cx.stroke();
     
     // Линия среза ковша
     const PW = getMowW();
@@ -981,15 +981,15 @@ function drawPlayer(){
     const sDY =  Math.cos(pAng) * (PW / 2);
     
     // Центр ковша относительно центра экрана (трактора)
-    const cutterCx = cx + Math.cos(pAng) * cutterDist;
-    const cutterCy = cy + Math.sin(pAng) * cutterDist;
+    const cutterCx = sx + Math.cos(pAng) * cutterDist;
+    const cutterCy = sy + Math.sin(pAng) * cutterDist;
     
-    ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)';
-    ctx.beginPath();
-    ctx.moveTo(cutterCx + sDX, cutterCy + sDY);
-    ctx.lineTo(cutterCx - sDX, cutterCy - sDY);
-    ctx.stroke();
-    ctx.restore();
+    cx.strokeStyle = 'rgba(0, 255, 255, 0.8)';
+    cx.beginPath();
+    cx.moveTo(cutterCx + sDX, cutterCy + sDY);
+    cx.lineTo(cutterCx - sDX, cutterCy - sDY);
+    cx.stroke();
+    cx.restore();
   }
 }
 

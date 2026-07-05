@@ -268,7 +268,6 @@
 <button id="shop-btn" class="corner-btn" onclick="toggleShop()" title="Прокачка">🛒</button>
 <button id="map-btn"  class="corner-btn" onclick="toggleMap()"  title="Карта">🗺️</button>
 <button id="rest-btn" class="corner-btn" onclick="startNight()" title="Отдыхать">🌙</button>
-<button id="newgame-btn" class="corner-btn" onclick="newGame()" title="Новая игра">🔄</button>
 <button id="audio-btn" class="corner-btn" onclick="toggleAudio()" title="Звук">🎵</button>
 
 <!-- ── Секретная Панель Разработчика ── -->
@@ -283,6 +282,10 @@
   <div class="dev-row">
     <label>Звуки (SFX)</label>
     <input type="range" id="vol-sfx" class="dev-slider" min="0" max="1" step="0.05" value="0.5" oninput="updateVolumes()">
+  </div>
+  <div class="dev-row">
+    <label>Хитбоксы</label>
+    <input type="checkbox" id="show-hitbox" onchange="toggleHitbox()" style="transform:scale(1.5);">
   </div>
   
   <hr style="border:1px solid #ffffff15;margin:8px 0">
@@ -398,7 +401,6 @@ function updateLanguage(lang) {
   document.getElementById('shop-title').textContent = t('shopTitle');
   document.getElementById('booster-btn-text').textContent = t('boosterBtn');
   document.getElementById('rest-btn').title = t('restBtn');
-  document.getElementById('newgame-btn').title = t('newGameBtn');
   
   if (shopOpen) renderShop();
 }
@@ -428,21 +430,19 @@ const startAudioOnInteract = () => {
 window.addEventListener('click', startAudioOnInteract);
 window.addEventListener('keydown', startAudioOnInteract);
 
-// Шум мотора (непрерывный)
-let engineOsc = null;
-let engineGain = null;
+// Автоматический запуск звука по первому клику (требование браузеров)
+const startAudioOnInteract = () => {
+  if (!audioMuted) initAudio();
+  window.removeEventListener('click', startAudioOnInteract);
+  window.removeEventListener('keydown', startAudioOnInteract);
+};
+window.addEventListener('click', startAudioOnInteract);
+window.addEventListener('keydown', startAudioOnInteract);
 
 function initAudio() {
   if (audioCtx.state === 'suspended') audioCtx.resume();
-  if (!engineOsc) {
-    engineOsc = audioCtx.createOscillator();
-    engineOsc.type = 'sawtooth';
-    engineOsc.frequency.value = 40; // Низкое тарахтение
-    engineGain = audioCtx.createGain();
-    engineGain.gain.value = 0;
-    engineOsc.connect(engineGain);
-    engineGain.connect(sfxGain);
-    engineOsc.start();
+  if (!window.musicStarted) {
+    window.musicStarted = true;
     playMusicSequence();
   }
 }
@@ -483,12 +483,14 @@ function playTone(freq, type, duration, volScale = 1) {
 function playClick() { playTone(600, 'square', 0.1, 0.4); }
 function playCut() { playTone(120, 'square', 0.08, 0.6); }
 
-// Простая 8-битная мелодия
+// Более спокойная и медленная мелодия
 const melody = [
-  {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.2}, {f: 523.25, d: 0.4},
-  {f: 392.00, d: 0.2}, {f: 329.63, d: 0.2}, {f: 261.63, d: 0.4}, {f: 0, d: 0.2},
-  {f: 349.23, d: 0.2}, {f: 440.00, d: 0.2}, {f: 523.25, d: 0.2}, {f: 698.46, d: 0.4},
-  {f: 523.25, d: 0.2}, {f: 440.00, d: 0.2}, {f: 349.23, d: 0.4}, {f: 0, d: 0.2}
+  {f: 261.63, d: 0.4}, {f: 329.63, d: 0.4}, {f: 392.00, d: 0.4}, {f: 523.25, d: 0.8},
+  {f: 0, d: 0.4},
+  {f: 440.00, d: 0.4}, {f: 349.23, d: 0.4}, {f: 261.63, d: 0.8},
+  {f: 0, d: 1.2},
+  {f: 392.00, d: 0.4}, {f: 329.63, d: 0.4}, {f: 261.63, d: 0.8},
+  {f: 0, d: 0.8}
 ];
 let noteIdx = 0;
 
@@ -496,9 +498,9 @@ function playMusicSequence() {
   if (melody[noteIdx].f > 0) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = 'square';
+    osc.type = 'triangle'; // Мягкий звук
     osc.frequency.value = melody[noteIdx].f;
-    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + melody[noteIdx].d);
     osc.connect(gain);
     gain.connect(musicGain);
@@ -708,11 +710,16 @@ window.addEventListener('keyup', e=>{ K[e.code]=false });
 
 // ── ПАНЕЛЬ РАЗРАБОТЧИКА ──────────────────────────────────────
 let devPanelOpen = false;
+let showHitboxes = false;
 
 function toggleDevPanel() {
   playClick();
   devPanelOpen = !devPanelOpen;
   document.getElementById('dev-panel').classList.toggle('open', devPanelOpen);
+}
+
+function toggleHitbox() {
+  showHitboxes = document.getElementById('show-hitbox').checked;
 }
 
 function devAddHay() {
@@ -955,6 +962,42 @@ function drawPlayer(){
   cx.fillRect( bodyW/2,     bodyH/2-6-wh,  ww,wh);
 
   cx.restore();
+
+  // Тень под трактором
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.rotate(pAng);
+    ctx.fillStyle='rgba(0,0,0,.15)';
+    ctx.beginPath();ctx.ellipse(-8,14, 16,8, 0,0,PI2);ctx.fill();
+    ctx.beginPath();ctx.ellipse(8,14, 16,8, 0,0,PI2);ctx.fill();
+  ctx.restore();
+  
+  if (showHitboxes) {
+    // Хитбокс трактора (круг)
+    ctx.save();
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 14, 0, Math.PI * 2); // col использует радиус 14
+    ctx.stroke();
+    
+    // Линия среза ковша
+    const PW = getMowW();
+    const cutterDist = 35 / 2 + 6;
+    const sDX = -Math.sin(pAng) * (PW / 2);
+    const sDY =  Math.cos(pAng) * (PW / 2);
+    
+    // Центр ковша относительно центра экрана (трактора)
+    const cutterCx = cx + Math.cos(pAng) * cutterDist;
+    const cutterCy = cy + Math.sin(pAng) * cutterDist;
+    
+    ctx.strokeStyle = 'rgba(0, 255, 255, 0.8)';
+    ctx.beginPath();
+    ctx.moveTo(cutterCx + sDX, cutterCy + sDY);
+    ctx.lineTo(cutterCx - sDX, cutterCy - sDY);
+    ctx.stroke();
+    ctx.restore();
+  }
 }
 
 // ── РЕНДЕР ───────────────────────────────────────────────────
@@ -1026,15 +1069,6 @@ function update(dt,now){
     // Избегаем тряски (jitter) при очень слабом отклонении джойстика
     if (!joyActive || Math.hypot(dx, dy) > 0.15) {
       pAng = Math.atan2(dy, dx);
-    }
-    if (engineOsc && !audioMuted) {
-      engineOsc.frequency.setTargetAtTime(80, audioCtx.currentTime, 0.1);
-      engineGain.gain.setTargetAtTime(0.5, audioCtx.currentTime, 0.1);
-    }
-  } else {
-    if (engineOsc && !audioMuted) {
-      engineOsc.frequency.setTargetAtTime(40, audioCtx.currentTime, 0.2);
-      engineGain.gain.setTargetAtTime(0.2, audioCtx.currentTime, 0.2);
     }
   }
 

@@ -588,7 +588,7 @@ const UPGRADES = [
     maxLevel:5,
     cost:[100,280,650,1500,3500],
     statKey:'statStamina',
-    statFn:(lvl)=>`+${lvl*25}s`,
+    statFn:(lvl)=>`+${lvl*60}s`,
   },
   {
     id:'bonus', icon:'🏚️',
@@ -610,10 +610,10 @@ function getMowH()      { return BASE_PH; }
 function getScoreBonus(){ return upgLvl.bonus; }
 
 // ── ВЫНОСЛИВОСТЬ ──────────────────────────────────────────────
-let maxStamina = 45; // Базовые 45 секунд
+let maxStamina = 45; // Базовые 45 единиц
 let currentStamina = 45;
 function updateMaxStamina() {
-  maxStamina = 45 + upgLvl.stamina * 25;
+  maxStamina = 45 + upgLvl.stamina * 60; // Увеличено с 25 до 60!
 }
 
 // ── МАГАЗИН ──────────────────────────────────────────────────

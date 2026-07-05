@@ -617,7 +617,7 @@ function playTone(freq, type, duration, volScale = 1) {
 }
 
 function playClick() { playTone(400, 'triangle', 0.05, 0.2); vibrate(15); }
-function playCut() { playTone(120, 'square', 0.08, 0.12); vibrate(5); }
+function playCut() { playTone(120, 'triangle', 0.08, 0.04); vibrate(5); }
 
 // Более длинная и разнообразная кантри-мелодия
 const melody = [

@@ -1606,7 +1606,17 @@ function drawMinimap() {
     for (let gx = 0; gx < MW; gx++) {
       const st = gState[gy * MW + gx];
       let r, g2, b;
-      if      (st === F) { r=139; g2=90;  b=43; }   // забор — деревянный (#8B5A2B)
+      if (st === F) { 
+        const isLeftFence = (gx === BRD - 1 && gy >= BRD - 1 && gy <= MH - BRD);
+        const isRightFence = (gx === MW - BRD && gy >= BRD - 1 && gy <= MH - BRD);
+        const isTopFence = (gy === BRD - 1 && gx >= BRD - 1 && gx <= MW - BRD);
+        const isBottomFence = (gy === MH - BRD && gx >= BRD - 1 && gx <= MW - BRD);
+        if (isLeftFence || isRightFence || isTopFence || isBottomFence) {
+          r=139; g2=90; b=43; // забор
+        } else {
+          r=60; g2=110; b=40; // трава
+        }
+      }
       else if (st === H) { r=220; g2=175; b=20; }   // сено — золотой
       else               { r=100; g2=75;  b=35; }   // растёт — коричневый
 

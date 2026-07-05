@@ -73,7 +73,7 @@
     #newgame-btn:hover{background:rgba(120,30,30,.9);transform:translateY(2px) scale(1.08);
       box-shadow:0 8px 30px rgba(255,60,60,.3)}
     #audio-btn{
-      top:256px;
+      top:196px;
       background:rgba(80,80,20,.85);
       border:1px solid rgba(255,255,80,.3);
       color:#ffff90;font-size:1.3rem;
@@ -430,14 +430,7 @@ const startAudioOnInteract = () => {
 window.addEventListener('click', startAudioOnInteract);
 window.addEventListener('keydown', startAudioOnInteract);
 
-// Автоматический запуск звука по первому клику (требование браузеров)
-const startAudioOnInteract = () => {
-  if (!audioMuted) initAudio();
-  window.removeEventListener('click', startAudioOnInteract);
-  window.removeEventListener('keydown', startAudioOnInteract);
-};
-window.addEventListener('click', startAudioOnInteract);
-window.addEventListener('keydown', startAudioOnInteract);
+
 
 function initAudio() {
   if (audioCtx.state === 'suspended') audioCtx.resume();

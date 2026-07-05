@@ -72,6 +72,17 @@
     }
     #newgame-btn:hover{background:rgba(120,30,30,.9);transform:translateY(2px) scale(1.08);
       box-shadow:0 8px 30px rgba(255,60,60,.3)}
+    #audio-btn{
+      top:256px;
+      background:rgba(80,80,20,.85);
+      border:1px solid rgba(255,255,80,.3);
+      color:#ffff90;font-size:1.3rem;
+      box-shadow:0 4px 24px rgba(255,255,60,.15);
+    }
+    #audio-btn.muted{background:rgba(50,50,50,.85);border-color:rgba(150,150,150,.3);color:#aaa;box-shadow:none;}
+    #audio-btn:hover{background:rgba(120,120,30,.9);transform:translateY(2px) scale(1.08);
+      box-shadow:0 8px 30px rgba(255,255,60,.3)}
+    #audio-btn.muted:hover{background:rgba(70,70,70,.9)}
 
     /* ── Надпись дня ── */
     #day-label{
@@ -192,17 +203,33 @@
       display:flex;align-items:center;gap:6px;
       transition:all .2s;white-space:nowrap;
     }
-    .buy-btn:hover:not(:disabled){
-      background:rgba(80,180,30,.4);
-      transform:translateY(-1px);
-      box-shadow:0 4px 14px rgba(80,180,30,.3);
-    }
-    .buy-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
-    .buy-btn.maxed-btn{
-      background:rgba(255,215,0,.1);border-color:rgba(255,215,0,.3);
-      color:#f0c030;cursor:default
-    }
+    .buy-btn:hover:not(:disabled){background:#5ab020;border-color:#7ae030;
+      box-shadow:0 4px 12px rgba(100,220,40,.25);transform:translateY(-1px)}
+    .buy-btn:disabled{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);
+      color:rgba(255,255,255,.3);cursor:not-allowed}
+    .buy-btn.maxed-btn{background:rgba(255,215,0,.15);border-color:rgba(255,215,0,.3);
+      color:#f0c030}
 
+    /* ── Панель Разработчика ── */
+    #dev-panel{
+      position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+      background:rgba(20,10,30,.95);backdrop-filter:blur(15px);
+      border:2px solid #a060ff;border-radius:16px;padding:24px;
+      z-index:100;color:#fff;display:none;flex-direction:column;gap:16px;
+      box-shadow:0 0 40px rgba(160,96,255,.4);min-width:320px;
+    }
+    #dev-panel.open{display:flex}
+    #dev-panel h2{color:#d0a0ff;text-align:center;margin-bottom:8px;font-size:1.4rem}
+    .dev-row{display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .dev-slider{flex:1;cursor:pointer}
+    .dev-btn{
+      background:#a060ff40;border:1px solid #a060ff;color:#e0c0ff;
+      padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;
+      transition:all .2s;text-align:center;
+    }
+    .dev-btn:hover{background:#a060ff80;box-shadow:0 0 12px #a060ff80}
+    .dev-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#aaa;font-size:1.2rem;cursor:pointer}
+    .dev-close:hover{color:#fff}
 
     /* ── Мобильная адаптация ── */
     @media (max-width: 600px) {
@@ -242,6 +269,34 @@
 <button id="map-btn"  class="corner-btn" onclick="toggleMap()"  title="Карта">🗺️</button>
 <button id="rest-btn" class="corner-btn" onclick="startNight()" title="Отдыхать">🌙</button>
 <button id="newgame-btn" class="corner-btn" onclick="newGame()" title="Новая игра">🔄</button>
+<button id="audio-btn" class="corner-btn muted" onclick="toggleAudio()" title="Звук">🔇</button>
+
+<!-- ── Секретная Панель Разработчика ── -->
+<div id="dev-panel">
+  <button class="dev-close" onclick="toggleDevPanel()">✕</button>
+  <h2>🛠 Dev Panel</h2>
+  
+  <div class="dev-row">
+    <label>Музыка</label>
+    <input type="range" id="vol-music" class="dev-slider" min="0" max="1" step="0.05" value="0.3" oninput="updateVolumes()">
+  </div>
+  <div class="dev-row">
+    <label>Звуки (SFX)</label>
+    <input type="range" id="vol-sfx" class="dev-slider" min="0" max="1" step="0.05" value="0.5" oninput="updateVolumes()">
+  </div>
+  
+  <hr style="border:1px solid #ffffff15;margin:8px 0">
+  
+  <div class="dev-btn" onclick="devAddHay()">+ 10,000 🌾</div>
+  <div style="display:flex;gap:8px">
+    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('speed')">Max ⚡</div>
+    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('width')">Max ⚙️</div>
+  </div>
+  <div style="display:flex;gap:8px">
+    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('grow')">Max 🌿</div>
+    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('bonus')">Max 🏚️</div>
+  </div>
+</div>
 
 <!-- ── Мини-карта ── -->
 <div id="minimap-wrap">
@@ -348,6 +403,103 @@ function updateLanguage(lang) {
   if (shopOpen) renderShop();
 }
 
+// ── АУДИО ДВИЖОК (8-bit Web Audio API) ───────────────────────
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioMuted = true;
+let musicVol = 0.3;
+let sfxVol = 0.5;
+
+// Узлы громкости
+const masterGain = audioCtx.createGain();
+const musicGain = audioCtx.createGain();
+const sfxGain = audioCtx.createGain();
+
+musicGain.connect(masterGain);
+sfxGain.connect(masterGain);
+masterGain.connect(audioCtx.destination);
+masterGain.gain.value = 0; // Начинаем с выключенным звуком
+
+// Шум мотора (непрерывный)
+let engineOsc = null;
+let engineGain = null;
+
+function initAudio() {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  if (!engineOsc) {
+    engineOsc = audioCtx.createOscillator();
+    engineOsc.type = 'sawtooth';
+    engineOsc.frequency.value = 40; // Низкое тарахтение
+    engineGain = audioCtx.createGain();
+    engineGain.gain.value = 0;
+    engineOsc.connect(engineGain);
+    engineGain.connect(sfxGain);
+    engineOsc.start();
+    playMusicSequence();
+  }
+}
+
+function toggleAudio() {
+  audioMuted = !audioMuted;
+  masterGain.gain.value = audioMuted ? 0 : 1;
+  const btn = document.getElementById('audio-btn');
+  btn.textContent = audioMuted ? '🔇' : '🎵';
+  btn.classList.toggle('muted', audioMuted);
+  if (!audioMuted) initAudio();
+}
+
+function updateVolumes() {
+  musicVol = parseFloat(document.getElementById('vol-music').value);
+  sfxVol = parseFloat(document.getElementById('vol-sfx').value);
+  musicGain.gain.value = musicVol;
+  sfxGain.gain.value = sfxVol;
+  if (!audioMuted) playClick();
+}
+
+function playTone(freq, type, duration, volScale = 1) {
+  if (audioMuted) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  
+  gain.gain.setValueAtTime(volScale, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+  
+  osc.connect(gain);
+  gain.connect(sfxGain);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+function playClick() { playTone(600, 'square', 0.1, 0.4); }
+function playCut() { playTone(120, 'square', 0.08, 0.6); }
+
+// Простая 8-битная мелодия
+const melody = [
+  {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.2}, {f: 523.25, d: 0.4},
+  {f: 392.00, d: 0.2}, {f: 329.63, d: 0.2}, {f: 261.63, d: 0.4}, {f: 0, d: 0.2},
+  {f: 349.23, d: 0.2}, {f: 440.00, d: 0.2}, {f: 523.25, d: 0.2}, {f: 698.46, d: 0.4},
+  {f: 523.25, d: 0.2}, {f: 440.00, d: 0.2}, {f: 349.23, d: 0.4}, {f: 0, d: 0.2}
+];
+let noteIdx = 0;
+
+function playMusicSequence() {
+  if (melody[noteIdx].f > 0) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'square';
+    osc.frequency.value = melody[noteIdx].f;
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + melody[noteIdx].d);
+    osc.connect(gain);
+    gain.connect(musicGain);
+    osc.start();
+    osc.stop(audioCtx.currentTime + melody[noteIdx].d);
+  }
+  setTimeout(playMusicSequence, melody[noteIdx].d * 1000);
+  noteIdx = (noteIdx + 1) % melody.length;
+}
+
 // ── КОНФИГ ───────────────────────────────────────────────────
 const T    = 32;
 const MW   = 100;
@@ -413,6 +565,7 @@ function getScoreBonus(){ return upgLvl.bonus + upgLvl.grow; }
 let shopOpen = false;
 
 function toggleShop() {
+  playClick();
   shopOpen = !shopOpen;
   document.getElementById('shop').classList.toggle('open', shopOpen);
   renderShop();
@@ -465,6 +618,7 @@ function renderShop() {
 }
 
 function buy(id) {
+  playClick();
   const upg = UPGRADES.find(u => u.id === id);
   const lvl = upgLvl[id];
   if (lvl >= upg.maxLevel) return;
@@ -537,8 +691,38 @@ const K={};
 window.addEventListener('keydown', e => {
   K[e.code]=true;
   if(e.code==='Tab'||/^Arrow/.test(e.code))e.preventDefault();
+  
+  // Открытие панели разработчика
+  if(e.code==='Digit7') toggleDevPanel();
 });
 window.addEventListener('keyup', e=>{ K[e.code]=false });
+
+// ── ПАНЕЛЬ РАЗРАБОТЧИКА ──────────────────────────────────────
+let devPanelOpen = false;
+
+function toggleDevPanel() {
+  playClick();
+  devPanelOpen = !devPanelOpen;
+  document.getElementById('dev-panel').classList.toggle('open', devPanelOpen);
+}
+
+function devAddHay() {
+  playClick();
+  score += 10000;
+  scEl.textContent = score;
+  if (shopOpen) document.getElementById('bal').textContent = score;
+  if (typeof saveProgress === 'function') saveProgress(score, upgLvl, currentDay);
+}
+
+function devMaxUpgrade(id) {
+  playClick();
+  const upg = UPGRADES.find(u => u.id === id);
+  if (upg) {
+    upgLvl[id] = upg.maxLevel;
+    if (typeof saveProgress === 'function') saveProgress(score, upgLvl, currentDay);
+    if (shopOpen) renderShop();
+  }
+}
 
 // Виртуальный плавающий джойстик
 let joyActive = false;
@@ -834,6 +1018,15 @@ function update(dt,now){
     if (!joyActive || Math.hypot(dx, dy) > 0.15) {
       pAng = Math.atan2(dy, dx);
     }
+    if (engineOsc && !audioMuted) {
+      engineOsc.frequency.setTargetAtTime(80, audioCtx.currentTime, 0.1);
+      engineGain.gain.setTargetAtTime(0.5, audioCtx.currentTime, 0.1);
+    }
+  } else {
+    if (engineOsc && !audioMuted) {
+      engineOsc.frequency.setTargetAtTime(40, audioCtx.currentTime, 0.2);
+      engineGain.gain.setTargetAtTime(0.2, audioCtx.currentTime, 0.2);
+    }
   }
 
   const nx=px+dx*SPD*dt; if(!col(nx,py))px=nx;
@@ -906,6 +1099,7 @@ function update(dt,now){
     scEl.textContent = score;
     if (shopOpen) document.getElementById('bal').textContent = score;
     renderCellToMap(i % MW, Math.floor(i / MW), now);
+    playCut(); // Звук срезания травы
   }
 
   // Авторост УБРАН — трава вырастает только после ночи (кнопка «Отдыхать»)
@@ -1023,6 +1217,7 @@ const mmCtx    = mmCanvas.getContext('2d');
 const MM = 2; // px на тайл (200px / 100 тайлов)
 
 function toggleMap() {
+  playClick();
   mapOpen = !mapOpen;
   document.getElementById('minimap-wrap').classList.toggle('open', mapOpen);
   if (mapOpen) drawMinimap();

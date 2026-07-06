@@ -1230,6 +1230,32 @@ function renderCellToMap(gx,gy,now){
     const r=h(gx,gy,1);
     mapCx.fillStyle=`hsl(${110+r*20}, ${40+r*20}%, ${25+r*10}%)`;
     mapCx.fillRect(sx,sy,T,T);
+    
+    // Рисуем забор на стыке с плантацией
+    const landLvl = Number(upgLvl.land) || 0;
+    const halfSize = 25 + landLvl * 15;
+    const dx = Math.abs(gx - cx);
+    const dy = Math.abs(gy - cy);
+    
+    // Если эта клетка леса граничит с плантацией
+    const isBorderX = (dx === halfSize + 1 && dy <= halfSize + 1);
+    const isBorderY = (dy === halfSize + 1 && dx <= halfSize + 1);
+    
+    if (isBorderX || isBorderY) {
+      // Рисуем деревянный забор
+      mapCx.strokeStyle = '#8B5A2B'; // Темно-коричневый
+      mapCx.lineWidth = 3;
+      
+      // Горизонтальные перекладины
+      mapCx.strokeRect(sx, sy + T/3, T, 3);
+      mapCx.strokeRect(sx, sy + 2*T/3, T, 3);
+      
+      // Вертикальные столбики
+      mapCx.fillStyle = '#A0522D';
+      mapCx.fillRect(sx + 3, sy, 4, T);
+      mapCx.fillRect(sx + T/2 - 2, sy, 4, T);
+      mapCx.fillRect(sx + T - 7, sy, 4, T);
+    }
     return;
   }
   
@@ -1243,8 +1269,8 @@ function renderCellToMap(gx,gy,now){
   
   const p = (st===H || st===C || st===S) ? 1 : Math.min(1, (now - gCutAt[i])/GROW_DUR);
   
-  // Коричневая земля (грязь) после покоса
-  const dirtColor = `hsl(${30+h1*10}, 45%, ${28+h2*5}%)`;
+  // Темно-зеленая скошенная трава (газон) вместо коричневой грязи
+  const dirtColor = `hsl(${100+h1*10}, 50%, 20%)`;
   
   // Base ground
   if (isHay) {

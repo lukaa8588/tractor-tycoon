@@ -1373,7 +1373,7 @@ function render(now){
     if (nightPhase === 'darkening' && nightAlpha > 0.8) {
       const ta = (nightAlpha - 0.8) / 0.2;
       cx.fillStyle = `rgba(180,160,255,${ta})`;
-      cx.font = `bold ${Math.round(CW * 0.045)}px 'Segoe UI', sans-serif';
+      cx.font = `bold ${Math.round(CW * 0.045)}px 'Segoe UI', sans-serif`;
       cx.textAlign = 'center';
       cx.fillText(t('nightText'), CW/2, CH/2 + 60);
       cx.textAlign = 'left';

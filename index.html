@@ -1333,7 +1333,7 @@ function render(now){
     cx.restore();
 
     drawPlayer();
-    const numBots = upgLvl.autopilot || 0;
+    let numBots = upgLvl.autopilot || 0; if (numBots > 3) numBots = 3; while(bots.length < numBots) bots.push({ x: px + 50 + bots.length*40, y: py + 50, ang: 0, tgtI: -1, cd: 0 });
     for(let i=0; i<numBots; i++) drawAITractor(bots[i]);
   }
 
@@ -1396,7 +1396,7 @@ function update(dt,now){
   const SPD = getSpeed();
 
   // Боты-Трактористы
-  const numBots = upgLvl.autopilot || 0;
+  let numBots = upgLvl.autopilot || 0; if (numBots > 3) numBots = 3; while(bots.length < numBots) bots.push({ x: px + 50 + bots.length*40, y: py + 50, ang: 0, tgtI: -1, cd: 0 });
   const bSpdMult = 1 + (upgLvl.botSpeed || 0) * 0.25; // +25% скорости за уровень
   for (let i = 0; i < numBots; i++) {
     let b = bots[i];
@@ -1817,7 +1817,7 @@ function drawMinimap() {
     }
   }
   
-  const numBots = upgLvl.autopilot || 0;
+  let numBots = upgLvl.autopilot || 0; if (numBots > 3) numBots = 3; while(bots.length < numBots) bots.push({ x: px + 50 + bots.length*40, y: py + 50, ang: 0, tgtI: -1, cd: 0 });
   for (let i = 0; i < numBots; i++) {
     const b = bots[i];
     const apxPx = Math.floor(b.x / T) * MM + 1;
@@ -1847,6 +1847,7 @@ if (typeof initYandexGame === 'function') {
       score = cloudData.score;
       if (cloudData.upgLvl) {
         Object.assign(upgLvl, cloudData.upgLvl);
+        if (upgLvl.autopilot > 3) upgLvl.autopilot = 3;
         // Миграция старого сохранения Удобрений в Выносливость
         if (typeof cloudData.upgLvl.grow !== 'undefined') {
           upgLvl.stamina = cloudData.upgLvl.grow;

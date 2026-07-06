@@ -734,8 +734,8 @@ function playMusicSequence() {
 
 // ── КОНФИГ ───────────────────────────────────────────────────
 const T    = 32;
-const MW   = 160;
-const MH   = 160;
+const MW   = 120;
+const MH   = 120;
 const BRD  = 12;
 const LRP  = 0.12;
 // GROW_BASE удалён — авторост заменён системой дней
@@ -1618,6 +1618,16 @@ function update(dt,now){
   
   let SPD = getSpeed();
   if (isNaN(SPD) || SPD < 50) SPD = BASE_SPD;
+  
+  // UNSTUCK FAILSAFE
+  const pxi = Math.floor(px / T), pyi = Math.floor(py / T);
+  for (let gy = pyi - 1; gy <= pyi + 1; gy++) {
+    for (let gx = pxi - 1; gx <= pxi + 1; gx++) {
+      if (gx >= 0 && gx < MW && gy >= 0 && gy < MH) {
+        if (gState[gy * MW + gx] === F) gState[gy * MW + gx] = H;
+      }
+    }
+  }
 
   // Боты-Трактористы
   let numBots = upgLvl.autopilot || 0; let maxBots = upgLvl.quest >= 2 ? 5 : 3; if (numBots > maxBots) numBots = maxBots; while(bots.length < numBots) bots.push({ x: px + 50 + bots.length*40, y: py + 50, ang: 0, tgtI: -1, cd: 0 });

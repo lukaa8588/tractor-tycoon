@@ -1070,7 +1070,13 @@ window.addEventListener('keyup', keyupHandler);
 document.addEventListener('keydown', keydownHandler);
 document.addEventListener('keyup', keyupHandler);
 
-// cv is already defined globally
+// ── CANVAS ───────────────────────────────────────────────────
+const cv=document.getElementById('c');
+const cx=cv.getContext('2d');
+let CW=0,CH=0;
+function resize(){CW=cv.width=innerWidth;CH=cv.height=innerHeight}
+window.addEventListener('resize',resize);
+resize();
 cv.tabIndex = 0;
 cv.style.outline = 'none';
 cv.addEventListener('mousedown', () => cv.focus());
@@ -1197,14 +1203,7 @@ function stopJoy(e) {
 jZone.addEventListener('touchend', stopJoy);
 jZone.addEventListener('touchcancel', stopJoy);
 
-// ── CANVAS ───────────────────────────────────────────────────
-const cv=document.getElementById('c');
-const cx=cv.getContext('2d');
-let CW=0,CH=0;
-function resize(){CW=cv.width=innerWidth;CH=cv.height=innerHeight}
-window.addEventListener('resize',resize);
-resize();
-
+// ── CANVAS MOVED UP ──
 // ── ХЭШ ─────────────────────────────────────────────────────
 function h(a,b,s){
   let v=(a*73856093)^(b*19349663)^(s*83492791);

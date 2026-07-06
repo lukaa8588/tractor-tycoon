@@ -697,7 +697,7 @@ const UPGRADES = [
     id:'speed', icon:'⚡',
     iconBg:'rgba(255,180,30,.15)',
     maxLevel:5,
-    cost:[50,150,350,800,1800],
+    cost:[1200,3500,8000,18000,40000],
     statKey:'statSpeed',
     statFn:(lvl)=>`${BASE_SPD + lvl*50} px/s`,
   },
@@ -705,7 +705,7 @@ const UPGRADES = [
     id:'width', icon:'⚙️',
     iconBg:'rgba(80,160,255,.15)',
     maxLevel:5,
-    cost:[80,220,550,1200,2800],
+    cost:[1500,4000,9500,22000,50000],
     statKey:'statWidth',
     statFn:(lvl)=>`${1 + lvl} 🟩`,
   },
@@ -713,7 +713,7 @@ const UPGRADES = [
     id:'stamina', icon:'🔋',
     iconBg:'rgba(40,200,80,.15)',
     maxLevel:5,
-    cost:[100,280,650,1500,3500],
+    cost:[1200,3000,7500,18000,45000],
     statKey:'statStamina',
     statFn:(lvl)=>`${45 + lvl*60} ⚡`,
   },
@@ -721,7 +721,7 @@ const UPGRADES = [
     id:'bonus', icon:'🏚️',
     iconBg:'rgba(255,215,0,.12)',
     maxLevel:4,
-    cost:[200,600,1500,3500],
+    cost:[2000,6000,18000,50000],
     statKey:'statBonus',
     statFn:(lvl)=>`${1 + lvl} 🌾`,
   },
@@ -729,7 +729,7 @@ const UPGRADES = [
     id:'autopilot', icon:'🤖',
     iconBg:'rgba(180,80,255,.15)',
     maxLevel:3,
-    cost:[1000,5000,15000],
+    cost:[5000,25000,100000],
     statKey:'statAutopilot',
     statFn:(lvl)=>`${lvl} 🤖`,
   },
@@ -737,7 +737,7 @@ const UPGRADES = [
     id:'botSpeed', icon:'🚀',
     iconBg:'rgba(0,255,200,.15)',
     maxLevel:5,
-    cost:[500,1500,3000,8000,20000],
+    cost:[2500,8000,20000,50000,120000],
     statKey:'statBotSpeed',
     statFn:(lvl)=>`${lvl * 25}%`,
   },
@@ -1406,8 +1406,8 @@ function update(dt,now){
       let bestD = Infinity;
       let bestI = -1;
       const bx = Math.floor(b.x / T), by = Math.floor(b.y / T);
-      for(let dy = -15; dy <= 15; dy++) {
-        for(let dx = -15; dx <= 15; dx++) {
+      for(let dy = -MH; dy <= MH; dy++) {
+        for(let dx = -MW; dx <= MW; dx++) {
           const nx = bx + dx, ny = by + dy;
           if (nx>=0 && nx<MW && ny>=0 && ny<MH) {
             const idx = ny * MW + nx;

@@ -1305,15 +1305,7 @@ function drawPlayer(){
 
   cx.restore();
 
-  // Тень под трактором
-  cx.save();
-  cx.translate(sx, sy);
-  cx.rotate(pAng);
-    cx.fillStyle='rgba(0,0,0,.15)';
-    cx.beginPath();cx.ellipse(-8,14, 16,8, 0,0,Math.PI * 2);cx.fill();
-    cx.beginPath();cx.ellipse(8,14, 16,8, 0,0,Math.PI * 2);cx.fill();
-  cx.restore();
-  
+
   if (showHitboxes) {
     // Хитбокс трактора (круг)
     cx.save();

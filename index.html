@@ -1229,7 +1229,7 @@ function drawPlayer(){
 
   // Тень под трактором и ковшом
   cx.fillStyle='rgba(0,0,0,.28)';
-  cx.fillRect(-bodyW/2+4,-bodyH/2+4,bodyW,bodyH);
+  cx.fillRect(-bodyW/2, -bodyH/2 + 4, bodyW, bodyH);
   cx.fillRect(-PW/2+4, -bodyH/2 - 10+4, PW, 7);
 
   // 🚜 Металлический ковш/жатка спереди (ширина PW растягивается при апгрейдах)
@@ -1270,13 +1270,21 @@ function drawPlayer(){
   }
   cx.fillRect(-bodyW/2,-bodyH/2,bodyW,bodyH);
 
-  // Желтый капот
-  cx.fillStyle='#ffb81c';
+  // Желтый капот (или светлый блик для золотого)
+  cx.fillStyle = (upgLvl.quest >= 3) ? 'rgba(255,255,255,0.5)' : '#ffb81c';
   cx.fillRect(-bodyW/2+3,-bodyH/2+3,bodyW-6,bodyH*.42);
 
   // Синее лобовое стекло
   cx.fillStyle='#87ceeb';
   cx.fillRect(-bodyW/2+6,-bodyH/2+6,bodyW-12,bodyH*.24);
+
+  // Блестки для золотого трактора
+  if (upgLvl.quest >= 3) {
+    cx.fillStyle = '#ffffff';
+    cx.beginPath(); cx.arc(-bodyW/2 + 5, -bodyH/2 + 5, 1.5, 0, Math.PI*2); cx.fill();
+    cx.beginPath(); cx.arc(bodyW/2 - 5, bodyH/2 - 5, 2, 0, Math.PI*2); cx.fill();
+    cx.beginPath(); cx.arc(-bodyW/2 + 5, bodyH/2 - 5, 1, 0, Math.PI*2); cx.fill();
+  }
 
   // Колеса (не растягиваются, крепятся по бокам кузова)
   cx.fillStyle='#111';
@@ -1343,7 +1351,7 @@ function drawAITractor(b){
 
   // Тень
   cx.fillStyle='rgba(0,0,0,.28)';
-  cx.fillRect(-bodyW/2+4,-bodyH/2+4,bodyW,bodyH);
+  cx.fillRect(-bodyW/2, -bodyH/2 + 4, bodyW, bodyH);
   cx.fillRect(-PW/2+4, -bodyH/2 - 10+4, PW, 7);
 
   // Крепления ковша

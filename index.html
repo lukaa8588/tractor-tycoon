@@ -1298,7 +1298,6 @@ function drawPlayer(){
 
   // Колеса (не растягиваются, крепятся по бокам кузова)
   cx.fillStyle='#111';
-  const ww=5,wh=bodyH*.30|0;
   cx.fillRect(-bodyW/2-ww, -bodyH/2+6,     ww,wh);
   cx.fillRect( bodyW/2,    -bodyH/2+6,     ww,wh);
   cx.fillRect(-bodyW/2-ww,  bodyH/2-6-wh,  ww,wh);
@@ -1410,7 +1409,6 @@ function drawAITractor(b){
 
   // Колеса
   cx.fillStyle='#111';
-  const ww=5,wh=bodyH*.30|0;
   cx.fillRect(-bodyW/2-ww, -bodyH/2+6,     ww,wh);
   cx.fillRect( bodyW/2,    -bodyH/2+6,     ww,wh);
   cx.fillRect(-bodyW/2-ww,  bodyH/2-wh-6,  ww,wh);

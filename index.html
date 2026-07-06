@@ -1223,14 +1223,24 @@ function drawPlayer(){
   const bodyW = 24;
   const bodyH = 35;
 
+  // --- Глобальная тень ---
+  cx.save();
+  cx.translate(sx + 4, sy + 4); // Смещение тени на экране
+  cx.rotate(pAng+Math.PI/2);
+  cx.fillStyle='rgba(0,0,0,.28)';
+  cx.fillRect(-bodyW/2, -bodyH/2, bodyW, bodyH); // Кузов
+  cx.fillRect(-PW/2, -bodyH/2 - 10, PW, 7); // Ковш
+  const ww=5,wh=bodyH*.30|0;
+  cx.fillRect(-bodyW/2-ww, -bodyH/2+6, ww,wh); // Колеса
+  cx.fillRect( bodyW/2,    -bodyH/2+6, ww,wh);
+  cx.fillRect(-bodyW/2-ww,  bodyH/2-6-wh, ww,wh);
+  cx.fillRect( bodyW/2,     bodyH/2-6-wh, ww,wh);
+  cx.restore();
+
+  // --- Сам трактор ---
   cx.save();
   cx.translate(sx,sy);
   cx.rotate(pAng+Math.PI/2);
-
-  // Тень под трактором и ковшом
-  cx.fillStyle='rgba(0,0,0,.28)';
-  cx.fillRect(-bodyW/2, -bodyH/2 + 4, bodyW, bodyH);
-  cx.fillRect(-PW/2+4, -bodyH/2 - 10+4, PW, 7);
 
   // 🚜 Металлический ковш/жатка спереди (ширина PW растягивается при апгрейдах)
   // Крепления ковша к трактору
@@ -1278,12 +1288,12 @@ function drawPlayer(){
   cx.fillStyle='#87ceeb';
   cx.fillRect(-bodyW/2+6,-bodyH/2+6,bodyW-12,bodyH*.24);
 
-  // Блестки для золотого трактора
+  // Квадратные блестки для золотого трактора
   if (upgLvl.quest >= 3) {
     cx.fillStyle = '#ffffff';
-    cx.beginPath(); cx.arc(-bodyW/2 + 5, -bodyH/2 + 5, 1.5, 0, Math.PI*2); cx.fill();
-    cx.beginPath(); cx.arc(bodyW/2 - 5, bodyH/2 - 5, 2, 0, Math.PI*2); cx.fill();
-    cx.beginPath(); cx.arc(-bodyW/2 + 5, bodyH/2 - 5, 1, 0, Math.PI*2); cx.fill();
+    cx.fillRect(-bodyW/2 + 4, -bodyH/2 + 4, 3, 3);
+    cx.fillRect(bodyW/2 - 6, bodyH/2 - 6, 4, 4);
+    cx.fillRect(-bodyW/2 + 5, bodyH/2 - 6, 2, 2);
   }
 
   // Колеса (не растягиваются, крепятся по бокам кузова)
@@ -1345,14 +1355,24 @@ function drawAITractor(b){
   const bodyW = 24;
   const bodyH = 35;
 
+  // --- Глобальная тень ---
+  cx.save();
+  cx.translate(sx + 4, sy + 4);
+  cx.rotate(b.ang+Math.PI/2);
+  cx.fillStyle='rgba(0,0,0,.28)';
+  cx.fillRect(-bodyW/2, -bodyH/2, bodyW, bodyH);
+  cx.fillRect(-PW/2, -bodyH/2 - 10, PW, 7);
+  const ww=5,wh=bodyH*.30|0;
+  cx.fillRect(-bodyW/2-ww, -bodyH/2+6, ww,wh);
+  cx.fillRect( bodyW/2,    -bodyH/2+6, ww,wh);
+  cx.fillRect(-bodyW/2-ww,  bodyH/2-6-wh, ww,wh);
+  cx.fillRect( bodyW/2,     bodyH/2-6-wh, ww,wh);
+  cx.restore();
+
+  // --- Сам бот ---
   cx.save();
   cx.translate(sx,sy);
   cx.rotate(b.ang+Math.PI/2);
-
-  // Тень
-  cx.fillStyle='rgba(0,0,0,.28)';
-  cx.fillRect(-bodyW/2, -bodyH/2 + 4, bodyW, bodyH);
-  cx.fillRect(-PW/2+4, -bodyH/2 - 10+4, PW, 7);
 
   // Крепления ковша
   cx.fillStyle = '#555555';

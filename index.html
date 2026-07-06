@@ -458,7 +458,8 @@ const i18n = {
     statFertilizer: "Hay bonus",
     statStamina: "Stamina",
     statBonus: "Hay per block",
-    statAutopilot: "Autopilot",
+    statAutopilot: "Bots count",
+    statBotSpeed: "Bots Speed",
     restBtn: "🌙 Rest",
     newGameBtn: "🔄 New Game",
     newGameConfirm: "Start a new game? All progress will be reset.",
@@ -475,7 +476,8 @@ const i18n = {
       width: { name: "Mower",      desc: "Increases harvest width" },
       stamina: { name: "Fuel Tank",desc: "Increases drive time" },
       bonus: { name: "Barn",       desc: "Even more hay per block" },
-      autopilot: { name: "Driver", desc: "Passive hay collection every second" }
+      autopilot: { name: "Driver", desc: "Hires an AI driver bot" },
+      botSpeed: { name: "Bots Speed", desc: "Makes AI bots drive faster" }
     }
   }
 };
@@ -724,14 +726,30 @@ const UPGRADES = [
   {
     id:'autopilot', icon:'🤖',
     iconBg:'rgba(180,80,255,.15)',
-    maxLevel:5,
-    cost:[1000,3000,7500,15000,35000],
+    maxLevel:3,
+    cost:[1000,5000,15000],
     statKey:'statAutopilot',
-    statFn:(lvl)=>`${lvl > 0 ? ([0,5,15,35,75,150][lvl]) : 0} 🌾/s`,
+    statFn:(lvl)=>`${lvl} 🤖`,
+  },
+  {
+    id:'botSpeed', icon:'🚀',
+    iconBg:'rgba(0,255,200,.15)',
+    maxLevel:5,
+    cost:[500,1500,3000,8000,20000],
+    statKey:'statBotSpeed',
+    statFn:(lvl)=>`${lvl * 25}%`,
+  }
+  {
+    id:'botSpeed', icon:'🚀',
+    iconBg:'rgba(0,255,200,.15)',
+    maxLevel:5,
+    cost:[500,1500,3000,8000,20000],
+    statKey:'statBotSpeed',
+    statFn:(lvl)=>`${lvl * 25}%`,
   },
 ];
 
-const upgLvl = {speed:0, width:0, stamina:0, bonus:0, autopilot:0};
+const upgLvl = {speed:0, width:0, stamina:0, bonus:0, autopilot:0, botSpeed:0};
 
 // Применяем эффекты прокачки
 function getSpeed()     { return BASE_SPD + upgLvl.speed * 50; }
@@ -739,7 +757,7 @@ function getMowW()      { return BASE_PW  + upgLvl.width * 28 + (window.devCutte
 function getMowH()      { return BASE_PH; }
 // Амбар дает бонус сена с каждого блока
 function getScoreBonus(){ return upgLvl.bonus; }
-function getAutopilotMPS() { return upgLvl.autopilot > 0 ? [0,5,15,35,75,150][upgLvl.autopilot] : 0; }
+function getAutopilotMPS() { return 0; } // obsolete, but keep stub for backwards compat just in case
 
 // ── ВЫНОСЛИВОСТЬ ──────────────────────────────────────────────
 let maxStamina = 45; // Базовые 45 единиц
@@ -817,14 +835,7 @@ function buy(id) {
   upgLvl[id]++;
   if (id === 'stamina') updateMaxStamina();
   
-  if (id === 'autopilot') {
-    const mpsDisp = document.getElementById('mps-display');
-    const mps = getAutopilotMPS();
-    if (mps > 0) {
-      mpsDisp.style.display = 'block';
-      mpsDisp.textContent = `+${mps} 🌾/${currentLang==='ru'?'сек':'s'}`;
-    }
-  }
+  if (id === 'stamina') updateMaxStamina();
 
   scEl.textContent = score;
   if (typeof saveProgress === 'function') saveProgress(score, upgLvl);
@@ -872,7 +883,10 @@ function blocked(gx, gy) {
 
 // ── ИГРОК И ИИ ────────────────────────────────────────────────
 let px=MW/2*T, py=MH/2*T, pAng=0;
-let aiX=MW/2*T + 50, aiY=MH/2*T + 50, aiAng=0;
+let bots = [];
+for (let i = 0; i < 3; i++) {
+  bots.push({ x: MW/2*T + 50 + i*40, y: MH/2*T + 50, ang: 0, tgtI: -1, cd: 0 });
+}
 let camX=px, camY=py;
 let score=0;
 const floatTexts = []; // Всплывающий текст сена
@@ -1229,10 +1243,10 @@ function drawPlayer(){
   }
 }
 
-function drawAITractor(){
+function drawAITractor(b){
   const PW=BASE_PW, PH=BASE_PH;
-  const sx = Math.round(aiX - camX + CW/2);
-  const sy = Math.round(aiY - camY + CH/2);
+  const sx = Math.round(b.x - camX + CW/2);
+  const sy = Math.round(b.y - camY + CH/2);
 
   // Константные размеры самого трактора
   const bodyW = 24;
@@ -1240,7 +1254,7 @@ function drawAITractor(){
 
   cx.save();
   cx.translate(sx,sy);
-  cx.rotate(aiAng+Math.PI/2);
+  cx.rotate(b.ang+Math.PI/2);
 
   // Тень
   cx.fillStyle='rgba(0,0,0,.28)';
@@ -1325,7 +1339,8 @@ function render(now){
     cx.restore();
 
     drawPlayer();
-    if (upgLvl.autopilot > 0) drawAITractor();
+    const numBots = upgLvl.autopilot || 0;
+    for(let i=0; i<numBots; i++) drawAITractor(bots[i]);
   }
 
   // ── Ночной оверлей ───────────────────────────────────────────
@@ -1386,30 +1401,59 @@ function update(dt,now){
   if (nightPhase) return;
   const SPD = getSpeed();
 
-  // Автопилот (Тракторист)
-  const mps = getAutopilotMPS();
-  if (mps > 0) {
-    fractionalScore += mps * dt;
-    if (fractionalScore >= 1) {
-      const gain = Math.floor(fractionalScore);
-      fractionalScore -= gain;
-      score += gain;
-      scEl.textContent = score;
+  // Боты-Трактористы
+  const numBots = upgLvl.autopilot || 0;
+  const bSpdMult = 1 + (upgLvl.botSpeed || 0) * 0.25; // +25% скорости за уровень
+  for (let i = 0; i < numBots; i++) {
+    let b = bots[i];
+    b.cd -= dt;
+    if (b.cd <= 0 || b.tgtI === -1 || gState[b.tgtI] !== H) {
+      b.cd = 0.5 + Math.random() * 0.5; // Ищем цель раз в 0.5-1.0 сек
+      let bestD = Infinity;
+      let bestI = -1;
+      const bx = Math.floor(b.x / T), by = Math.floor(b.y / T);
+      for(let dy = -15; dy <= 15; dy++) {
+        for(let dx = -15; dx <= 15; dx++) {
+          const nx = bx + dx, ny = by + dy;
+          if (nx>=0 && nx<MW && ny>=0 && ny<MH) {
+            const idx = ny * MW + nx;
+            if (gState[idx] === H) {
+              const dist = dx*dx + dy*dy;
+              if (dist < bestD) { bestD = dist; bestI = idx; }
+            }
+          }
+        }
+      }
+      b.tgtI = bestI;
     }
-    // Физика ИИ-трактора
-    const lookAheadX = aiX + Math.cos(aiAng) * 40;
-    const lookAheadY = aiY + Math.sin(aiAng) * 40;
-    if (col(lookAheadX, lookAheadY) || Math.random() < 0.01) {
-      aiAng += (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random());
+
+    if (b.tgtI !== -1) {
+      const tx = (b.tgtI % MW) * T + T/2;
+      const ty = Math.floor(b.tgtI / MW) * T + T/2;
+      const targetAng = Math.atan2(ty - b.y, tx - b.x);
+      let diff = targetAng - b.ang;
+      while (diff > Math.PI) diff -= Math.PI*2;
+      while (diff < -Math.PI) diff += Math.PI*2;
+      b.ang += Math.sign(diff) * Math.min(Math.abs(diff), 3 * dt); // скорость поворота
+    } else {
+      b.ang += 0.5 * dt; // кружимся на месте
     }
-    // Движение вперед (чуть медленнее базовой скорости игрока)
-    const aiSpeed = BASE_SPD * 0.7;
-    const nx = aiX + Math.cos(aiAng) * aiSpeed * dt;
-    const ny = aiY + Math.sin(aiAng) * aiSpeed * dt;
-    if (!col(nx, aiY)) aiX = nx; else aiAng += Math.PI/2;
-    if (!col(aiX, ny)) aiY = ny; else aiAng += Math.PI/2;
-    
-    mowAt(aiX, aiY, aiAng, now, true);
+
+    // Избегание препятствий (заборов)
+    const lookX = b.x + Math.cos(b.ang) * 35;
+    const lookY = b.y + Math.sin(b.ang) * 35;
+    if (col(lookX, lookY)) {
+      b.ang += Math.PI * dt;
+    }
+
+    if (b.tgtI !== -1) {
+      const aiSpeed = BASE_SPD * 0.6 * bSpdMult; 
+      const nx = b.x + Math.cos(b.ang) * aiSpeed * dt;
+      const ny = b.y + Math.sin(b.ang) * aiSpeed * dt;
+      if (!col(nx, b.y)) b.x = nx;
+      if (!col(b.x, ny)) b.y = ny;
+      mowAt(b.x, b.y, b.ang, now, true);
+    }
   }
 
   // Обновление всплывающего текста
@@ -1701,7 +1745,9 @@ function newGame() {
   
   scEl.textContent = 0;
   px = MW/2*T; py = MH/2*T; pAng = 0;
-  aiX = px + 50; aiY = py + 50; aiAng = 0;
+  for (let i = 0; i < 3; i++) {
+    bots[i] = { x: px + 50 + i*40, y: py + 50, ang: 0, tgtI: -1, cd: 0 };
+  }
   camX = px; camY = py;
   growSet.clear();
   initGrid();
@@ -1777,9 +1823,11 @@ function drawMinimap() {
     }
   }
   
-  if (upgLvl.autopilot > 0) {
-    const apxPx = Math.floor(aiX / T) * MM + 1;
-    const apyPx = Math.floor(aiY / T) * MM + 1;
+  const numBots = upgLvl.autopilot || 0;
+  for (let i = 0; i < numBots; i++) {
+    const b = bots[i];
+    const apxPx = Math.floor(b.x / T) * MM + 1;
+    const apyPx = Math.floor(b.y / T) * MM + 1;
     if (apxPx >= 0 && apxPx < MW*MM && apyPx >= 0 && apyPx < MH*MM) {
       for (let dy=-1; dy<=1; dy++) {
         for (let dx=-1; dx<=1; dx++) {

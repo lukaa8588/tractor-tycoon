@@ -768,7 +768,7 @@ const UPGRADES = [
 const upgLvl = {speed:0, width:0, stamina:0, bonus:0, autopilot:0, botSpeed:0, quest:0};
 
 const QUESTS = [
-  { title: "Городской пекарь", desc: "Пекарне нужно много чистого сена для бережной упаковки свежего хлеба.", cost: 15000, reward: "Награда: навсегда +1 сено с блока" },
+  { title: "Городской зоопарк", desc: "Зоопарку срочно нужна подстилка из чистого сена для вольеров со слонами.", cost: 15000, reward: "Награда: навсегда +1 сено с блока" },
   { title: "Местный Лорд", desc: "Лорду нужно кормить огромный табун лошадей.", cost: 50000, reward: "Награда: Максимум ботов-трактористов увеличен с 3 до 5" },
   { title: "Король", desc: "Королевские амбары пусты! Зима близко.", cost: 250000, reward: "Награда: Ваш трактор окрашивается в ЗОЛОТОЙ цвет" },
   { title: "Мега-заказ Империи", desc: "Построить запасы на зиму для всей страны.", cost: 1000000, reward: "Титул Магната (Полная победа в игре!)" }
@@ -1255,9 +1255,16 @@ function drawPlayer(){
     cx.fillRect(-PW/2 + offsetX + i*stripeStep, -bodyH/2 - 10, stripeW, 7);
   }
 
-  // 🚜 Сам трактор (остается красивым и пропорциональным!)
-  // Красный кузов (или золотой за 3-й квест!)
-  cx.fillStyle = (upgLvl.quest >= 3) ? '#ffd700' : '#cc2200';
+  // 🚜 Сам трактор (Красный или градиентный Золотой)
+  if (upgLvl.quest >= 3) {
+    let grad = cx.createLinearGradient(-bodyW/2, -bodyH/2, bodyW/2, bodyH/2);
+    grad.addColorStop(0, '#ffeeaa');
+    grad.addColorStop(0.4, '#ffcc00');
+    grad.addColorStop(1, '#996600');
+    cx.fillStyle = grad;
+  } else {
+    cx.fillStyle = '#cc2200';
+  }
   cx.fillRect(-bodyW/2,-bodyH/2,bodyW,bodyH);
 
   // Желтый капот
@@ -1350,8 +1357,8 @@ function drawAITractor(b){
   cx.fillRect(-PW/2 - 2, -bodyH/2 - 12, 2, 10);
   cx.fillRect( PW/2,     -bodyH/2 - 12, 2, 10);
 
-  // Синий кузов бота (или золотой!)
-  cx.fillStyle = (upgLvl.quest >= 3) ? '#ffd700' : '#1e88e5';
+  // Синий кузов бота
+  cx.fillStyle = '#1e88e5';
   cx.fillRect(-bodyW/2,-bodyH/2,bodyW,bodyH);
 
   // Серебристый капот

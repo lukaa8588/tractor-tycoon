@@ -384,7 +384,10 @@
   
   <hr style="border:1px solid #ffffff15;margin:8px 0">
   
-  <div class="dev-btn" onclick="devAddHay()">+ 10,000 🌾</div>
+  <div style="display:flex;gap:8px">
+    <div class="dev-btn" style="flex:1" onclick="devAddHay()">+ 10,000 🌾</div>
+    <div class="dev-btn" style="flex:1; background:#cc5500" onclick="score+=1000000;scEl.textContent=score;if(typeof saveProgress === 'function')saveProgress(score,upgLvl,currentDay);">+ 1,000,000 🌾</div>
+  </div>
   <div style="display:flex;gap:8px">
     <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('speed')">Max ⚡</div>
     <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('width')">Max ⚙️</div>

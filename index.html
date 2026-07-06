@@ -1229,19 +1229,73 @@ function drawPlayer(){
   }
 }
 
-function drawAITractor() {
+function drawAITractor(){
+  const PW=BASE_PW, PH=BASE_PH;
   const sx = Math.round(aiX - camX + CW/2);
   const sy = Math.round(aiY - camY + CH/2);
+
+  // Константные размеры самого трактора
+  const bodyW = 24;
+  const bodyH = 35;
+
   cx.save();
-  cx.translate(sx, sy);
-  cx.rotate(aiAng + Math.PI / 2);
-  cx.fillStyle = '#333';
-  cx.fillRect(-12, -18, 24, 35);
-  cx.fillStyle = '#555';
-  cx.fillRect(-14, -15, 4, 10);
-  cx.fillRect(10, -15, 4, 10);
-  cx.fillRect(-14, 8, 4, 10);
-  cx.fillRect(10, 8, 4, 10);
+  cx.translate(sx,sy);
+  cx.rotate(aiAng+Math.PI/2);
+
+  // Тень
+  cx.fillStyle='rgba(0,0,0,.28)';
+  cx.fillRect(-bodyW/2+4,-bodyH/2+4,bodyW,bodyH);
+  cx.fillRect(-PW/2+4, -bodyH/2 - 10+4, PW, 7);
+
+  // Крепления ковша
+  cx.fillStyle = '#555555';
+  cx.fillRect(-6, -bodyH/2 - 4, 3, 5);
+  cx.fillRect(3, -bodyH/2 - 4, 3, 5);
+
+  // Ковш
+  cx.fillStyle = '#b0b8c0';
+  cx.fillRect(-PW/2, -bodyH/2 - 10, PW, 7);
+
+  // Боковые щитки
+  cx.fillStyle = '#606870';
+  cx.fillRect(-PW/2 - 2, -bodyH/2 - 12, 2, 10);
+  cx.fillRect( PW/2,     -bodyH/2 - 12, 2, 10);
+
+  // Синий кузов бота
+  cx.fillStyle='#1e88e5';
+  cx.fillRect(-bodyW/2,-bodyH/2,bodyW,bodyH);
+
+  // Серебристый капот
+  cx.fillStyle='#cfd8dc';
+  cx.fillRect(-bodyW/2+3,-bodyH/2+3,bodyW-6,bodyH*.42);
+
+  // Голубое лобовое стекло
+  cx.fillStyle='#87ceeb';
+  cx.fillRect(-bodyW/2+6,-bodyH/2+6,bodyW-12,bodyH*.24);
+
+  // Антеннка робота сзади
+  cx.fillStyle='#333';
+  cx.fillRect(-1, 0, 2, bodyH/2 - 4);
+  cx.fillStyle='#ff3333';
+  cx.beginPath();
+  cx.arc(0, bodyH/2 - 4, 3, 0, Math.PI*2);
+  cx.fill();
+
+  // Колеса
+  cx.fillStyle='#111';
+  const ww=5,wh=bodyH*.30|0;
+  cx.fillRect(-bodyW/2-ww, -bodyH/2+6,     ww,wh);
+  cx.fillRect( bodyW/2,    -bodyH/2+6,     ww,wh);
+  cx.fillRect(-bodyW/2-ww,  bodyH/2-wh-6,  ww,wh);
+  cx.fillRect( bodyW/2,     bodyH/2-wh-6,  ww,wh);
+
+  // Колпаки на колесах
+  cx.fillStyle='#555';
+  cx.fillRect(-bodyW/2-ww+1, -bodyH/2+8, ww-2, wh-4);
+  cx.fillRect( bodyW/2+1,    -bodyH/2+8, ww-2, wh-4);
+  cx.fillRect(-bodyW/2-ww+1,  bodyH/2-wh-4, ww-2, wh-4);
+  cx.fillRect( bodyW/2+1,     bodyH/2-wh-4, ww-2, wh-4);
+  
   cx.restore();
 }
 

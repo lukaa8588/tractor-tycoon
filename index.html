@@ -1045,13 +1045,26 @@ const scEl=document.getElementById('sc');
 // ── ВВОД ─────────────────────────────────────────────────────
 const K={};
 window.addEventListener('keydown', e => {
-  K[e.code]=true;
+  if (e.code) K[e.code]=true;
+  if (e.key) K[e.key.toLowerCase()]=true;
   if(e.code==='Tab'||/^Arrow/.test(e.code))e.preventDefault();
   
   // Открытие панели разработчика
-  if(e.code==='Digit7') toggleDevPanel();
+  if(e.code==='Digit7'||e.key==='7') toggleDevPanel();
 });
-window.addEventListener('keyup', e=>{ K[e.code]=false });
+window.addEventListener('keyup', e=>{ 
+  if (e.code) K[e.code]=false;
+  if (e.key) K[e.key.toLowerCase()]=false;
+});
+document.getElementById('joystick-zone').addEventListener('touchcancel', (e) => {
+  for(let i=0; i<e.changedTouches.length; i++){
+    if (e.changedTouches[i].identifier === jTouchId) {
+      joyActive = false; jTouchId = null; joyDX = 0; joyDY = 0;
+      document.getElementById('joystick-base').style.display = 'none';
+      break;
+    }
+  }
+}, { passive: false });
 
 // Сброс всех клавиш и джойстика при потере фокуса окном (чтобы трактор не залипал)
 window.addEventListener('blur', () => {
@@ -1179,6 +1192,7 @@ function h(a,b,s){
 
 // ── РИСОВАНИЕ ────────────────────────────────────────────────
 function renderCellToMap(gx,gy,now){
+  if (!mapCx) return;
   if(gx<0||gx>=MW||gy<0||gy>=MH)return;
   const i=gy*MW+gx;
   const st=gState[i];
@@ -1515,9 +1529,12 @@ function render(now){
   cx.clearRect(0,0,CW,CH);
   
   // Рисуем кэшированную карту за один вызов!
-  const mapSx = Math.round(camX - CW/2);
-  const mapSy = Math.round(camY - CH/2);
-  cx.drawImage(mapCv, -mapSx, -mapSy);
+  const mapSx = Math.max(0, Math.min(MW * T - CW, camX - CW / 2));
+  const mapSy = Math.max(0, Math.min(MH * T - CH, camY - CH / 2));
+
+  try {
+    cx.drawImage(mapCv, mapSx, mapSy, CW, CH, 0, 0, CW, CH);
+  } catch(e) {}
   
   if (!isNight || nightAlpha < 0.85) {
     // Всплывающий текст поверх карты, но под трактором
@@ -1665,15 +1682,16 @@ function update(dt,now){
     if (ft.life <= 0) floatTexts.splice(i, 1);
   }
 
-  let dx=0,dy=0;
+  let kDX=0,kDY=0;
+  if(K['KeyW'] || K['ArrowUp'] || K['w'] || K['ц'])kDY-=1;
+  if(K['KeyS'] || K['ArrowDown'] || K['s'] || K['ы'])kDY+=1;
+  if(K['KeyA'] || K['ArrowLeft'] || K['a'] || K['ф'])kDX-=1;
+  if(K['KeyD'] || K['ArrowRight'] || K['d'] || K['в'])kDX+=1;
+  if(kDX&&kDY){kDX*=.7071;kDY*=.7071}
   
-  if(K['KeyW'] || K['ArrowUp'])dy-=1;
-  if(K['KeyS'] || K['ArrowDown'])dy+=1;
-  if(K['KeyA'] || K['ArrowLeft'])dx-=1;
-  if(K['KeyD'] || K['ArrowRight'])dx+=1;
-  if(dx&&dy){dx*=.7071;dy*=.7071}
+  let dx = kDX, dy = kDY;
   
-  if(joyActive) {
+  if (kDX === 0 && kDY === 0 && joyActive) {
     dx = joyDX;
     dy = joyDY;
   }

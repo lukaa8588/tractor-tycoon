@@ -450,6 +450,7 @@ const i18n = {
     statBonus: "Сена с блока",
     statAutopilot: "Ботов",
     statBotSpeed: "Скор. ботов",
+    statLand: "Территория",
     restBtn: "⛺ Отдохнуть",
     newGameBtn: "🔄 Новая игра",
     newGameConfirm: "Начать новую игру? Весь прогресс будет сброшен.",
@@ -467,6 +468,7 @@ const i18n = {
       stamina: { name: "Бак",     desc: "Увеличивает запас хода" },
       bonus: { name: "Амбар",     desc: "Ещё больше сена с каждого блока" },
       autopilot: { name: "Тракторист", desc: "Нанимает бота-тракториста" },
+      land: { name: "Расширение фермы", desc: "Вырубает лес, открывая новые культуры" },
       botSpeed: { name: "Скор. Ботов", desc: "Делает ботов быстрее" }
     },
     questsTitle: "📜 Доска Заказов",
@@ -500,6 +502,7 @@ const i18n = {
     statBonus: "Hay per block",
     statAutopilot: "Bots count",
     statBotSpeed: "Bots Speed",
+    statLand: "Territory",
     restBtn: "🌙 Rest",
     newGameBtn: "🔄 New Game",
     newGameConfirm: "Start a new game? All progress will be reset.",
@@ -517,6 +520,7 @@ const i18n = {
       stamina: { name: "Fuel Tank",desc: "Increases drive time" },
       bonus: { name: "Barn",       desc: "Even more hay per block" },
       autopilot: { name: "Driver", desc: "Hires an AI driver bot" },
+      land: { name: "Farm Expansion", desc: "Clears the forest, unlocking new crops" },
       botSpeed: { name: "Bots Speed", desc: "Makes AI bots drive faster" }
     },
     questsTitle: "📜 Quest Board",
@@ -730,9 +734,9 @@ function playMusicSequence() {
 
 // ── КОНФИГ ───────────────────────────────────────────────────
 const T    = 32;
-const MW   = 100;
-const MH   = 100;
-const BRD  = 17;
+const MW   = 160;
+const MH   = 160;
+const BRD  = 12;
 const LRP  = 0.12;
 // GROW_BASE удалён — авторост заменён системой дней
 
@@ -742,10 +746,19 @@ const BASE_PW  = 12; // 12px на уровне 0 (меньше тайла 32px, 
 const BASE_PH  = 35;
 
 // Состояния: F=лес, H=сено, G=растёт
-const F=0, H=1, G=2;
+const F=0, H=1, G=2, C=3, CG=4, S=5, SG=6;
 
 // ── ПРОКАЧКА ─────────────────────────────────────────────────
 const UPGRADES = [
+  {
+    id:'land', icon:'🗺️',
+    iconBg:'rgba(100,255,100,.15)',
+    maxLevel:2,
+    cost:[150000, 1500000],
+    statKey:'statLand',
+    statFn:(lvl)=>lvl===0?'Сено':lvl===1?'Кукуруза':'Подсолнухи',
+  },
+
   {
     id:'speed', icon:'⚡',
     iconBg:'rgba(255,180,30,.15)',
@@ -796,7 +809,7 @@ const UPGRADES = [
   },
 ];
 
-const upgLvl = {speed:0, width:0, stamina:0, bonus:0, autopilot:0, botSpeed:0, quest:0};
+const upgLvl = {land:0, speed:0, width:0, stamina:0, bonus:0, autopilot:0, botSpeed:0, quest:0};
 
 const QUESTS = [
   { cost: 13500 },
@@ -1146,58 +1159,88 @@ function h(a,b,s){
 
 // ── РИСОВАНИЕ ────────────────────────────────────────────────
 function renderCellToMap(gx,gy,now){
+  if(gx<0||gx>=MW||gy<0||gy>=MH)return;
   const i=gy*MW+gx;
   const st=gState[i];
-  const h1=h(gx,gy,1),h2=h(gx,gy,2),h3=h(gx,gy,3);
-  const sx = gx * T, sy = gy * T;
+  const sx=gx*T;
+  const sy=gy*T;
   
-  mapCx.save();
-  mapCx.beginPath();
-  mapCx.rect(sx, sy, T, T);
-  mapCx.clip();
-  
-  if(st===F){ drawForestMap(sx,sy,h1,h2,h3,gx,gy); }
-  else if(st===H){ drawStalksMap(sx,sy,1,h1,h2,h3,gx,gy); }
-  else {
-    // Растёт только ночью, поэтому прогресс всегда 0 (только пеньки)
-    drawGrowingMap(sx,sy,0,h1,h2,h3,gx,gy);
-  }
-  
-  mapCx.restore();
-}
-
-function drawForestMap(sx,sy,h1,h2,h3,gx,gy){
-  // Обычная трава снаружи забора
-  mapCx.fillStyle = `hsl(100, 40%, ${25 + h1 * 10}%)`; 
-  mapCx.fillRect(sx, sy, T, T);
-  
-  // Определяем, находится ли эта клетка на границе с полем
-  const isLeftFence = (gx === BRD - 1 && gy >= BRD - 1 && gy <= MH - BRD);
-  const isRightFence = (gx === MW - BRD && gy >= BRD - 1 && gy <= MH - BRD);
-  const isTopFence = (gy === BRD - 1 && gx >= BRD - 1 && gx <= MW - BRD);
-  const isBottomFence = (gy === MH - BRD && gx >= BRD - 1 && gx <= MW - BRD);
-
-  if (!isLeftFence && !isRightFence && !isTopFence && !isBottomFence) {
-    if (h2 > 0.8) {
-       mapCx.fillStyle = `hsl(110, 40%, ${15 + h3 * 10}%)`;
-       mapCx.fillRect(sx + 4, sy + 4, T - 8, T - 8);
-    }
+  if(st===F){
+    // Forest
+    const r=h(gx,gy,1);
+    mapCx.fillStyle=`hsl(${110+r*20}, ${40+r*20}%, ${25+r*10}%)`;
+    mapCx.fillRect(sx,sy,T,T);
     return;
   }
-
-  // Рисуем деревянный забор!
-  mapCx.fillStyle = `hsl(30, 40%, ${30 + h2 * 10}%)`; // Дерево
-
-  if (isTopFence || isBottomFence) {
-    mapCx.fillRect(sx, sy + T/2 - 3, T, 6);
-    if (gx % 2 === 0) {
-      mapCx.fillRect(sx + T/2 - 4, sy + 2, 8, T - 4);
-    }
+  
+  const h1=h(gx,gy,1);
+  const h2=h(gx,gy,2);
+  const h3=h(gx,gy,3);
+  
+  const isHay = (st===H || st===G);
+  const isCorn = (st===C || st===CG);
+  const isSun = (st===S || st===SG);
+  
+  const p = (st===H || st===C || st===S) ? 1 : Math.min(1, (now - gCutAt[i])/GROW_DUR);
+  
+  // Base ground
+  if (isHay) {
+    if(p<.33) mapCx.fillStyle=`hsl(${38+h1*10},70%,${48+h2*10}%)`;
+    else mapCx.fillStyle=`hsl(${44+h1*12},80%,${57+h2*12}%)`;
+  } else if (isCorn) {
+    if(p<.33) mapCx.fillStyle=`hsl(${35+h1*10},60%,${40+h2*10}%)`;
+    else mapCx.fillStyle=`hsl(${40+h1*10},70%,${45+h2*10}%)`;
+  } else if (isSun) {
+    if(p<.33) mapCx.fillStyle=`hsl(${30+h1*10},55%,${35+h2*10}%)`;
+    else mapCx.fillStyle=`hsl(${35+h1*10},60%,${40+h2*10}%)`;
   }
-  if (isLeftFence || isRightFence) {
-    mapCx.fillRect(sx + T/2 - 3, sy, 6, T);
-    if (gy % 2 === 0) {
-      mapCx.fillRect(sx + 2, sy + T/2 - 4, T - 4, 8);
+  
+  mapCx.fillRect(sx,sy,T,T);
+  
+  const cnt=4+(h3*4)|0;
+  for(let j=0; j<cnt; j++){
+    const hx =h(gx*7+j,gy*3+j,10+j);
+    const hh2=h(gx*3+j,gy*9+j,20+j);
+    const hc =h(gx*5+j,gy*2+j,30+j);
+    const stx=sx+3+hx*(T-6);
+    
+    if (isHay) {
+      const maxH=T*(.22+hh2*.45);
+      const hp=p<.33?(p/.33)*.33:p<.66?.33+(p-.33)/.34*.34:.67+(p-.66)/.34*.33;
+      const sth=maxH*Math.min(1,hp);
+      const colorT=Math.max(0,(p-.33)/.67);
+      const hue=110-colorT*66;
+      const light=32+colorT*30;
+      const alpha=.38+hc*.42;
+      mapCx.fillStyle=`hsla(${hue},75%,${light}%,${alpha})`;
+      mapCx.fillRect(stx,sy+T-3-sth,1,sth);
+      if(p>.35){
+        const tA=Math.min(1,(p-.35)/.3)*alpha;
+        mapCx.fillStyle=`hsla(${hue-8},78%,${light-5}%,${tA})`;
+        mapCx.fillRect(stx-1,sy+T-3-sth-3,3,4);
+      }
+    } else if (isCorn) {
+      const maxH=T*(.5+hh2*.5);
+      const sth=maxH*p;
+      mapCx.fillStyle=`hsl(${90+hc*20}, 70%, ${35+hc*15}%)`;
+      mapCx.fillRect(stx-1,sy+T-2-sth,2,sth);
+      if(p>0.8) {
+        // Corn cob
+        mapCx.fillStyle=`hsl(50, 90%, 60%)`;
+        mapCx.fillRect(stx-1,sy+T-2-sth*.7,3,sth*.3);
+      }
+    } else if (isSun) {
+      const maxH=T*(.4+hh2*.3);
+      const sth=maxH*p;
+      mapCx.fillStyle=`hsl(${100+hc*10}, 60%, 30%)`;
+      mapCx.fillRect(stx,sy+T-2-sth,2,sth);
+      if(p>0.9) {
+        // Sunflower head
+        mapCx.fillStyle=`hsl(50, 100%, 55%)`;
+        mapCx.beginPath(); mapCx.arc(stx+1, sy+T-2-sth, 4, 0, Math.PI*2); mapCx.fill();
+        mapCx.fillStyle=`hsl(30, 80%, 20%)`;
+        mapCx.beginPath(); mapCx.arc(stx+1, sy+T-2-sth, 2, 0, Math.PI*2); mapCx.fill();
+      }
     }
   }
 }
@@ -1736,7 +1779,7 @@ function mowAt(tx, ty, tAng, now, isAI = false) {
   for (let gy = gy0; gy <= gy1; gy++) {
     for (let gx = gx0; gx <= gx1; gx++) {
       const cellI = gy * MW + gx;
-      if (gState[cellI] === H) {
+      if (gState[cellI] === H || gState[cellI] === C || gState[cellI] === S) {
         const cxVal = gx * T + T / 2;
         const cyVal = gy * T + T / 2;
         const d2 = distToSegSq(cxVal, cyVal, x1, y1, x2, y2);
@@ -1757,12 +1800,18 @@ function mowAt(tx, ty, tAng, now, isAI = false) {
   for (let k = 0; k < len; k++) {
     didCut = true;
     const i = candidates[k].i;
-    gState[i] = G;
+    const st = gState[i];
+    if(st===H) gState[i] = G;
+    else if(st===C) gState[i] = CG;
+    else if(st===S) gState[i] = SG;
+    
     gCutAt[i] = now;
     growSet.add(i);
     
-    
-    const amount = 1 + getScoreBonus();
+    let baseAmount = 1;
+    if(st===C) baseAmount = 5;
+    if(st===S) baseAmount = 25;
+    const amount = baseAmount + getScoreBonus();
     score += amount;
     
     floatTexts.push({
@@ -1839,9 +1888,11 @@ function animateNight() {
       growSet.clear();
       for (let i = 0; i < gState.length; i++) {
         if (gState[i] === G) {
-          gState[i] = H;
-          gCutAt[i] = 0;
-          renderCellToMap(i % MW, Math.floor(i / MW), 0);
+          gState[i] = H; gCutAt[i] = 0; renderCellToMap(i % MW, Math.floor(i / MW), 0);
+        } else if (gState[i] === CG) {
+          gState[i] = C; gCutAt[i] = 0; renderCellToMap(i % MW, Math.floor(i / MW), 0);
+        } else if (gState[i] === SG) {
+          gState[i] = S; gCutAt[i] = 0; renderCellToMap(i % MW, Math.floor(i / MW), 0);
         }
       }
       // Показываем номер дня

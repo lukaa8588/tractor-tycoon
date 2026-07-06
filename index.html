@@ -993,6 +993,7 @@ function initGrid() {
   const cx = MW/2;
   const cy = MH/2;
   const landLvl = Number(upgLvl.land) || 0;
+  const maxR = 25 + landLvl * 15;
 
   for(let y=0; y<MH; y++){
     for(let x=0; x<MW; x++){
@@ -1004,13 +1005,10 @@ function initGrid() {
         const dy = y - cy;
         const dist = Math.sqrt(dx*dx + dy*dy);
         
-        if (landLvl === 0) {
-          gState[i] = H;
-        } else if (landLvl === 1) {
-          if (dist <= 25) gState[i] = H;
-          else gState[i] = C;
+        if(dist > maxR) {
+          gState[i] = F;
         } else {
-          if (dist <= 25) gState[i] = H;
+          if(dist <= 25) gState[i] = H;
           else if (dist <= 40) gState[i] = C;
           else gState[i] = S;
         }
@@ -1240,16 +1238,19 @@ function renderCellToMap(gx,gy,now){
   
   const p = (st===H || st===C || st===S) ? 1 : Math.min(1, (now - gCutAt[i])/GROW_DUR);
   
+  // Коричневая земля
+  const dirtColor = `hsl(${30+h1*10}, 45%, ${28+h2*5}%)`;
+  
   // Base ground
   if (isHay) {
-    if(p<.33) mapCx.fillStyle=`hsl(${38+h1*10},70%,${48+h2*10}%)`;
-    else mapCx.fillStyle=`hsl(${44+h1*12},80%,${57+h2*12}%)`;
+    if(p<.33) mapCx.fillStyle = dirtColor;
+    else mapCx.fillStyle = `hsl(${100+h1*15}, 60%, ${40+h2*10}%)`; // Зеленая трава
   } else if (isCorn) {
-    if(p<.33) mapCx.fillStyle=`hsl(${35+h1*10},60%,${40+h2*10}%)`;
-    else mapCx.fillStyle=`hsl(${40+h1*10},70%,${45+h2*10}%)`;
+    if(p<.33) mapCx.fillStyle = dirtColor;
+    else mapCx.fillStyle = `hsl(${45+h1*10}, 80%, ${50+h2*10}%)`; // Желто-зеленая
   } else if (isSun) {
-    if(p<.33) mapCx.fillStyle=`hsl(${30+h1*10},55%,${35+h2*10}%)`;
-    else mapCx.fillStyle=`hsl(${35+h1*10},60%,${40+h2*10}%)`;
+    if(p<.33) mapCx.fillStyle = dirtColor;
+    else mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`; // Оранжевая
   }
   
   mapCx.fillRect(sx,sy,T,T);

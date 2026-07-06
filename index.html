@@ -754,7 +754,7 @@ const UPGRADES = [
     id:'land', icon:'🗺️',
     iconBg:'rgba(100,255,100,.15)',
     maxLevel:2,
-    cost:[150000, 1500000],
+    cost:[135000, 1350000],
     statKey:'statLand',
     statFn:(lvl)=>lvl===0?'Сено':lvl===1?'Кукуруза':'Подсолнухи',
   },
@@ -763,7 +763,7 @@ const UPGRADES = [
     id:'speed', icon:'⚡',
     iconBg:'rgba(255,180,30,.15)',
     maxLevel:5,
-    cost:[700,2250,5400,12600,27000],
+    cost:[630, 2025, 4860, 11340, 24300],
     statKey:'statSpeed',
     statFn:(lvl)=>`${BASE_SPD + lvl*50} px/s`,
   },
@@ -771,7 +771,7 @@ const UPGRADES = [
     id:'width', icon:'⚙️',
     iconBg:'rgba(80,160,255,.15)',
     maxLevel:5,
-    cost:[900,2700,6300,14400,31500],
+    cost:[810, 2430, 5670, 12960, 28350],
     statKey:'statWidth',
     statFn:(lvl)=>`${1 + lvl} 🟩`,
   },
@@ -779,7 +779,7 @@ const UPGRADES = [
     id:'stamina', icon:'🔋',
     iconBg:'rgba(40,200,80,.15)',
     maxLevel:5,
-    cost:[700,1800,4500,10800,27000],
+    cost:[630, 1620, 4050, 9720, 24300],
     statKey:'statStamina',
     statFn:(lvl)=>`${45 + lvl*60} ⚡`,
   },
@@ -787,7 +787,7 @@ const UPGRADES = [
     id:'bonus', icon:'🏚️',
     iconBg:'rgba(255,215,0,.12)',
     maxLevel:4,
-    cost:[1350,3600,10800,31500],
+    cost:[1215, 3240, 9720, 28350],
     statKey:'statBonus',
     statFn:(lvl)=>`${1 + lvl} 🌾`,
   },
@@ -795,7 +795,7 @@ const UPGRADES = [
     id:'autopilot', icon:'🤖',
     iconBg:'rgba(180,80,255,.15)',
     maxLevel:3,
-    cost:[2700,13500,63000],
+    cost:[2430, 12150, 56700],
     statKey:'statAutopilot',
     statFn:(lvl)=>`${lvl} 🤖`,
   },
@@ -803,7 +803,7 @@ const UPGRADES = [
     id:'botSpeed', icon:'🚀',
     iconBg:'rgba(0,255,200,.15)',
     maxLevel:5,
-    cost:[1350,4500,12600,31500,72000],
+    cost:[1215, 4050, 11340, 28350, 64800],
     statKey:'statBotSpeed',
     statFn:(lvl)=>`${lvl * 25}%`,
   },
@@ -812,10 +812,10 @@ const UPGRADES = [
 const upgLvl = {land:0, speed:0, width:0, stamina:0, bonus:0, autopilot:0, botSpeed:0, quest:0};
 
 const QUESTS = [
-  { cost: 13500 },
-  { cost: 45000 },
-  { cost: 225000 },
-  { cost: 900000 }
+  { cost: 12150 },
+  { cost: 40500 },
+  { cost: 202500 },
+  { cost: 810000 }
 ];
 
 // Применяем эффекты прокачки
@@ -993,7 +993,6 @@ function initGrid() {
   const cx = MW/2;
   const cy = MH/2;
   const landLvl = Number(upgLvl.land) || 0;
-  const maxR = 25 + landLvl * 15;
 
   for(let y=0; y<MH; y++){
     for(let x=0; x<MW; x++){
@@ -1005,10 +1004,13 @@ function initGrid() {
         const dy = y - cy;
         const dist = Math.sqrt(dx*dx + dy*dy);
         
-        if(dist > maxR) {
-          gState[i] = F;
+        if (landLvl === 0) {
+          gState[i] = H;
+        } else if (landLvl === 1) {
+          if (dist <= 25) gState[i] = H;
+          else gState[i] = C;
         } else {
-          if(dist <= 25) gState[i] = H;
+          if (dist <= 25) gState[i] = H;
           else if (dist <= 40) gState[i] = C;
           else gState[i] = S;
         }

@@ -870,8 +870,9 @@ function blocked(gx, gy) {
   return gState[gy*MW+gx]===F;
 }
 
-// ── ИГРОК ────────────────────────────────────────────────────
+// ── ИГРОК И ИИ ────────────────────────────────────────────────
 let px=MW/2*T, py=MH/2*T, pAng=0;
+let aiX=MW/2*T + 50, aiY=MH/2*T + 50, aiAng=0;
 let camX=px, camY=py;
 let score=0;
 const floatTexts = []; // Всплывающий текст сена
@@ -1228,6 +1229,22 @@ function drawPlayer(){
   }
 }
 
+function drawAITractor() {
+  const sx = Math.round(aiX - camX + CW/2);
+  const sy = Math.round(aiY - camY + CH/2);
+  cx.save();
+  cx.translate(sx, sy);
+  cx.rotate(aiAng + Math.PI / 2);
+  cx.fillStyle = '#333';
+  cx.fillRect(-12, -18, 24, 35);
+  cx.fillStyle = '#555';
+  cx.fillRect(-14, -15, 4, 10);
+  cx.fillRect(10, -15, 4, 10);
+  cx.fillRect(-14, 8, 4, 10);
+  cx.fillRect(10, 8, 4, 10);
+  cx.restore();
+}
+
 // ── РЕНДЕР ───────────────────────────────────────────────────
 function render(now){
   cx.clearRect(0,0,CW,CH);
@@ -1254,6 +1271,7 @@ function render(now){
     cx.restore();
 
     drawPlayer();
+    if (upgLvl.autopilot > 0) drawAITractor();
   }
 
   // ── Ночной оверлей ───────────────────────────────────────────
@@ -1301,7 +1319,7 @@ function render(now){
     if (nightPhase === 'darkening' && nightAlpha > 0.8) {
       const ta = (nightAlpha - 0.8) / 0.2;
       cx.fillStyle = `rgba(180,160,255,${ta})`;
-      cx.font = `bold ${Math.round(CW * 0.045)}px 'Segoe UI', sans-serif`;
+      cx.font = `bold ${Math.round(CW * 0.045)}px 'Segoe UI', sans-serif';
       cx.textAlign = 'center';
       cx.fillText(t('nightText'), CW/2, CH/2 + 60);
       cx.textAlign = 'left';
@@ -1323,8 +1341,21 @@ function update(dt,now){
       fractionalScore -= gain;
       score += gain;
       scEl.textContent = score;
-      if (shopOpen) document.getElementById('bal').textContent = score;
     }
+    // Физика ИИ-трактора
+    const lookAheadX = aiX + Math.cos(aiAng) * 40;
+    const lookAheadY = aiY + Math.sin(aiAng) * 40;
+    if (col(lookAheadX, lookAheadY) || Math.random() < 0.01) {
+      aiAng += (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random());
+    }
+    // Движение вперед (чуть медленнее базовой скорости игрока)
+    const aiSpeed = BASE_SPD * 0.7;
+    const nx = aiX + Math.cos(aiAng) * aiSpeed * dt;
+    const ny = aiY + Math.sin(aiAng) * aiSpeed * dt;
+    if (!col(nx, aiY)) aiX = nx; else aiAng += Math.PI/2;
+    if (!col(aiX, ny)) aiY = ny; else aiAng += Math.PI/2;
+    
+    mowAt(aiX, aiY, aiAng, now, true);
   }
 
   // Обновление всплывающего текста
@@ -1414,7 +1445,7 @@ function update(dt,now){
       const ny = py + stepY; if (!col(px, ny)) py = ny;
       
       // Сразу косим траву в новой промежуточной точке
-      if (mowAt(px, py, pAng, now)) {
+      if (mowAt(px, py, pAng, now, false)) {
         playedCutThisFrame = true;
       }
     }
@@ -1448,9 +1479,9 @@ function distToSegSq(cx, cy, x1, y1, x2, y2) {
 }
 
 // ── ФУНКЦИЯ ПОКОСА ───────────────────────────────────────────
-function mowAt(tx, ty, tAng, now) {
+function mowAt(tx, ty, tAng, now, isAI = false) {
   let didCut = false;
-  const PW = getMowW();
+  const PW = isAI ? BASE_PW : getMowW(); // У ИИ базовая косилка
   const cutterDist = 35 / 2 + 6;
   const cutterX = tx + Math.cos(tAng) * cutterDist;
   const cutterY = ty + Math.sin(tAng) * cutterDist;
@@ -1497,16 +1528,19 @@ function mowAt(tx, ty, tAng, now) {
     gState[i] = G;
     gCutAt[i] = now;
     growSet.add(i);
-    const amount = 1 + getScoreBonus();
-    score += amount;
     
-    // Всплывающий текст
-    floatTexts.push({
-      x: (i % MW) * T + T / 2 + (Math.random() * 10 - 5),
-      y: Math.floor(i / MW) * T + T / 2 + (Math.random() * 10 - 5),
-      text: '+' + amount,
-      life: 1.0
-    });
+    if (!isAI) {
+      const amount = 1 + getScoreBonus();
+      score += amount;
+      
+      // Всплывающий текст
+      floatTexts.push({
+        x: (i % MW) * T + T / 2 + (Math.random() * 10 - 5),
+        y: Math.floor(i / MW) * T + T / 2 + (Math.random() * 10 - 5),
+        text: '+' + amount,
+        life: 1.0
+      });
+    }
 
     // DOM 업데이트 УБРАН отсюда, перерисовка только одного блока
     renderCellToMap(i % MW, Math.floor(i / MW), now);
@@ -1613,6 +1647,7 @@ function newGame() {
   
   scEl.textContent = 0;
   px = MW/2*T; py = MH/2*T; pAng = 0;
+  aiX = MW/4*T; aiY = MH/4*T; aiAng = 0;
   camX = px; camY = py;
   growSet.clear();
   initGrid();
@@ -1673,13 +1708,37 @@ function drawMinimap() {
         }
     }
   }
-  mmCtx.putImageData(img, 0, 0);
 
-  // Трактор на карте — белая точка размером с блок сена (2х2 пикселя)
-  const mpx = Math.round((px / T) * MM);
-  const mpy = Math.round((py / T) * MM);
-  mmCtx.fillStyle = '#ffffff';
-  mmCtx.fillRect(mpx - 1, mpy - 1, MM, MM);
+  const pxPx = Math.floor(px / T) * MM + 1;
+  const pyPx = Math.floor(py / T) * MM + 1;
+  
+  if (pxPx >= 0 && pxPx < MW*MM && pyPx >= 0 && pyPx < MH*MM) {
+    for (let dy=-1; dy<=1; dy++) {
+      for (let dx=-1; dx<=1; dx++) {
+        const pi = ((pyPx+dy)*MW*MM + (pxPx+dx)) * 4;
+        if (pi >= 0 && pi < d.length) {
+          d[pi]=255; d[pi+1]=0; d[pi+2]=0;
+        }
+      }
+    }
+  }
+  
+  if (upgLvl.autopilot > 0) {
+    const apxPx = Math.floor(aiX / T) * MM + 1;
+    const apyPx = Math.floor(aiY / T) * MM + 1;
+    if (apxPx >= 0 && apxPx < MW*MM && apyPx >= 0 && apyPx < MH*MM) {
+      for (let dy=-1; dy<=1; dy++) {
+        for (let dx=-1; dx<=1; dx++) {
+          const api = ((apyPx+dy)*MW*MM + (apxPx+dx)) * 4;
+          if (api >= 0 && api < d.length) {
+            d[api]=50; d[api+1]=100; d[api+2]=255; d[api+3]=255;
+          }
+        }
+      }
+    }
+  }
+
+  mmCtx.putImageData(img, 0, 0);
 }
 
 // Обновляем мини-карту каждые 200мс (не каждый кадр — экономим ресурсы)

@@ -992,7 +992,7 @@ const mapCx = mapCv.getContext('2d', { alpha: false });
 function initGrid() {
   const cx = MW/2;
   const cy = MH/2;
-  const landLvl = upgLvl.land || 0;
+  const landLvl = Number(upgLvl.land) || 0;
   const maxR = 25 + landLvl * 15;
 
   for(let y=0; y<MH; y++){
@@ -1596,7 +1596,11 @@ function render(now){
 // ── UPDATE ───────────────────────────────────────────────────
 function update(dt,now){
   if (nightPhase) return;
-  const SPD = getSpeed();
+  if (isNaN(px) || isNaN(py)) { px = MW/2*T; py = MH/2*T; }
+  if (isNaN(pAng)) pAng = 0;
+  
+  let SPD = getSpeed();
+  if (isNaN(SPD) || SPD < 50) SPD = BASE_SPD;
 
   // Боты-Трактористы
   let numBots = upgLvl.autopilot || 0; let maxBots = upgLvl.quest >= 2 ? 5 : 3; if (numBots > maxBots) numBots = maxBots; while(bots.length < numBots) bots.push({ x: px + 50 + bots.length*40, y: py + 50, ang: 0, tgtI: -1, cd: 0 });
@@ -1663,8 +1667,10 @@ function update(dt,now){
 
   let dx=0,dy=0;
   
-  if(K['KeyW'])dy-=1;if(K['KeyS'])dy+=1;
-  if(K['KeyA'])dx-=1;if(K['KeyD'])dx+=1;
+  if(K['KeyW'] || K['ArrowUp'])dy-=1;
+  if(K['KeyS'] || K['ArrowDown'])dy+=1;
+  if(K['KeyA'] || K['ArrowLeft'])dx-=1;
+  if(K['KeyD'] || K['ArrowRight'])dx+=1;
   if(dx&&dy){dx*=.7071;dy*=.7071}
   
   if(joyActive) {
@@ -1704,10 +1710,12 @@ function update(dt,now){
     const forwardY = Math.sin(pAng);
     
     // ТРАТА ВЫНОСЛИВОСТИ (теперь тратится в 1.5 раза быстрее)
+    if (isNaN(currentStamina)) currentStamina = maxStamina;
     currentStamina -= dt * 1.5;
     if (currentStamina < 0) currentStamina = 0;
     
     let pct = currentStamina / maxStamina;
+    if (isNaN(pct)) pct = 1;
     const stFill = document.getElementById('stamina-fill');
     stFill.style.width = (pct * 100) + '%';
     document.getElementById('stamina-text').textContent = Math.ceil(pct * 100) + '%';
@@ -1967,7 +1975,8 @@ function newGame() {
 // ── GAME LOOP ────────────────────────────────────────────────
 let lastT=0;
 function loop(now){
-  const dt=Math.min((now-lastT)/1000,.05);
+  let dt=Math.min((now-lastT)/1000,.05);
+  if (dt < 0 || isNaN(dt)) dt = 0.016;
   lastT=now;
   update(dt,now);
   render(now);

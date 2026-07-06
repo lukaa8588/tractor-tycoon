@@ -408,7 +408,7 @@
 <!-- ── Мини-карта ── -->
 <div id="minimap-wrap">
   <h3 id="map-title">🗺️ Карта</h3>
-  <canvas id="minimap" width="200" height="200"></canvas>
+  <canvas id="minimap" width="320" height="320"></canvas>
 </div>
 
 <!-- ── Панель прокачки ── -->
@@ -990,12 +990,32 @@ mapCv.height = MH * T;
 const mapCx = mapCv.getContext('2d', { alpha: false });
 
 function initGrid() {
-  for (let gy = 0; gy < MH; gy++)
-    for (let gx = 0; gx < MW; gx++) {
-      const i = gy*MW+gx;
-      gState[i] = (gx<BRD||gx>=MW-BRD||gy<BRD||gy>=MH-BRD) ? F : H;
-      renderCellToMap(gx, gy, 0);
+  const cx = MW/2;
+  const cy = MH/2;
+  const landLvl = upgLvl.land || 0;
+  const maxR = 25 + landLvl * 15;
+
+  for(let y=0; y<MH; y++){
+    for(let x=0; x<MW; x++){
+      const i = y*MW + x;
+      if(x<BRD || x>=MW-BRD || y<BRD || y>=MH-BRD){
+        gState[i] = F;
+      } else {
+        const dx = x - cx;
+        const dy = y - cy;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        
+        if(dist > maxR) {
+          gState[i] = F;
+        } else {
+          if(dist <= 25) gState[i] = H;
+          else if (dist <= 40) gState[i] = C;
+          else gState[i] = S;
+        }
+      }
+      renderCellToMap(x, y, 0);
     }
+  }
 }
 
 function blocked(gx, gy) {

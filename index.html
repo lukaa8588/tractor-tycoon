@@ -1621,22 +1621,26 @@ function mowAt(tx, ty, tAng, now, isAI = false) {
     gCutAt[i] = now;
     growSet.add(i);
     
-    if (!isAI) {
-      const amount = 1 + getScoreBonus();
-      score += amount;
-      
-      // Всплывающий текст
-      floatTexts.push({
-        x: (i % MW) * T + T / 2 + (Math.random() * 10 - 5),
-        y: Math.floor(i / MW) * T + T / 2 + (Math.random() * 10 - 5),
-        text: '+' + amount,
-        life: 1.0
-      });
-    }
+    
+    const amount = 1 + getScoreBonus();
+    score += amount;
+    
+    floatTexts.push({
+      x: (i % MW) * T + T / 2 + (Math.random() * 10 - 5),
+      y: Math.floor(i / MW) * T + T / 2 + (Math.random() * 10 - 5),
+      text: "+" + amount,
+      life: isAI ? 0.4 : 1.0
+    });
 
     // DOM 업데이트 УБРАН отсюда, перерисовка только одного блока
     renderCellToMap(i % MW, Math.floor(i / MW), now);
   }
+
+  if (didCut && isAI) {
+    scEl.textContent = score;
+    if (shopOpen) { const be = document.getElementById('bal'); if(be) be.textContent = score; }
+  }
+
   return didCut;
 }
 

@@ -993,7 +993,12 @@ function initGrid() {
   const cx = MW/2;
   const cy = MH/2;
   const landLvl = Number(upgLvl.land) || 0;
-  const maxR = 25 + landLvl * 15;
+  
+  // Размер квадратной плантации увеличивается с уровнем land
+  // lvl 0: 50x50 (halfSize = 25)
+  // lvl 1: 80x80 (halfSize = 40)
+  // lvl 2: 110x110 (halfSize = 55)
+  const halfSize = 25 + landLvl * 15;
 
   for(let y=0; y<MH; y++){
     for(let x=0; x<MW; x++){
@@ -1001,15 +1006,15 @@ function initGrid() {
       if(x<BRD || x>=MW-BRD || y<BRD || y>=MH-BRD){
         gState[i] = F;
       } else {
-        const dx = x - cx;
-        const dy = y - cy;
-        const dist = Math.sqrt(dx*dx + dy*dy);
+        const dx = Math.abs(x - cx);
+        const dy = Math.abs(y - cy);
         
-        if(dist > maxR) {
-          gState[i] = F;
+        if(dx > halfSize || dy > halfSize) {
+          gState[i] = F; // Лес (забор) за пределами квадратной плантации
         } else {
-          if(dist <= 25) gState[i] = H;
-          else if (dist <= 40) gState[i] = C;
+          // Зоны культур тоже делаем квадратными
+          if(dx <= 25 && dy <= 25) gState[i] = H;
+          else if(dx <= 40 && dy <= 40) gState[i] = C;
           else gState[i] = S;
         }
       }
@@ -1238,19 +1243,19 @@ function renderCellToMap(gx,gy,now){
   
   const p = (st===H || st===C || st===S) ? 1 : Math.min(1, (now - gCutAt[i])/GROW_DUR);
   
-  // Коричневая земля
+  // Коричневая земля (грязь) после покоса
   const dirtColor = `hsl(${30+h1*10}, 45%, ${28+h2*5}%)`;
   
   // Base ground
   if (isHay) {
     if(p<.33) mapCx.fillStyle = dirtColor;
-    else mapCx.fillStyle = `hsl(${100+h1*15}, 60%, ${40+h2*10}%)`; // Зеленая трава
+    else mapCx.fillStyle = `hsl(${44+h1*12}, 80%, ${57+h2*12}%)`; // Желтое сено
   } else if (isCorn) {
     if(p<.33) mapCx.fillStyle = dirtColor;
-    else mapCx.fillStyle = `hsl(${45+h1*10}, 80%, ${50+h2*10}%)`; // Желто-зеленая
+    else mapCx.fillStyle = `hsl(${65+h1*10}, 75%, ${50+h2*10}%)`; // Салатовая кукуруза
   } else if (isSun) {
     if(p<.33) mapCx.fillStyle = dirtColor;
-    else mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`; // Оранжевая
+    else mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`; // Оранжевый подсолнух
   }
   
   mapCx.fillRect(sx,sy,T,T);

@@ -468,7 +468,20 @@ const i18n = {
       bonus: { name: "Амбар",     desc: "Ещё больше сена с каждого блока" },
       autopilot: { name: "Тракторист", desc: "Нанимает бота-тракториста" },
       botSpeed: { name: "Скор. Ботов", desc: "Делает ботов быстрее" }
-    }
+    },
+    questsTitle: "📜 Доска Заказов",
+    questCompletedTitle: "🏆 ВЫ ПОБЕДИЛИ!",
+    questCompletedDesc: "Вы выполнили все заказы и стали настоящим Сельскохозяйственным Магнатом!",
+    questCostStr: "сена",
+    questBtnDo: "Выполнить заказ",
+    questBtnNoMoney: "Не хватает сена",
+    questPopupMsg: "ЗАКАЗ ВЫПОЛНЕН!",
+    quests: [
+      { title: "Городской зоопарк", desc: "Зоопарку срочно нужна подстилка из чистого сена для вольеров со слонами.", reward: "Награда: навсегда +1 сено с блока" },
+      { title: "Местный Лорд", desc: "Лорду нужно кормить огромный табун лошадей.", reward: "Награда: Максимум ботов увеличен с 3 до 5" },
+      { title: "Король", desc: "Королевские амбары пусты! Зима близко.", reward: "Награда: Ваш трактор окрашивается в ЗОЛОТОЙ цвет" },
+      { title: "Мега-заказ Империи", desc: "Построить запасы на зиму для всей страны.", reward: "Титул Магната (Полная победа в игре!)" }
+    ]
   },
   en: {
     title: "Tractor Tycoon",
@@ -505,7 +518,20 @@ const i18n = {
       bonus: { name: "Barn",       desc: "Even more hay per block" },
       autopilot: { name: "Driver", desc: "Hires an AI driver bot" },
       botSpeed: { name: "Bots Speed", desc: "Makes AI bots drive faster" }
-    }
+    },
+    questsTitle: "📜 Quest Board",
+    questCompletedTitle: "🏆 YOU WON!",
+    questCompletedDesc: "You completed all orders and became a true Agricultural Tycoon!",
+    questCostStr: "hay",
+    questBtnDo: "Complete Order",
+    questBtnNoMoney: "Not enough hay",
+    questPopupMsg: "ORDER COMPLETED!",
+    quests: [
+      { title: "City Zoo", desc: "The zoo urgently needs clean hay bedding for elephant enclosures.", reward: "Reward: Permanent +1 hay per block" },
+      { title: "Local Lord", desc: "The Lord needs to feed his massive herd of horses.", reward: "Reward: Max bots increased from 3 to 5" },
+      { title: "The King", desc: "Royal barns are empty! Winter is coming.", reward: "Reward: Your tractor is painted GOLD" },
+      { title: "Empire Mega-Order", desc: "Build winter supplies for the entire country.", reward: "Tycoon Title (Total Victory!)" }
+    ]
   }
 };
 
@@ -527,6 +553,7 @@ function updateLanguage(lang) {
   document.getElementById('shop-title').textContent = t('shopTitle');
   document.getElementById('booster-btn-text').textContent = t('boosterBtn');
   document.getElementById('rest-btn').title = t('restBtn');
+  document.getElementById('quests-btn').textContent = t('questsTitle');
   
   document.getElementById('settings-btn').title = t('settingsTitle');
   document.getElementById('settings-title').textContent = t('settingsTitle');
@@ -544,6 +571,7 @@ function updateLanguage(lang) {
   }
   
   if (shopOpen) renderShop();
+  if (typeof questsOpen !== 'undefined' && questsOpen) renderQuests();
 }
 
 // ── АУДИО ДВИЖОК (8-bit Web Audio API) ───────────────────────
@@ -722,7 +750,7 @@ const UPGRADES = [
     id:'speed', icon:'⚡',
     iconBg:'rgba(255,180,30,.15)',
     maxLevel:5,
-    cost:[800,2500,6000,14000,30000],
+    cost:[700,2250,5400,12600,27000],
     statKey:'statSpeed',
     statFn:(lvl)=>`${BASE_SPD + lvl*50} px/s`,
   },
@@ -730,7 +758,7 @@ const UPGRADES = [
     id:'width', icon:'⚙️',
     iconBg:'rgba(80,160,255,.15)',
     maxLevel:5,
-    cost:[1000,3000,7000,16000,35000],
+    cost:[900,2700,6300,14400,31500],
     statKey:'statWidth',
     statFn:(lvl)=>`${1 + lvl} 🟩`,
   },
@@ -738,7 +766,7 @@ const UPGRADES = [
     id:'stamina', icon:'🔋',
     iconBg:'rgba(40,200,80,.15)',
     maxLevel:5,
-    cost:[800,2000,5000,12000,30000],
+    cost:[700,1800,4500,10800,27000],
     statKey:'statStamina',
     statFn:(lvl)=>`${45 + lvl*60} ⚡`,
   },
@@ -746,7 +774,7 @@ const UPGRADES = [
     id:'bonus', icon:'🏚️',
     iconBg:'rgba(255,215,0,.12)',
     maxLevel:4,
-    cost:[1500,4000,12000,35000],
+    cost:[1350,3600,10800,31500],
     statKey:'statBonus',
     statFn:(lvl)=>`${1 + lvl} 🌾`,
   },
@@ -754,7 +782,7 @@ const UPGRADES = [
     id:'autopilot', icon:'🤖',
     iconBg:'rgba(180,80,255,.15)',
     maxLevel:3,
-    cost:[3000,15000,70000],
+    cost:[2700,13500,63000],
     statKey:'statAutopilot',
     statFn:(lvl)=>`${lvl} 🤖`,
   },
@@ -762,7 +790,7 @@ const UPGRADES = [
     id:'botSpeed', icon:'🚀',
     iconBg:'rgba(0,255,200,.15)',
     maxLevel:5,
-    cost:[1500,5000,14000,35000,80000],
+    cost:[1350,4500,12600,31500,72000],
     statKey:'statBotSpeed',
     statFn:(lvl)=>`${lvl * 25}%`,
   },
@@ -771,10 +799,10 @@ const UPGRADES = [
 const upgLvl = {speed:0, width:0, stamina:0, bonus:0, autopilot:0, botSpeed:0, quest:0};
 
 const QUESTS = [
-  { title: "Городской зоопарк", desc: "Зоопарку срочно нужна подстилка из чистого сена для вольеров со слонами.", cost: 15000, reward: "Награда: навсегда +1 сено с блока" },
-  { title: "Местный Лорд", desc: "Лорду нужно кормить огромный табун лошадей.", cost: 50000, reward: "Награда: Максимум ботов-трактористов увеличен с 3 до 5" },
-  { title: "Король", desc: "Королевские амбары пусты! Зима близко.", cost: 250000, reward: "Награда: Ваш трактор окрашивается в ЗОЛОТОЙ цвет" },
-  { title: "Мега-заказ Империи", desc: "Построить запасы на зиму для всей страны.", cost: 1000000, reward: "Титул Магната (Полная победа в игре!)" }
+  { cost: 13500 },
+  { cost: 45000 },
+  { cost: 225000 },
+  { cost: 900000 }
 ];
 
 // Применяем эффекты прокачки
@@ -812,21 +840,24 @@ function renderQuests() {
   const container = document.getElementById('quests-content');
   const qId = upgLvl.quest || 0;
   
+  document.querySelector('#quests-modal h2').textContent = t('questsTitle');
+  
   if (qId >= QUESTS.length) {
-    container.innerHTML = `<div class="quest-card"><div class="quest-title" style="text-align:center;">🏆 ВЫ ПОБЕДИЛИ!</div><div class="quest-desc" style="text-align:center;">Вы выполнили все заказы и стали настоящим Сельскохозяйственным Магнатом!</div></div>`;
+    container.innerHTML = `<div class="quest-card"><div class="quest-title" style="text-align:center;">${t('questCompletedTitle')}</div><div class="quest-desc" style="text-align:center;">${t('questCompletedDesc')}</div></div>`;
     return;
   }
   
   const q = QUESTS[qId];
+  const qText = t('quests')[qId];
   const canAfford = score >= q.cost;
   
   container.innerHTML = `
     <div class="quest-card">
-      <div class="quest-title">${q.title}</div>
-      <div class="quest-desc">${q.desc}</div>
-      <div class="quest-reward">${q.reward}</div>
-      <div class="quest-cost">🌾 ${q.cost} сена</div>
-      <button class="quest-btn" ${!canAfford ? 'disabled' : ''} onclick="completeQuest()">${canAfford ? 'Выполнить заказ' : 'Не хватает сена'}</button>
+      <div class="quest-title">${qText.title}</div>
+      <div class="quest-desc">${qText.desc}</div>
+      <div class="quest-reward">${qText.reward}</div>
+      <div class="quest-cost">🌾 ${q.cost} ${t('questCostStr')}</div>
+      <button class="quest-btn" ${!canAfford ? 'disabled' : ''} onclick="completeQuest()">${canAfford ? t('questBtnDo') : t('questBtnNoMoney')}</button>
     </div>
   `;
 }
@@ -841,7 +872,7 @@ function completeQuest() {
     if (typeof saveProgress === 'function') saveProgress(score, upgLvl, currentDay);
     
     // Spawn float text at player
-    floatTexts.push({ x: px, y: py, text: "ЗАКАЗ ВЫПОЛНЕН!", life: 2.0 });
+    floatTexts.push({ x: px, y: py, text: t('questPopupMsg'), life: 2.0 });
     
     scEl.textContent = score;
     renderQuests();

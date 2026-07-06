@@ -1,6 +1,6 @@
-const CACHE_NAME = 'tractor-v42';
+const CACHE_NAME = 'tractor-v43';
 const ASSETS = [
-  './index.html?v=42',
+  './index.html?v=43',
   './yandex-sdk.js',
   './manifest.json',
   './icon.png'

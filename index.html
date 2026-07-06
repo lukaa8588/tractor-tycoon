@@ -299,7 +299,10 @@
   </div>
 </div>
 
-<div id="hud">🌾 <span id="sc">0</span><span class="lbl" id="lbl-hay">сена</span></div>
+<div id="hud" style="flex-direction: column; gap: 0;">
+  <div style="display:flex; align-items:center; gap:8px;">🌾 <span id="sc">0</span><span class="lbl" id="lbl-hay">сена</span></div>
+  <div id="mps-display" style="font-size: 1.1rem; color: #a0e060; display: none; font-weight: bold; margin-top: -2px;">+0 🌾/сек</div>
+</div>
 <div id="day-label"></div>
 <button id="shop-btn" class="corner-btn" onclick="toggleShop()" title="Прокачка">🛒</button>
 <button id="map-btn"  class="corner-btn" onclick="toggleMap()"  title="Карта">🗺️</button>
@@ -420,6 +423,7 @@ const i18n = {
     statFertilizer: "Бонус сена",
     statStamina: "Выносливость",
     statBonus: "Сена с блока",
+    statAutopilot: "Автосбор",
     restBtn: "🌙 Отдыхать",
     newGameBtn: "🔄 Новая игра",
     newGameConfirm: "Начать новую игру? Весь прогресс будет сброшен.",
@@ -435,7 +439,8 @@ const i18n = {
       speed: { name: "Двигатель", desc: "Увеличивает скорость трактора" },
       width: { name: "Косилка",   desc: "Увеличивает ширину скоса" },
       stamina: { name: "Бак",     desc: "Увеличивает запас хода" },
-      bonus: { name: "Амбар",     desc: "Ещё больше сена с каждого блока" }
+      bonus: { name: "Амбар",     desc: "Ещё больше сена с каждого блока" },
+      autopilot: { name: "Тракторист", desc: "Пассивный сбор сена каждую секунду" }
     }
   },
   en: {
@@ -453,6 +458,7 @@ const i18n = {
     statFertilizer: "Hay bonus",
     statStamina: "Stamina",
     statBonus: "Hay per block",
+    statAutopilot: "Autopilot",
     restBtn: "🌙 Rest",
     newGameBtn: "🔄 New Game",
     newGameConfirm: "Start a new game? All progress will be reset.",
@@ -468,7 +474,8 @@ const i18n = {
       speed: { name: "Engine",     desc: "Increases tractor speed" },
       width: { name: "Mower",      desc: "Increases harvest width" },
       stamina: { name: "Fuel Tank",desc: "Increases drive time" },
-      bonus: { name: "Barn",       desc: "Even more hay per block" }
+      bonus: { name: "Barn",       desc: "Even more hay per block" },
+      autopilot: { name: "Driver", desc: "Passive hay collection every second" }
     }
   }
 };
@@ -499,6 +506,13 @@ function updateLanguage(lang) {
   document.getElementById('lbl-vibration').textContent = t('vibration');
   document.getElementById('lbl-lang').textContent = t('langToggle');
   document.getElementById('close-settings-btn').textContent = t('closeBtn');
+
+  const mpsDisp = document.getElementById('mps-display');
+  const mps = getAutopilotMPS();
+  if (mpsDisp && mps > 0) {
+    mpsDisp.style.display = 'block';
+    mpsDisp.textContent = `+${mps} 🌾/${currentLang==='ru'?'сек':'s'}`;
+  }
   
   if (shopOpen) renderShop();
 }
@@ -707,9 +721,17 @@ const UPGRADES = [
     statKey:'statBonus',
     statFn:(lvl)=>`${1 + lvl} 🌾`,
   },
+  {
+    id:'autopilot', icon:'🤖',
+    iconBg:'rgba(180,80,255,.15)',
+    maxLevel:5,
+    cost:[1000,3000,7500,15000,35000],
+    statKey:'statAutopilot',
+    statFn:(lvl)=>`${lvl > 0 ? ([0,5,15,35,75,150][lvl]) : 0} 🌾/s`,
+  },
 ];
 
-const upgLvl = {speed:0, width:0, stamina:0, bonus:0};
+const upgLvl = {speed:0, width:0, stamina:0, bonus:0, autopilot:0};
 
 // Применяем эффекты прокачки
 function getSpeed()     { return BASE_SPD + upgLvl.speed * 50; }
@@ -717,10 +739,12 @@ function getMowW()      { return BASE_PW  + upgLvl.width * 28 + (window.devCutte
 function getMowH()      { return BASE_PH; }
 // Амбар дает бонус сена с каждого блока
 function getScoreBonus(){ return upgLvl.bonus; }
+function getAutopilotMPS() { return upgLvl.autopilot > 0 ? [0,5,15,35,75,150][upgLvl.autopilot] : 0; }
 
 // ── ВЫНОСЛИВОСТЬ ──────────────────────────────────────────────
 let maxStamina = 45; // Базовые 45 единиц
 let currentStamina = 45;
+let fractionalScore = 0; // Для плавного начисления автопилота
 function updateMaxStamina() {
   maxStamina = 45 + upgLvl.stamina * 60; // Увеличено с 25 до 60!
 }
@@ -792,6 +816,16 @@ function buy(id) {
   score -= cost;
   upgLvl[id]++;
   if (id === 'stamina') updateMaxStamina();
+  
+  if (id === 'autopilot') {
+    const mpsDisp = document.getElementById('mps-display');
+    const mps = getAutopilotMPS();
+    if (mps > 0) {
+      mpsDisp.style.display = 'block';
+      mpsDisp.textContent = `+${mps} 🌾/${currentLang==='ru'?'сек':'s'}`;
+    }
+  }
+
   scEl.textContent = score;
   if (typeof saveProgress === 'function') saveProgress(score, upgLvl);
   renderShop();
@@ -1277,6 +1311,22 @@ function render(now){
 
 // ── UPDATE ───────────────────────────────────────────────────
 function update(dt,now){
+  if (nightPhase) return;
+  const SPD = getSpeed();
+
+  // Автопилот (Тракторист)
+  const mps = getAutopilotMPS();
+  if (mps > 0) {
+    fractionalScore += mps * dt;
+    if (fractionalScore >= 1) {
+      const gain = Math.floor(fractionalScore);
+      fractionalScore -= gain;
+      score += gain;
+      scEl.textContent = score;
+      if (shopOpen) document.getElementById('bal').textContent = score;
+    }
+  }
+
   // Обновление всплывающего текста
   for (let i = floatTexts.length - 1; i >= 0; i--) {
     const ft = floatTexts[i];
@@ -1285,7 +1335,6 @@ function update(dt,now){
     if (ft.life <= 0) floatTexts.splice(i, 1);
   }
 
-  const SPD=getSpeed();
   let dx=0,dy=0;
   
   if(K['KeyW'])dy-=1;if(K['KeyS'])dy+=1;
@@ -1386,9 +1435,6 @@ function update(dt,now){
   const halfH = MH * T / 2;
   camX = Math.max(Math.min(CW/2, halfW), Math.min(Math.max(MW*T - CW/2, halfW), camX));
   camY = Math.max(Math.min(CH/2, halfH), Math.min(Math.max(MH*T - CH/2, halfH), camY));
-
-  // ОГРОМНАЯ ОПТИМИЗАЦИЯ: Мы больше не перерисовываем все скошенные пеньки каждый кадр!
-  // Они статичны до наступления ночи.
 }
 
 // Быстрая функция дистанции (в квадрате), чтобы не вызывать медленный Math.sqrt тысячи раз

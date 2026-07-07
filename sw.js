@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tractor-cache-v92';
+const CACHE_NAME = 'tractor-cache-v93';
 const ASSETS = [
   './',
   './index.html?v=91',

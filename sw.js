@@ -1,10 +1,10 @@
-const CACHE_NAME = 'tractor-tycoon-v77';
+const CACHE_NAME = 'tractor-tycoon-v78';
 const ASSETS = [
   './',
-  './index.html?v=77',
+  './index.html?v=78',
   './yandex-sdk.js',
-  './manifest.json?v=77',
-  './icon.png?v=77'
+  './manifest.json?v=78',
+  './icon.png?v=78'
 ];
 
 self.addEventListener('install', (e) => {

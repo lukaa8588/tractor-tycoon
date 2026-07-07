@@ -397,6 +397,20 @@
     <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('bonus')">Max 🏚️</div>
   </div>
   <div class="dev-btn" style="background:rgba(180,40,40,0.8);margin-top:8px" onclick="newGame()">СБРОС ИГРЫ</div>
+
+  <hr style="border:1px solid #ffffff15;margin:8px 0">
+  <h3 style="text-align:center;color:#d0a0ff;margin:5px 0;">Текстуры (Моды)</h3>
+  <p style="font-size:12px;margin:5px 0;text-align:center;color:#aaa;">Загрузите свою картинку!</p>
+  <select id="tex-type" style="width:100%;margin-bottom:10px;padding:5px;background:#333;color:#fff;border:1px solid #a060ff;">
+    <option value="dirt">Земля (подложка)</option>
+    <option value="hay">Сено</option>
+    <option value="corn">Кукуруза</option>
+    <option value="sun">Подсолнух</option>
+    <option value="forest">Лес (Деревья)</option>
+    <option value="tractor">Трактор</option>
+  </select>
+  <input type="file" id="tex-upload" accept="image/*" style="width:100%;margin-bottom:10px;"/>
+  <button onclick="clearCustomTextures()" class="dev-btn" style="background:#8b2b2b;border-color:#ff5050;color:#ffc0c0;width:100%;">Сбросить все моды</button>
 </div>
 
 <!-- ── Шкала Выносливости ── -->

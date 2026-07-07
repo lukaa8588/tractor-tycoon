@@ -2,7 +2,7 @@ window.ysdk = null;
 window.ysdkPlayer = null;
 
 function initYandexGame(onReady) {
-  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname.includes('github.io');
 
   if (isLocal) {
     console.warn("Running in mock/localhost mode. Real Yandex SDK is disabled locally.");

@@ -1086,7 +1086,17 @@ document.addEventListener('keyup', keyupHandler);
 const cv=document.getElementById('c');
 const cx=cv.getContext('2d');
 let CW=0,CH=0;
-function resize(){CW=cv.width=innerWidth;CH=cv.height=innerHeight}
+let dpr=1;
+function resize(){
+  dpr=window.devicePixelRatio||1;
+  CW=innerWidth;
+  CH=innerHeight;
+  cv.width=CW*dpr;
+  cv.height=CH*dpr;
+  cv.style.width=CW+'px';
+  cv.style.height=CH+'px';
+  cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
 window.addEventListener('resize',resize);
 resize();
 cv.tabIndex = 0;
@@ -1278,7 +1288,7 @@ function renderCellToMap(gx,gy,now){
   const p = (st===H || st===C || st===S) ? 1 : Math.min(1, (now - gCutAt[i])/GROW_DUR);
   
   // Реалистичная темно-коричневая земля после покоса
-  const dirtColor = `hsl(${18+h1*6}, ${30+h2*10}%, ${15+h3*4}%)`;
+  const dirtColor = `hsl(${22+h1*6}, ${35+h2*10}%, ${18+h3*4}%)`;
   
   // Base ground
   if (isHay) {
@@ -1299,12 +1309,12 @@ function renderCellToMap(gx,gy,now){
     const hx =h(gx*7+j,gy*3+j,10+j);
     const hh2=h(gx*3+j,gy*9+j,20+j);
     const hc =h(gx*5+j,gy*2+j,30+j);
-    const stx=sx+3+hx*(T-6);
+    const stx=Math.round(sx+3+hx*(T-6));
     
     if (isHay) {
       const maxH=T*(.22+hh2*.45);
       const hp=p<.33?(p/.33)*.33:p<.66?.33+(p-.33)/.34*.34:.67+(p-.66)/.34*.33;
-      const sth=maxH*Math.min(1,hp);
+      const sth=Math.round(maxH*Math.min(1,hp));
       const colorT=Math.max(0,(p-.33)/.67);
       const hue=110-colorT*66;
       const light=32+colorT*30;
@@ -1318,25 +1328,26 @@ function renderCellToMap(gx,gy,now){
       }
     } else if (isCorn) {
       const maxH=T*(.5+hh2*.5);
-      const sth=maxH*p;
+      const sth=Math.round(maxH*p);
       mapCx.fillStyle=`hsl(${90+hc*20}, 70%, ${35+hc*15}%)`;
       mapCx.fillRect(stx-1,sy+T-2-sth,2,sth);
       if(p>0.8) {
         // Corn cob
         mapCx.fillStyle=`hsl(50, 90%, 60%)`;
-        mapCx.fillRect(stx-1,sy+T-2-sth*.7,3,sth*.3);
+        mapCx.fillRect(stx-1,sy+T-2-Math.round(sth*.7),3,Math.round(sth*.3));
       }
     } else if (isSun) {
       const maxH=T*(.4+hh2*.3);
-      const sth=maxH*p;
+      const sth=Math.round(maxH*p);
       mapCx.fillStyle=`hsl(${100+hc*10}, 60%, 30%)`;
       mapCx.fillRect(stx,sy+T-2-sth,2,sth);
       if(p>0.9) {
         // Sunflower head
+        const headY = Math.round(sy+T-2-sth);
         mapCx.fillStyle=`hsl(50, 100%, 55%)`;
-        mapCx.beginPath(); mapCx.arc(stx+1, sy+T-2-sth, 4, 0, Math.PI*2); mapCx.fill();
+        mapCx.beginPath(); mapCx.arc(stx+1, headY, 4, 0, Math.PI*2); mapCx.fill();
         mapCx.fillStyle=`hsl(30, 80%, 20%)`;
-        mapCx.beginPath(); mapCx.arc(stx+1, sy+T-2-sth, 2, 0, Math.PI*2); mapCx.fill();
+        mapCx.beginPath(); mapCx.arc(stx+1, headY, 2, 0, Math.PI*2); mapCx.fill();
       }
     }
   }

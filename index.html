@@ -286,8 +286,14 @@
         padding: 10px;
       }
     }
-    #quests-btn { position:fixed; right:16px; top:232px; background:linear-gradient(45deg,#ff9900,#ff6600); border:1px solid rgba(255,255,255,.2); color:#fff; font-size:1.4rem; padding:12px 24px; border-radius:30px; cursor:pointer; font-weight:800; box-shadow:0 6px 0 #cc5200, 0 10px 20px rgba(0,0,0,.5); transition:transform .1s,box-shadow .1s; user-select:none; z-index:10; }
-    #quests-btn:active { transform:translateY(6px); box-shadow:0 0 0 #cc5200,0 2px 5px rgba(0,0,0,.5); }
+    #quests-btn{
+      top:196px;
+      background:rgba(200,100,0,.85);
+      border:2px solid #ff9900;
+      box-shadow:0 4px 24px rgba(255,150,0,.18);
+    }
+    #quests-btn:hover:not(:disabled){background:rgba(230,120,0,.9);transform:translateY(2px) scale(1.08);
+      box-shadow:0 8px 30px rgba(255,150,0,.35)}
     #quests-modal { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(20,30,20,.95); backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:24px; color:#fff; display:none; flex-direction:column; gap:16px; min-width:400px; max-width:90%; z-index:100; box-shadow:0 20px 40px rgba(0,0,0,.8); }
     #quests-modal.open { display:flex; }
     .quest-card { background:rgba(0,0,0,.4); border:1px solid rgba(255,255,255,.05); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:8px; }
@@ -318,7 +324,7 @@
 <div id="day-label"></div>
 <button id="shop-btn" class="corner-btn" onclick="toggleShop()" title="Прокачка">🛒</button>
 <button id="map-btn" class="corner-btn" onclick="toggleMap()" title="Карта">🗺️</button>
-<button id="quests-btn" onclick="toggleQuests()">📜 Заказы</button>
+<button id="quests-btn" class="corner-btn" onclick="toggleQuests()" title="Доска Заказов">📜</button>
 
 <div id="quests-modal">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -571,7 +577,7 @@ function updateLanguage(lang) {
   document.getElementById('shop-title').textContent = t('shopTitle');
   document.getElementById('booster-btn-text').textContent = t('boosterBtn');
   document.getElementById('rest-btn').title = t('restBtn');
-  document.getElementById('quests-btn').textContent = t('questsTitle');
+  document.getElementById('quests-btn').title = t('questsTitle');
   
   document.getElementById('settings-btn').title = t('settingsTitle');
   document.getElementById('settings-title').textContent = t('settingsTitle');

@@ -1061,23 +1061,34 @@ let score=0;
 window.customTextures = {};
 
 function loadCustomTextures() {
+  const defaults = {
+    fence: './fence.jpg',
+    hay: './hay.jpg',
+    dirt: './dirt.jpg',
+    grass: './grass.jpg'
+  };
+  
+  let data = {};
   const saved = localStorage.getItem('tractorCustomTextures');
   if (saved) {
-    try {
-      const data = JSON.parse(saved);
-      for (const key in data) {
-        const img = new Image();
-        img.src = data[key];
-        img.onload = () => { 
-          const maxS = key === 'tractor' ? 32 : 64;
-          const cv = document.createElement('canvas');
-          cv.width = maxS; cv.height = maxS;
-          cv.getContext('2d').drawImage(img, 0, 0, maxS, maxS);
-          window.customTextures[key] = cv;
-          if (typeof mapCx !== 'undefined' && mapCx) drawMap(true); 
-        };
-      }
-    } catch(e) {}
+    try { data = JSON.parse(saved); } catch(e) {}
+  }
+  
+  const allKeys = [...new Set([...Object.keys(defaults), ...Object.keys(data)])];
+  
+  for (const key of allKeys) {
+    const src = data[key] || defaults[key];
+    if (!src) continue;
+    const img = new Image();
+    img.src = src;
+    img.onload = () => { 
+      const maxS = key === 'tractor' ? 32 : 64;
+      const cv = document.createElement('canvas');
+      cv.width = maxS; cv.height = maxS;
+      cv.getContext('2d').drawImage(img, 0, 0, maxS, maxS);
+      window.customTextures[key] = cv;
+      if (typeof mapCx !== 'undefined' && mapCx) drawMap(true); 
+    };
   }
 }
 

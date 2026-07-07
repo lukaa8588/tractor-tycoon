@@ -1069,7 +1069,7 @@ const keydownHandler = e => {
   if(e.code==='Tab'||/^Arrow/.test(e.code)||(e.keyCode>=37&&e.keyCode<=40)) e.preventDefault();
   
   // Открытие панели разработчика
-  if(e.code==='Digit7'||e.key==='7'||e.keyCode===55) toggleDevPanel();
+  if(e.code==='Digit7'||e.key==='7'||e.keyCode===55||e.code==='Backquote'||e.key==='`'||e.keyCode===192) toggleDevPanel();
 };
 const keyupHandler = e => { 
   if (e.code) K[e.code]=false;
@@ -1290,7 +1290,7 @@ function renderCellToMap(gx,gy,now){
   // Реалистичная темно-коричневая земля после покоса
   const dirtColor = `hsl(${22+h1*6}, ${35+h2*10}%, ${18+h3*4}%)`;
   
-  // Base ground
+  // Рисуем базовую землю
   if (isHay) {
     if(p<.33) mapCx.fillStyle = dirtColor;
     else mapCx.fillStyle = `hsl(${44+h1*12}, 80%, ${57+h2*12}%)`; // Желтое сено
@@ -1303,8 +1303,25 @@ function renderCellToMap(gx,gy,now){
   }
   
   mapCx.fillRect(sx,sy,T,T);
+
+  // --- ДЕТАЛИЗОВАННАЯ ЗЕМЛЯ (Как в резервной копии) ---
+  if (p < 0.99) {
+    for(let i=0;i<3;i++){
+      const px2=h(gx*3+i,gy*5+i,60+i);
+      const py2=h(gx*7+i,gy*2+i,70+i);
+      const pr =h(gx+i,  gy+i,  80+i);
+      mapCx.fillStyle=`rgba(0,0,0,${.07+pr*.07})`;
+      mapCx.fillRect(sx+2+Math.round(px2*(T-7)),sy+2+Math.round(py2*(T-7)),Math.round(3+pr*5),Math.round(2+pr*4));
+    }
+    // Сетка (границы тайлов)
+    mapCx.fillStyle='rgba(0,0,0,.05)';
+    mapCx.fillRect(sx,sy,T,1);
+    mapCx.fillRect(sx,sy,1,T);
+  }
   
-  const cnt=4+(h3*4)|0;
+  // --- ДЕТАЛИЗОВАННЫЕ КУЛЬТУРЫ ---
+  // Больше стеблей для более высокой детализации травы
+  const cnt= (isHay) ? Math.floor(10+(h3*6)) : Math.floor(4+(h3*4));
   for(let j=0; j<cnt; j++){
     const hx =h(gx*7+j,gy*3+j,10+j);
     const hh2=h(gx*3+j,gy*9+j,20+j);
@@ -1319,8 +1336,12 @@ function renderCellToMap(gx,gy,now){
       const hue=110-colorT*66;
       const light=32+colorT*30;
       const alpha=.38+hc*.42;
+      
+      // Варьируем ширину травинок для реализма (1 или 2 пикселя)
+      const stalkW = (hc > 0.5) ? 2 : 1;
+
       mapCx.fillStyle=`hsla(${hue},75%,${light}%,${alpha})`;
-      mapCx.fillRect(stx,sy+T-3-sth,1,sth);
+      mapCx.fillRect(stx,sy+T-3-sth,stalkW,sth);
       if(p>.35){
         const tA=Math.min(1,(p-.35)/.3)*alpha;
         mapCx.fillStyle=`hsla(${hue-8},78%,${light-5}%,${tA})`;

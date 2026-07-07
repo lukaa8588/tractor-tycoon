@@ -1320,8 +1320,8 @@ function renderCellToMap(gx,gy,now){
   }
   
   // --- ДЕТАЛИЗОВАННЫЕ КУЛЬТУРЫ ---
-  // Больше стеблей для более высокой детализации травы
-  const cnt= (isHay) ? Math.floor(10+(h3*6)) : Math.floor(4+(h3*4));
+  // Значительно больше стеблей для очень высокой детализации травы
+  const cnt= (isHay) ? Math.floor(14+(h3*10)) : Math.floor(4+(h3*4));
   for(let j=0; j<cnt; j++){
     const hx =h(gx*7+j,gy*3+j,10+j);
     const hh2=h(gx*3+j,gy*9+j,20+j);
@@ -1337,15 +1337,37 @@ function renderCellToMap(gx,gy,now){
       const light=32+colorT*30;
       const alpha=.38+hc*.42;
       
-      // Варьируем ширину травинок для реализма (1 или 2 пикселя)
-      const stalkW = (hc > 0.5) ? 2 : 1;
+      // Варьируем толщину
+      const stalkW = (hc > 0.6) ? 2 : 1;
+      
+      // Изгиб травинки (от -6 до 6 пикселей влево/вправо)
+      const bend = (h(gx+j, gy*2+j, 40+j) - 0.5) * 12;
 
-      mapCx.fillStyle=`hsla(${hue},75%,${light}%,${alpha})`;
-      mapCx.fillRect(stx,sy+T-3-sth,stalkW,sth);
-      if(p>.35){
+      mapCx.beginPath();
+      mapCx.moveTo(stx, sy+T-2);
+      mapCx.quadraticCurveTo(stx + bend/2, sy+T-2 - sth/2, stx + bend, sy+T-2 - sth);
+      mapCx.lineWidth = stalkW;
+      mapCx.strokeStyle = `hsla(${hue}, 75%, ${light}%, ${alpha})`;
+      mapCx.stroke();
+
+      // Детализованный колосок пшеницы (seed head)
+      if(p>.35 && sth > 5){
         const tA=Math.min(1,(p-.35)/.3)*alpha;
-        mapCx.fillStyle=`hsla(${hue-8},78%,${light-5}%,${tA})`;
-        mapCx.fillRect(stx-1,sy+T-3-sth-3,3,4);
+        mapCx.fillStyle=`hsla(${hue-10}, 85%, ${light+5}%, ${tA})`;
+        
+        mapCx.save();
+        mapCx.translate(stx + bend, sy+T-2 - sth);
+        // Поворот колоска по направлению изгиба
+        mapCx.rotate(bend * 0.05);
+        
+        // Зёрнышки колоска (несколько маленьких прямоугольников ёлочкой)
+        mapCx.fillRect(-1, -2, 2, 3);
+        mapCx.fillRect(-2, -4, 2, 3);
+        mapCx.fillRect( 0, -5, 2, 3);
+        mapCx.fillRect(-1.5, -7, 2, 3);
+        mapCx.fillRect(-0.5, -9, 2, 3);
+        
+        mapCx.restore();
       }
     } else if (isCorn) {
       const maxH=T*(.5+hh2*.5);

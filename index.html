@@ -1089,7 +1089,7 @@ function loadCustomTextures() {
       cv.width = maxS; cv.height = maxS;
       cv.getContext('2d').drawImage(img, 0, 0, maxS, maxS);
       window.customTextures[key] = cv;
-      if (typeof mapCx !== 'undefined' && mapCx) drawMap(true); 
+      if (typeof mapCx !== 'undefined' && mapCx) initGrid();
     };
   }
 }
@@ -1099,7 +1099,7 @@ function clearCustomTextures() {
   localStorage.removeItem('tractorCustomTextures');
   if (typeof mapCx !== 'undefined' && mapCx) {
     for(let i=0;i<MW*MH;i++) gCutAt[i] = 0;
-    drawMap(true);
+    initGrid();
   }
 }
 
@@ -2299,7 +2299,7 @@ document.getElementById('tex-upload').addEventListener('change', (e) => {
           for(let i=0;i<MW*MH;i++){
             gCutAt[i] = 0; // Trigger redraw
           }
-          drawMap(true); 
+          initGrid();
         }
       }
       if (typeof toggleDevPanel === 'function') toggleDevPanel(); // Close the panel after uploading

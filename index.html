@@ -738,6 +738,8 @@ const MW   = 120;
 const MH   = 120;
 const BRD  = 12;
 const LRP  = 0.12;
+const mapCenterX = MW / 2;
+const mapCenterY = MH / 2;
 // GROW_BASE удалён — авторост заменён системой дней
 
 // Базовые значения (без прокачки)
@@ -990,8 +992,6 @@ mapCv.height = MH * T;
 const mapCx = mapCv.getContext('2d', { alpha: false });
 
 function initGrid() {
-  const cx = MW/2;
-  const cy = MH/2;
   const landLvl = Number(upgLvl.land) || 0;
   
   // Размер квадратной плантации увеличивается с уровнем land
@@ -1006,8 +1006,8 @@ function initGrid() {
       if(x<BRD || x>=MW-BRD || y<BRD || y>=MH-BRD){
         gState[i] = F;
       } else {
-        const dx = Math.abs(x - cx);
-        const dy = Math.abs(y - cy);
+        const dx = Math.abs(x - mapCenterX);
+        const dy = Math.abs(y - mapCenterY);
         
         if(dx > halfSize || dy > halfSize) {
           gState[i] = F; // Лес (забор) за пределами квадратной плантации
@@ -1234,8 +1234,8 @@ function renderCellToMap(gx,gy,now){
     // Рисуем забор на стыке с плантацией
     const landLvl = Number(upgLvl.land) || 0;
     const halfSize = 25 + landLvl * 15;
-    const dx = Math.abs(gx - cx);
-    const dy = Math.abs(gy - cy);
+    const dx = Math.abs(gx - mapCenterX);
+    const dy = Math.abs(gy - mapCenterY);
     
     // Если эта клетка леса граничит с плантацией
     const isBorderX = (dx === halfSize + 1 && dy <= halfSize + 1);

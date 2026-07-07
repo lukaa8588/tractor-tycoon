@@ -1,10 +1,10 @@
-const CACHE_NAME = 'tractor-cache-v87';
+const CACHE_NAME = 'tractor-cache-v88';
 const ASSETS = [
   './',
-  './index.html?v=87',
+  './index.html?v=88',
   './yandex-sdk.js',
-  './manifest.json?v=87',
-  './icon.png?v=87'
+  './manifest.json?v=88',
+  './icon.png?v=88'
 ];
 
 self.addEventListener('install', (e) => {

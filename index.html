@@ -1066,8 +1066,14 @@ function loadCustomTextures() {
       for (const key in data) {
         const img = new Image();
         img.src = data[key];
-        window.customTextures[key] = img;
-        img.onload = () => { if (typeof mapCx !== 'undefined' && mapCx) drawMap(true); };
+        img.onload = () => { 
+          const maxS = key === 'tractor' ? 32 : 64;
+          const cv = document.createElement('canvas');
+          cv.width = maxS; cv.height = maxS;
+          cv.getContext('2d').drawImage(img, 0, 0, maxS, maxS);
+          window.customTextures[key] = cv;
+          if (typeof mapCx !== 'undefined' && mapCx) drawMap(true); 
+        };
       }
     } catch(e) {}
   }
@@ -2264,8 +2270,13 @@ document.getElementById('tex-upload').addEventListener('change', (e) => {
     
     const img = new Image();
     img.src = dataUrl;
-    window.customTextures[type] = img;
     img.onload = () => {
+      const maxS = type === 'tractor' ? 32 : 64;
+      const cv = document.createElement('canvas');
+      cv.width = maxS; cv.height = maxS;
+      cv.getContext('2d').drawImage(img, 0, 0, maxS, maxS);
+      window.customTextures[type] = cv;
+      
       if(type==='tractor') {
         // Just redraw
       } else {
@@ -2276,6 +2287,7 @@ document.getElementById('tex-upload').addEventListener('change', (e) => {
           drawMap(true); 
         }
       }
+      if (typeof toggleDevPanel === 'function') toggleDevPanel(); // Close the panel after uploading
     };
   };
   reader.readAsDataURL(file);

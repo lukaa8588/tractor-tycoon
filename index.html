@@ -1226,14 +1226,10 @@ function renderCellToMap(gx,gy,now){
   const sy=gy*T;
   
   if(st===F){
-    // Детализированный лес
-    for(let dy=0; dy<T; dy+=4){
-      for(let dx=0; dx<T; dx+=4){
-        const noise = h(gx*T+dx, gy*T+dy, 12);
-        mapCx.fillStyle = `hsl(${110 + noise*20}, ${45 + noise*15}%, ${20 + noise*15}%)`;
-        mapCx.fillRect(sx+dx, sy+dy, 4, 4);
-      }
-    }
+    // Forest (clean)
+    const r=h(gx,gy,1);
+    mapCx.fillStyle=`hsl(${110+r*20}, ${40+r*20}%, ${25+r*10}%)`;
+    mapCx.fillRect(sx,sy,T,T);
     
     // Рисуем забор на стыке с плантацией
     const landLvl = Number(upgLvl.land) || 0;
@@ -1275,32 +1271,24 @@ function renderCellToMap(gx,gy,now){
   
   const p = (st===H || st===C || st===S) ? 1 : Math.min(1, (now - gCutAt[i])/GROW_DUR);
   
-  // 1. Детализированная земля (грязь) как базовая подложка
-  for(let dy=0; dy<T; dy+=4){
-    for(let dx=0; dx<T; dx+=4){
-      const noise = h(gx*T+dx, gy*T+dy, 42);
-      mapCx.fillStyle = `hsl(35, 45%, ${15 + noise*12}%)`;
-      mapCx.fillRect(sx+dx, sy+dy, 4, 4);
-    }
+  // Коричневая грязь под культурами
+  const dirtColor = `hsl(35, 50%, ${20 + h1 * 10}%)`;
+  
+  // Base ground
+  if (isHay) {
+    if(p<.33) mapCx.fillStyle = dirtColor;
+    else mapCx.fillStyle = `hsl(${44+h1*12}, 80%, ${57+h2*12}%)`; // Желтое сено
+  } else if (isCorn) {
+    if(p<.33) mapCx.fillStyle = dirtColor;
+    else mapCx.fillStyle = `hsl(${65+h1*10}, 75%, ${50+h2*10}%)`; // Салатовая кукуруза
+  } else if (isSun) {
+    if(p<.33) mapCx.fillStyle = dirtColor;
+    else mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`; // Оранжевый подсолнух
   }
   
-  // 2. Густая подстилка из растений, если они выросли
-  if (p >= .33) {
-    for(let dy=0; dy<T; dy+=4){
-      for(let dx=0; dx<T; dx+=4){
-        const noise = h(gx*T+dx, gy*T+dy, 55);
-        if (noise > 0.25) { // 75% покрытие
-          if (isHay) mapCx.fillStyle = `hsl(${44+h1*12}, 75%, ${45+noise*20}%)`;
-          else if (isCorn) mapCx.fillStyle = `hsl(${65+h1*10}, 70%, ${40+noise*15}%)`;
-          else if (isSun) mapCx.fillStyle = `hsl(${35+h1*10}, 75%, ${35+noise*15}%)`;
-          mapCx.fillRect(sx+dx, sy+dy, 4, 4);
-        }
-      }
-    }
-  }
+  mapCx.fillRect(sx,sy,T,T);
   
-  // 3. Детализированные ростки (увеличиваем плотность в 3 раза)
-  const cnt = 15 + (h3 * 10) | 0;
+  const cnt=7+(h3*4)|0;
   for(let j=0; j<cnt; j++){
     const hx =h(gx*7+j,gy*3+j,10+j);
     const hh2=h(gx*3+j,gy*9+j,20+j);

@@ -2249,11 +2249,13 @@ if (typeof initYandexGame === 'function') {
       if (typeof saveProgress === 'function') saveProgress(score, upgLvl, currentDay);
     }, 30000);
     
+    loadCustomTextures();
     initGrid();
     lastT=performance.now();
     requestAnimationFrame(loop);
   });
 } else {
+  loadCustomTextures();
   initGrid();
   lastT=performance.now();
   requestAnimationFrame(loop);

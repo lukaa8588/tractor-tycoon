@@ -1234,8 +1234,10 @@ function renderCellToMap(gx,gy,now){
     // Рисуем забор на стыке с плантацией
     const landLvl = Number(upgLvl.land) || 0;
     const halfSize = 25 + landLvl * 15;
-    const dx = Math.abs(gx - cx);
-    const dy = Math.abs(gy - cy);
+    const cx_val = MW / 2;
+    const cy_val = MH / 2;
+    const dx = Math.abs(gx - cx_val);
+    const dy = Math.abs(gy - cy_val);
     
     // Если эта клетка леса граничит с плантацией
     const isBorderX = (dx === halfSize + 1 && dy <= halfSize + 1);

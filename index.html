@@ -1067,6 +1067,8 @@ function loadCustomTextures() {
     dirt: './dirt.jpg',
     grass: './grass.jpg'
   };
+  // Force clear old broken textures once
+  localStorage.removeItem('tractorCustomTextures');
   
   let data = {};
   const saved = localStorage.getItem('tractorCustomTextures');
@@ -1359,36 +1361,13 @@ function renderCellToMap(gx,gy,now){
   }
   
   let customCrop = null;
-  let customGrass = null;
-  if (window.customTextures && window.customTextures.grass) customGrass = window.customTextures.grass;
-  
   if (isHay && window.customTextures && window.customTextures.hay) customCrop = window.customTextures.hay;
   if (isCorn && window.customTextures && window.customTextures.corn) customCrop = window.customTextures.corn;
   if (isSun && window.customTextures && window.customTextures.sun) customCrop = window.customTextures.sun;
 
-  // Draw full crop
-  if (p >= .66 && customCrop) {
+  if (p >= .33 && customCrop) {
     mapCx.drawImage(customCrop, sx, sy, T, T);
     return;
-  }
-  // Draw growing grass
-  if (p >= .33 && p < .66 && customGrass) {
-    mapCx.drawImage(customGrass, sx, sy, T, T);
-    return;
-  }
-  
-  // If customCrop is drawn above, it returns. If not, fallback to default drawing.
-  // Wait, if p >= .66 but no customCrop, what if customGrass exists?
-  if (p >= .66 && !customCrop && customGrass) {
-    // If no custom crop (e.g. for Hay), but grass exists, maybe don't return so it draws default?
-    // Actually, fallback to default logic.
-  }
-  
-  if (p >= .33 && customCrop && !customGrass) {
-      // If we have crop but no grass, draw crop early?
-      // Just draw the crop.
-      mapCx.drawImage(customCrop, sx, sy, T, T);
-      return;
   }
   
   const cnt=7+(h3*4)|0;

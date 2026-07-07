@@ -1036,7 +1036,33 @@ for (let i = 0; i < 3; i++) {
 }
 let camX=px, camY=py;
 let score=0;
-const floatTexts = []; // Всплывающий текст сена
+window.customTextures = {};
+
+function loadCustomTextures() {
+  const saved = localStorage.getItem('tractorCustomTextures');
+  if (saved) {
+    try {
+      const data = JSON.parse(saved);
+      for (const key in data) {
+        const img = new Image();
+        img.src = data[key];
+        window.customTextures[key] = img;
+        img.onload = () => { if (typeof mapCx !== 'undefined' && mapCx) drawMap(true); };
+      }
+    } catch(e) {}
+  }
+}
+
+function clearCustomTextures() {
+  window.customTextures = {};
+  localStorage.removeItem('tractorCustomTextures');
+  if (typeof mapCx !== 'undefined' && mapCx) {
+    for(let i=0;i<MW*MH;i++) gCutAt[i] = 0;
+    drawMap(true);
+  }
+}
+
+const floatTexts = []; // Всплывающий текст (счет)
 
 // ── СИСТЕМА ДНЕЙ И НОЧЕЙ ─────────────────────────────────────
 let currentDay = 1;
@@ -1226,10 +1252,14 @@ function renderCellToMap(gx,gy,now){
   const sy=gy*T;
   
   if(st===F){
-    // Forest (clean)
-    const r=h(gx,gy,1);
-    mapCx.fillStyle=`hsl(${110+r*20}, ${40+r*20}%, ${25+r*10}%)`;
-    mapCx.fillRect(sx,sy,T,T);
+    // Forest
+    if (window.customTextures && window.customTextures.forest) {
+      mapCx.drawImage(window.customTextures.forest, sx, sy, T, T);
+    } else {
+      const r=h(gx,gy,1);
+      mapCx.fillStyle=`hsl(${110+r*20}, ${40+r*20}%, ${25+r*10}%)`;
+      mapCx.fillRect(sx,sy,T,T);
+    }
     
     // Рисуем забор на стыке с плантацией
     const landLvl = Number(upgLvl.land) || 0;
@@ -1274,19 +1304,32 @@ function renderCellToMap(gx,gy,now){
   // Коричневая грязь под культурами
   const dirtColor = `hsl(35, 50%, ${20 + h1 * 10}%)`;
   
-  // Base ground
-  if (isHay) {
-    if(p<.33) mapCx.fillStyle = dirtColor;
-    else mapCx.fillStyle = `hsl(${44+h1*12}, 80%, ${57+h2*12}%)`; // Желтое сено
-  } else if (isCorn) {
-    if(p<.33) mapCx.fillStyle = dirtColor;
-    else mapCx.fillStyle = `hsl(${65+h1*10}, 75%, ${50+h2*10}%)`; // Салатовая кукуруза
-  } else if (isSun) {
-    if(p<.33) mapCx.fillStyle = dirtColor;
-    else mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`; // Оранжевый подсолнух
+  if (window.customTextures && window.customTextures.dirt) {
+    mapCx.drawImage(window.customTextures.dirt, sx, sy, T, T);
+  } else {
+    // Base ground
+    if (isHay) {
+      if(p<.33) mapCx.fillStyle = dirtColor;
+      else mapCx.fillStyle = `hsl(${44+h1*12}, 80%, ${57+h2*12}%)`; // Желтое сено
+    } else if (isCorn) {
+      if(p<.33) mapCx.fillStyle = dirtColor;
+      else mapCx.fillStyle = `hsl(${65+h1*10}, 75%, ${50+h2*10}%)`; // Салатовая кукуруза
+    } else if (isSun) {
+      if(p<.33) mapCx.fillStyle = dirtColor;
+      else mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`; // Оранжевый подсолнух
+    }
+    mapCx.fillRect(sx,sy,T,T);
   }
   
-  mapCx.fillRect(sx,sy,T,T);
+  let customCrop = null;
+  if (isHay && window.customTextures && window.customTextures.hay) customCrop = window.customTextures.hay;
+  if (isCorn && window.customTextures && window.customTextures.corn) customCrop = window.customTextures.corn;
+  if (isSun && window.customTextures && window.customTextures.sun) customCrop = window.customTextures.sun;
+
+  if (p >= .33 && customCrop) {
+    mapCx.drawImage(customCrop, sx, sy, T, T);
+    return;
+  }
   
   const cnt=7+(h3*4)|0;
   for(let j=0; j<cnt; j++){
@@ -2184,6 +2227,40 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log("Service Worker Registered"))
     .catch(err => console.error("SW Registration failed", err));
 }
+
+document.getElementById('tex-upload').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const type = document.getElementById('tex-type').value;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const dataUrl = ev.target.result;
+    
+    // Save to localStorage
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('tractorCustomTextures') || '{}'); } catch(e){}
+    saved[type] = dataUrl;
+    localStorage.setItem('tractorCustomTextures', JSON.stringify(saved));
+    
+    const img = new Image();
+    img.src = dataUrl;
+    window.customTextures[type] = img;
+    img.onload = () => {
+      if(type==='tractor') {
+        // Just redraw
+      } else {
+        if(typeof mapCx !== 'undefined' && mapCx) {
+          for(let i=0;i<MW*MH;i++){
+            gCutAt[i] = 0; // Trigger redraw
+          }
+          drawMap(true); 
+        }
+      }
+    };
+  };
+  reader.readAsDataURL(file);
+});
+
 </script>
 </body>
 </html>

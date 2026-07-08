@@ -1363,7 +1363,7 @@ function renderCellToMap(gx,gy,now){
     return;
   }
   
-  } else if (st === P) {
+  if (st === P) {
     if (window.customTextures && window.customTextures.dirt) {
       mapCx.drawImage(window.customTextures.dirt, sx, sy, T, T);
       mapCx.fillStyle = 'rgba(255,255,255,0.1)';
@@ -1372,8 +1372,8 @@ function renderCellToMap(gx,gy,now){
       mapCx.fillStyle = '#6b4c30';
       mapCx.fillRect(sx, sy, T, T);
     }
+    return;
   }
-  
   const cnt=7+(h3*4)|0;
   for(let j=0; j<cnt; j++){
     const hx =h(gx*7+j,gy*3+j,10+j);

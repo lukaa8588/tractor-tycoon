@@ -1172,6 +1172,22 @@ let showHitboxes = false;
 window.devTractorRadius = 14;
 window.devCutterWidth = 0;
 
+  let touchCount = 0;
+  let lastTouch = 0;
+  document.addEventListener('touchstart', (e) => {
+    const now = Date.now();
+    if (now - lastTouch < 500) {
+      touchCount++;
+      if (touchCount >= 7) {
+        touchCount = 0;
+        if (typeof toggleDevPanel === 'function') toggleDevPanel();
+      }
+    } else {
+      touchCount = 1;
+    }
+    lastTouch = now;
+  });
+
 function toggleDevPanel() {
   try { playClick(); } catch(e) {}
   devPanelOpen = !devPanelOpen;

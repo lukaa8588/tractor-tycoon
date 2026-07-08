@@ -1061,25 +1061,16 @@ let score=0;
 window.customTextures = {};
 
 function loadCustomTextures() {
-  const defaults = {
-    forest: './fence.jpg',
-    hay: './hay.jpg',
-    dirt: './dirt.jpg',
-    grass: './grass.jpg'
-  };
-  // Force clear old broken textures once
-  localStorage.removeItem('tractorCustomTextures');
-  
   let data = {};
   const saved = localStorage.getItem('tractorCustomTextures');
   if (saved) {
     try { data = JSON.parse(saved); } catch(e) {}
   }
   
-  const allKeys = [...new Set([...Object.keys(defaults), ...Object.keys(data)])];
+  const allKeys = Object.keys(data);
   
   for (const key of allKeys) {
-    const src = data[key] || defaults[key];
+    const src = data[key];
     if (!src) continue;
     const img = new Image();
     img.src = src;
@@ -1365,10 +1356,8 @@ function renderCellToMap(gx,gy,now){
   if (isCorn && window.customTextures && window.customTextures.corn) customCrop = window.customTextures.corn;
   if (isSun && window.customTextures && window.customTextures.sun) customCrop = window.customTextures.sun;
 
-  if (customCrop) {
-    if (st === H || st === C || st === S) {
-      mapCx.drawImage(customCrop, sx, sy, T, T);
-    }
+  if (p >= .33 && customCrop) {
+    mapCx.drawImage(customCrop, sx, sy, T, T);
     return;
   }
   

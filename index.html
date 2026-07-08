@@ -768,7 +768,7 @@ const BASE_PW  = 12; // 12px на уровне 0 (меньше тайла 32px, 
 const BASE_PH  = 35;
 
 // Состояния: F=лес, H=сено, G=растёт
-const F=0, H=1, G=2, C=3, CG=4, S=5, SG=6;
+const F=0, H=1, G=2, C=3, CG=4, S=5, SG=6, P=7;
 
 // ── ПРОКАЧКА ─────────────────────────────────────────────────
 const UPGRADES = [
@@ -980,6 +980,18 @@ function buy(id) {
   if (id === 'stamina') updateMaxStamina();
   
   if (id === 'stamina') updateMaxStamina();
+  
+  if (id === 'land') {
+    const l = upgLvl.land;
+    for(let y=55; y<=64; y++){
+      for(let x=30; x<=34; x++){
+        if(l >= 1 && gState[y*MW + x] === F) { gState[y*MW + x] = P; renderCellToMap(x, y, 0); }
+      }
+      for(let x=85; x<=89; x++){
+        if(l >= 2 && gState[y*MW + x] === F) { gState[y*MW + x] = P; renderCellToMap(x, y, 0); }
+      }
+    }
+  }
 
   scEl.textContent = score;
   if (typeof saveProgress === 'function') saveProgress(score, upgLvl);
@@ -1012,33 +1024,26 @@ mapCv.height = MH * T;
 const mapCx = mapCv.getContext('2d', { alpha: false });
 
 function initGrid() {
-  const cx = MW/2;
-  const cy = MH/2;
   const landLvl = Number(upgLvl.land) || 0;
   
-  // Размер квадратной плантации увеличивается с уровнем land
-  // lvl 0: 50x50 (halfSize = 25)
-  // lvl 1: 80x80 (halfSize = 40)
-  // lvl 2: 110x110 (halfSize = 55)
-  const halfSize = 25 + landLvl * 15;
-
   for(let y=0; y<MH; y++){
     for(let x=0; x<MW; x++){
       const i = y*MW + x;
       if(x<BRD || x>=MW-BRD || y<BRD || y>=MH-BRD){
         gState[i] = F;
       } else {
-        const dx = Math.abs(x - cx);
-        const dy = Math.abs(y - cy);
+        let state = F;
         
-        if(dx > halfSize || dy > halfSize) {
-          gState[i] = F; // Лес (забор) за пределами квадратной плантации
-        } else {
-          // Зоны культур тоже делаем квадратными
-          if(dx <= 25 && dy <= 25) gState[i] = H;
-          else if(dx <= 40 && dy <= 40) gState[i] = C;
-          else gState[i] = S;
+        if (x >= 35 && x <= 84 && y >= 35 && y <= 84) state = H;
+        else if (x >= 5 && x <= 29 && y >= 45 && y <= 74) state = C;
+        else if (x >= 90 && x <= 114 && y >= 45 && y <= 74) state = S;
+        else if (x >= 30 && x <= 34 && y >= 55 && y <= 64) {
+          state = (landLvl < 1) ? F : P;
         }
+        else if (x >= 85 && x <= 89 && y >= 55 && y <= 64) {
+          state = (landLvl < 2) ? F : P;
+        }
+        gState[i] = state;
       }
       renderCellToMap(x, y, 0);
     }
@@ -1307,32 +1312,13 @@ function renderCellToMap(gx,gy,now){
       mapCx.fillRect(sx,sy,T,T);
     }
     
-    // Рисуем забор на стыке с плантацией
-    const landLvl = Number(upgLvl.land) || 0;
-    const halfSize = 25 + landLvl * 15;
-    const cx_val = MW / 2;
-    const cy_val = MH / 2;
-    const dx = Math.abs(gx - cx_val);
-    const dy = Math.abs(gy - cy_val);
-    
-    // Если эта клетка леса граничит с плантацией
-    const isBorderX = (dx === halfSize + 1 && dy <= halfSize + 1);
-    const isBorderY = (dy === halfSize + 1 && dx <= halfSize + 1);
-    
-    if (isBorderX || isBorderY) {
-      // Рисуем деревянный забор
-      mapCx.strokeStyle = '#8B5A2B'; // Темно-коричневый
-      mapCx.lineWidth = 3;
-      
-      // Горизонтальные перекладины
-      mapCx.strokeRect(sx, sy + T/3, T, 3);
-      mapCx.strokeRect(sx, sy + 2*T/3, T, 3);
-      
-      // Вертикальные столбики
-      mapCx.fillStyle = '#A0522D';
-      mapCx.fillRect(sx + 3, sy, 4, T);
-      mapCx.fillRect(sx + T/2 - 2, sy, 4, T);
-      mapCx.fillRect(sx + T - 7, sy, 4, T);
+    // SALE signs for blocked paths
+    const isLeftPath = (gx >= 30 && gx <= 34 && gy >= 55 && gy <= 64);
+    const isRightPath = (gx >= 85 && gx <= 89 && gy >= 55 && gy <= 64);
+    if ((isLeftPath || isRightPath) && gy === 59 && gx % 2 === 0) {
+       mapCx.fillStyle = '#ff4444';
+       mapCx.font = 'bold 12px Arial';
+       mapCx.fillText("SALE", sx - 5, sy + 15);
     }
     return;
   }
@@ -1375,6 +1361,17 @@ function renderCellToMap(gx,gy,now){
   if (p >= .33 && customCrop) {
     mapCx.drawImage(customCrop, sx, sy, T, T);
     return;
+  }
+  
+  } else if (st === P) {
+    if (window.customTextures && window.customTextures.dirt) {
+      mapCx.drawImage(window.customTextures.dirt, sx, sy, T, T);
+      mapCx.fillStyle = 'rgba(255,255,255,0.1)';
+      mapCx.fillRect(sx, sy, T, T);
+    } else {
+      mapCx.fillStyle = '#6b4c30';
+      mapCx.fillRect(sx, sy, T, T);
+    }
   }
   
   const cnt=7+(h3*4)|0;
@@ -2001,8 +1998,8 @@ function mowAt(tx, ty, tAng, now, isAI = false) {
     growSet.add(i);
     
     let baseAmount = 1;
-    if(st===C) baseAmount = 5;
-    if(st===S) baseAmount = 25;
+    if(st===C) baseAmount = 3;
+    if(st===S) baseAmount = 2;
     const amount = baseAmount + getScoreBonus();
     score += amount;
     

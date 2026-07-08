@@ -1365,8 +1365,10 @@ function renderCellToMap(gx,gy,now){
   if (isCorn && window.customTextures && window.customTextures.corn) customCrop = window.customTextures.corn;
   if (isSun && window.customTextures && window.customTextures.sun) customCrop = window.customTextures.sun;
 
-  if (p >= .33 && customCrop) {
-    mapCx.drawImage(customCrop, sx, sy, T, T);
+  if (customCrop) {
+    if (st === H || st === C || st === S) {
+      mapCx.drawImage(customCrop, sx, sy, T, T);
+    }
     return;
   }
   

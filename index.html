@@ -756,7 +756,7 @@ function playMusicSequence() {
 
 // ── КОНФИГ ───────────────────────────────────────────────────
 const T    = 32;
-const MW   = 120;
+const MW   = 180;
 const MH   = 120;
 const BRD  = 12;
 const LRP  = 0.12;
@@ -984,10 +984,10 @@ function buy(id) {
   if (id === 'land') {
     const l = upgLvl.land;
     for(let y=55; y<=64; y++){
-      for(let x=30; x<=34; x++){
+      for(let x=45; x<=64; x++){
         if(l >= 1 && gState[y*MW + x] === F) { gState[y*MW + x] = P; renderCellToMap(x, y, 0); }
       }
-      for(let x=85; x<=89; x++){
+      for(let x=115; x<=134; x++){
         if(l >= 2 && gState[y*MW + x] === F) { gState[y*MW + x] = P; renderCellToMap(x, y, 0); }
       }
     }
@@ -1034,13 +1034,13 @@ function initGrid() {
       } else {
         let state = F;
         
-        if (x >= 35 && x <= 84 && y >= 35 && y <= 84) state = H;
-        else if (x >= 5 && x <= 29 && y >= 45 && y <= 74) state = C;
-        else if (x >= 90 && x <= 114 && y >= 45 && y <= 74) state = S;
-        else if (x >= 30 && x <= 34 && y >= 55 && y <= 64) {
+        if (x >= 65 && x <= 114 && y >= 35 && y <= 84) state = H;
+        else if (x >= 15 && x <= 44 && y >= 20 && y <= 99) state = C;
+        else if (x >= 135 && x <= 164 && y >= 20 && y <= 99) state = S;
+        else if (x >= 45 && x <= 64 && y >= 55 && y <= 64) {
           state = (landLvl < 1) ? F : P;
         }
-        else if (x >= 85 && x <= 89 && y >= 55 && y <= 64) {
+        else if (x >= 115 && x <= 134 && y >= 55 && y <= 64) {
           state = (landLvl < 2) ? F : P;
         }
         gState[i] = state;
@@ -1312,9 +1312,33 @@ function renderCellToMap(gx,gy,now){
       mapCx.fillRect(sx,sy,T,T);
     }
     
-    // SALE signs for blocked paths
-    const isLeftPath = (gx >= 30 && gx <= 34 && gy >= 55 && gy <= 64);
-    const isRightPath = (gx >= 85 && gx <= 89 && gy >= 55 && gy <= 64);
+    // Draw fences if bordering an open area
+    let hasInnerNeighbor = false;
+    for(let dy=-1; dy<=1; dy++){
+      for(let dx=-1; dx<=1; dx++){
+         if(dx===0 && dy===0) continue;
+         let nx = gx+dx, ny = gy+dy;
+         if(nx>=0 && nx<MW && ny>=0 && ny<MH){
+            if(gState[ny*MW+nx] !== F) { hasInnerNeighbor = true; break; }
+         }
+      }
+      if(hasInnerNeighbor) break;
+    }
+    
+    if (hasInnerNeighbor) {
+      mapCx.strokeStyle = '#8B5A2B'; 
+      mapCx.lineWidth = 3;
+      mapCx.strokeRect(sx, sy + T/3, T, 3);
+      mapCx.strokeRect(sx, sy + 2*T/3, T, 3);
+      mapCx.fillStyle = '#A0522D';
+      mapCx.fillRect(sx + 3, sy, 4, T);
+      mapCx.fillRect(sx + T/2 - 2, sy, 4, T);
+      mapCx.fillRect(sx + T - 7, sy, 4, T);
+    }
+
+    // SALE signs for blocked paths (acting as gates)
+    const isLeftPath = (gx >= 45 && gx <= 64 && gy >= 55 && gy <= 64);
+    const isRightPath = (gx >= 115 && gx <= 134 && gy >= 55 && gy <= 64);
     if ((isLeftPath || isRightPath) && gy === 59 && gx % 2 === 0) {
        mapCx.fillStyle = '#ff4444';
        mapCx.font = 'bold 12px Arial';
@@ -1998,8 +2022,8 @@ function mowAt(tx, ty, tAng, now, isAI = false) {
     growSet.add(i);
     
     let baseAmount = 1;
-    if(st===C) baseAmount = 3;
-    if(st===S) baseAmount = 2;
+    if(st===C) baseAmount = 10;
+    if(st===S) baseAmount = 5;
     const amount = baseAmount + getScoreBonus();
     score += amount;
     
@@ -2176,10 +2200,20 @@ function drawMinimap() {
         const isBorderX = (dx === halfSize + 1 && dy <= halfSize + 1);
         const isBorderY = (dy === halfSize + 1 && dx <= halfSize + 1);
         
-        if (isBorderX || isBorderY) {
-          r=200; g2=20; b=20; // Красный забор на мини-карте
+        // Minimap border logic
+        let hasInner = false;
+        for(let dy=-1; dy<=1; dy++){
+          for(let dx=-1; dx<=1; dx++){
+             if(dx===0 && dy===0) continue;
+             let nx = gx+dx, ny = gy+dy;
+             if(nx>=0 && nx<MW && ny>=0 && ny<MH && gState[ny*MW+nx] !== F) { hasInner = true; break; }
+          }
+          if(hasInner) break;
+        }
+        if (hasInner) {
+          r=200; g2=20; b=20;
         } else {
-          r=60; g2=110; b=40; // трава леса
+          r=60; g2=110; b=40;
         }
       }
       else if (st === H || st === C || st === S) { r=220; g2=175; b=20; }   // выросло — золотой/салатовый

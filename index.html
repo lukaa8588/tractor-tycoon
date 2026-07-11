@@ -1320,8 +1320,57 @@ function renderCellToMap(gx,gy,now){
       mapCx.drawImage(window.customTextures.forest, sx, sy, T, T);
     } else {
       const r=h(gx,gy,1);
-      mapCx.fillStyle=`hsl(${110+r*20}, ${40+r*20}%, ${25+r*10}%)`;
-      mapCx.fillRect(sx,sy,T,T);
+      // Base grass color - vivid green
+      const baseL = 28 + r * 12;
+      mapCx.fillStyle = `hsl(${115 + r*15}, ${55+r*15}%, ${baseL}%)`;
+      mapCx.fillRect(sx, sy, T, T);
+      // Dark patches (shadows / variations)
+      for (let p = 0; p < 4; p++) {
+        const px = h(gx, gy, p*4+10);
+        const py = h(gx, gy, p*4+11);
+        const pr = h(gx, gy, p*4+12);
+        const pa = h(gx, gy, p*4+13);
+        mapCx.fillStyle = `hsla(${120+pr*20}, ${60+pr*20}%, ${baseL - 7}%, 0.5)`;
+        mapCx.beginPath();
+        mapCx.ellipse(sx + px*T, sy + py*T, 3+pr*5, 2+pr*3, pa*Math.PI, 0, Math.PI*2);
+        mapCx.fill();
+      }
+      // Bright highlight patches
+      for (let p = 0; p < 3; p++) {
+        const px = h(gx, gy, p*4+20);
+        const py = h(gx, gy, p*4+21);
+        const pr = h(gx, gy, p*4+22);
+        mapCx.fillStyle = `hsla(${100+pr*25}, ${70}%, ${baseL + 12}%, 0.35)`;
+        mapCx.beginPath();
+        mapCx.ellipse(sx + px*T, sy + py*T, 2+pr*4, 1+pr*2, pr*Math.PI, 0, Math.PI*2);
+        mapCx.fill();
+      }
+      // Individual grass blades
+      for (let b = 0; b < 6; b++) {
+        const bx = h(gx, gy, b*3+30);
+        const by = h(gx, gy, b*3+31);
+        const bl = h(gx, gy, b*3+32);
+        const bladeX = sx + bx * T;
+        const bladeY = sy + by * T;
+        const bladeH = 3 + bl * 5;
+        mapCx.strokeStyle = `hsl(${105+bl*20}, ${65}%, ${baseL + 15 + bl*10}%)`;
+        mapCx.lineWidth = 1;
+        mapCx.beginPath();
+        mapCx.moveTo(bladeX, bladeY);
+        mapCx.quadraticCurveTo(bladeX + (bl-0.5)*4, bladeY - bladeH*0.6, bladeX + (bl-0.5)*3, bladeY - bladeH);
+        mapCx.stroke();
+      }
+      // Small flowers/dandelions occasionally
+      const flowerChance = h(gx, gy, 99);
+      if (flowerChance > 0.75) {
+        const fx = sx + h(gx,gy,50)*T;
+        const fy = sy + h(gx,gy,51)*T;
+        const ft = h(gx,gy,52);
+        mapCx.fillStyle = ft > 0.5 ? '#fffaaa' : '#ffaacc';
+        mapCx.beginPath();
+        mapCx.arc(fx, fy, 2, 0, Math.PI*2);
+        mapCx.fill();
+      }
     }
     
     // Draw fences on edges bordering open areas

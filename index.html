@@ -768,7 +768,8 @@ const BASE_PW  = 12; // 12px на уровне 0 (меньше тайла 32px, 
 const BASE_PH  = 35;
 
 // Состояния: F=лес, H=сено, G=растёт
-const F=0, H=1, G=2, C=3, CG=4, S=5, SG=6, P=7;
+const F=0,H=1,C=2,S=3,T_S=4,G_S=5,R_S=6,P=7,L=8;
+const G=9,CG=10,SG=11;
 
 // ── ПРОКАЧКА ─────────────────────────────────────────────────
 const UPGRADES = [
@@ -984,11 +985,17 @@ function buy(id) {
   if (id === 'land') {
     const l = upgLvl.land;
     for(let y=55; y<=64; y++){
-      for(let x=45; x<=64; x++){
-        if(l >= 1 && gState[y*MW + x] === F) { gState[y*MW + x] = P; renderCellToMap(x, y, 0); }
+      for(let x=55; x<=64; x++){
+        if(l >= 1 && gState[y*MW + x] === L) { 
+           gState[y*MW + x] = P; 
+           for(let dy=-1; dy<=1; dy++) for(let dx=-1; dx<=1; dx++) renderCellToMap(x+dx, y+dy, 0);
+        }
       }
-      for(let x=115; x<=134; x++){
-        if(l >= 2 && gState[y*MW + x] === F) { gState[y*MW + x] = P; renderCellToMap(x, y, 0); }
+      for(let x=115; x<=124; x++){
+        if(l >= 2 && gState[y*MW + x] === L) { 
+           gState[y*MW + x] = P; 
+           for(let dy=-1; dy<=1; dy++) for(let dx=-1; dx<=1; dx++) renderCellToMap(x+dx, y+dy, 0);
+        }
       }
     }
   }
@@ -1035,16 +1042,21 @@ function initGrid() {
         let state = F;
         
         if (x >= 65 && x <= 114 && y >= 35 && y <= 84) state = H;
-        else if (x >= 15 && x <= 44 && y >= 20 && y <= 99) state = C;
-        else if (x >= 135 && x <= 164 && y >= 20 && y <= 99) state = S;
-        else if (x >= 45 && x <= 64 && y >= 55 && y <= 64) {
-          state = (landLvl < 1) ? F : P;
+        else if (x >= 10 && x <= 54 && y >= 10 && y <= 109) state = C;
+        else if (x >= 125 && x <= 169 && y >= 10 && y <= 109) state = S;
+        else if (x >= 55 && x <= 64 && y >= 55 && y <= 64) {
+          state = (landLvl < 1) ? L : P;
         }
-        else if (x >= 115 && x <= 134 && y >= 55 && y <= 64) {
-          state = (landLvl < 2) ? F : P;
+        else if (x >= 115 && x <= 124 && y >= 55 && y <= 64) {
+          state = (landLvl < 2) ? L : P;
         }
         gState[i] = state;
       }
+    }
+  }
+  
+  for(let y=0; y<MH; y++){
+    for(let x=0; x<MW; x++){
       renderCellToMap(x, y, 0);
     }
   }
@@ -1052,7 +1064,7 @@ function initGrid() {
 
 function blocked(gx, gy) {
   if (gx<0||gx>=MW||gy<0||gy>=MH) return true;
-  return gState[gy*MW+gx]===F;
+  return gState[gy*MW+gx]===F || gState[gy*MW+gx]===L;
 }
 
 // ── ИГРОК И ИИ ────────────────────────────────────────────────
@@ -1312,38 +1324,61 @@ function renderCellToMap(gx,gy,now){
       mapCx.fillRect(sx,sy,T,T);
     }
     
-    // Draw fences if bordering an open area
-    let hasInnerNeighbor = false;
-    for(let dy=-1; dy<=1; dy++){
-      for(let dx=-1; dx<=1; dx++){
-         if(dx===0 && dy===0) continue;
-         let nx = gx+dx, ny = gy+dy;
-         if(nx>=0 && nx<MW && ny>=0 && ny<MH){
-            if(gState[ny*MW+nx] !== F) { hasInnerNeighbor = true; break; }
-         }
-      }
-      if(hasInnerNeighbor) break;
-    }
-    
-    if (hasInnerNeighbor) {
-      mapCx.strokeStyle = '#8B5A2B'; 
-      mapCx.lineWidth = 3;
-      mapCx.strokeRect(sx, sy + T/3, T, 3);
-      mapCx.strokeRect(sx, sy + 2*T/3, T, 3);
+    // Draw fences on edges bordering open areas
+    let fL = (gx > 0 && gState[gy*MW + (gx-1)] !== F);
+    let fR = (gx < MW-1 && gState[gy*MW + (gx+1)] !== F);
+    let fT = (gy > 0 && gState[(gy-1)*MW + gx] !== F);
+    let fB = (gy < MH-1 && gState[(gy+1)*MW + gx] !== F);
+
+    let dTL = (gx > 0 && gy > 0 && gState[(gy-1)*MW + gx-1] !== F && !fL && !fT);
+    let dTR = (gx < MW-1 && gy > 0 && gState[(gy-1)*MW + gx+1] !== F && !fR && !fT);
+    let dBL = (gx > 0 && gy < MH-1 && gState[(gy+1)*MW + gx-1] !== F && !fL && !fB);
+    let dBR = (gx < MW-1 && gy < MH-1 && gState[(gy+1)*MW + gx+1] !== F && !fR && !fB);
+
+    // Left edge
+    if (fL) {
+      mapCx.fillStyle = '#8B5A2B';
+      mapCx.fillRect(sx + 2, sy, 3, T);
+      mapCx.fillRect(sx + 8, sy, 3, T);
       mapCx.fillStyle = '#A0522D';
-      mapCx.fillRect(sx + 3, sy, 4, T);
-      mapCx.fillRect(sx + T/2 - 2, sy, 4, T);
-      mapCx.fillRect(sx + T - 7, sy, 4, T);
+      mapCx.fillRect(sx, sy + T/4, 12, 4);
+      mapCx.fillRect(sx, sy + 3*T/4, 12, 4);
+    }
+    // Right edge
+    if (fR) {
+      mapCx.fillStyle = '#8B5A2B';
+      mapCx.fillRect(sx + T - 5, sy, 3, T);
+      mapCx.fillRect(sx + T - 11, sy, 3, T);
+      mapCx.fillStyle = '#A0522D';
+      mapCx.fillRect(sx + T - 12, sy + T/4, 12, 4);
+      mapCx.fillRect(sx + T - 12, sy + 3*T/4, 12, 4);
+    }
+    // Top edge
+    if (fT) {
+      mapCx.fillStyle = '#8B5A2B';
+      mapCx.fillRect(sx, sy + 2, T, 3);
+      mapCx.fillRect(sx, sy + 8, T, 3);
+      mapCx.fillStyle = '#A0522D';
+      mapCx.fillRect(sx + T/4, sy, 4, 12);
+      mapCx.fillRect(sx + 3*T/4, sy, 4, 12);
+    }
+    // Bottom edge
+    if (fB) {
+      mapCx.fillStyle = '#8B5A2B';
+      mapCx.fillRect(sx, sy + T - 5, T, 3);
+      mapCx.fillRect(sx, sy + T - 11, T, 3);
+      mapCx.fillStyle = '#A0522D';
+      mapCx.fillRect(sx + T/4, sy + T - 12, 4, 12);
+      mapCx.fillRect(sx + 3*T/4, sy + T - 12, 4, 12);
     }
 
-    // SALE signs for blocked paths (acting as gates)
-    const isLeftPath = (gx >= 45 && gx <= 64 && gy >= 55 && gy <= 64);
-    const isRightPath = (gx >= 115 && gx <= 134 && gy >= 55 && gy <= 64);
-    if ((isLeftPath || isRightPath) && gy === 59 && gx % 2 === 0) {
-       mapCx.fillStyle = '#ff4444';
-       mapCx.font = 'bold 12px Arial';
-       mapCx.fillText("SALE", sx - 5, sy + 15);
-    }
+    // Outer corner posts to connect the fences
+    mapCx.fillStyle = '#A0522D';
+    if (dTL) mapCx.fillRect(sx, sy, 12, 12);
+    if (dTR) mapCx.fillRect(sx + T - 12, sy, 12, 12);
+    if (dBL) mapCx.fillRect(sx, sy + T - 12, 12, 12);
+    if (dBR) mapCx.fillRect(sx + T - 12, sy + T - 12, 12, 12);
+
     return;
   }
   
@@ -1355,7 +1390,7 @@ function renderCellToMap(gx,gy,now){
   const isCorn = (st===C || st===CG);
   const isSun = (st===S || st===SG);
   
-  const p = (st===H || st===C || st===S) ? 1 : Math.min(1, (now - gCutAt[i])/GROW_DUR);
+  const p = (st===H || st===C || st===S) ? 1 : 0;
   
   // Коричневая грязь под культурами
   const dirtColor = `hsl(35, 50%, ${20 + h1 * 10}%)`;
@@ -1387,14 +1422,46 @@ function renderCellToMap(gx,gy,now){
     return;
   }
   
-  if (st === P) {
+  if (st === P || st === L) {
     if (window.customTextures && window.customTextures.dirt) {
       mapCx.drawImage(window.customTextures.dirt, sx, sy, T, T);
       mapCx.fillStyle = 'rgba(255,255,255,0.1)';
       mapCx.fillRect(sx, sy, T, T);
     } else {
-      mapCx.fillStyle = '#6b4c30';
+      mapCx.fillStyle = '#8c8c82';
       mapCx.fillRect(sx, sy, T, T);
+      for(let pz=0; pz<5; pz++) {
+        let px2 = h(gx, gy, pz*2);
+        let py2 = h(gx, gy, pz*2+1);
+        mapCx.fillStyle = pz%2===0 ? '#7a7a72' : '#9c9c92';
+        mapCx.fillRect(sx + px2*(T-4), sy + py2*(T-4), 4, 4);
+      }
+    }
+    if (st === L) {
+      mapCx.fillStyle = 'rgba(0,0,0,0.3)';
+      mapCx.fillRect(sx, sy, T, T);
+      
+      let drawLeftGate = (gx > 0 && gState[gy*MW + (gx-1)] !== L && gState[gy*MW + (gx-1)] !== F);
+      let drawRightGate = (gx < MW-1 && gState[gy*MW + (gx+1)] !== L && gState[gy*MW + (gx+1)] !== F);
+      
+      if (drawLeftGate || drawRightGate) {
+        let gateX = drawLeftGate ? sx : (sx + T - 6);
+        mapCx.fillStyle = '#8B5A2B';
+        mapCx.fillRect(gateX, sy, 6, T);
+        mapCx.fillStyle = '#A0522D';
+        mapCx.fillRect(gateX - 2, sy + T/3, 10, 4);
+        mapCx.fillRect(gateX - 2, sy + 2*T/3, 10, 4);
+        if (gy % 2 === 0) {
+           let signX = drawLeftGate ? gateX + 8 : gateX - 28;
+           mapCx.fillStyle = '#d2b48c';
+           mapCx.fillRect(signX, sy + 4, 24, 14);
+           mapCx.fillStyle = '#8B5A2B';
+           mapCx.fillRect(signX + 10, sy + 18, 4, T - 18);
+           mapCx.fillStyle = '#ff0000';
+           mapCx.font = 'bold 10px Arial';
+           mapCx.fillText("SALE", signX + 2, sy + 15);
+        }
+      }
     }
     return;
   }
@@ -2216,8 +2283,10 @@ function drawMinimap() {
           r=60; g2=110; b=40;
         }
       }
-      else if (st === H || st === C || st === S) { r=220; g2=175; b=20; }   // выросло — золотой/салатовый
-      else               { r=100; g2=75;  b=35; }   // растёт — коричневый
+      else if (st === H) { r=220; g2=175; b=20; }   // Hay - Yellow
+      else if (st === C) { r=140; g2=200; b=40; }   // Corn - Greenish Yellow
+      else if (st === S) { r=255; g2=165; b=0;  }   // Sunflower - Orange
+      else               { r=100; g2=75;  b=35; }   // Path/Locked - Brown
 
       for (let dy = 0; dy < MM; dy++)
         for (let dx = 0; dx < MM; dx++) {

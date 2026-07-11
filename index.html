@@ -1320,50 +1320,55 @@ function renderCellToMap(gx,gy,now){
       mapCx.drawImage(window.customTextures.forest, sx, sy, T, T);
     } else {
       const r = h(gx, gy, 1);
-
-      // Pick one of 5 grass variants per tile based on hash
-      const variant = Math.floor(h(gx, gy, 3) * 5); // 0..4
-
-      // 5 distinct grass tile styles:
-      // 0 — standard medium green
-      // 1 — deep rich green (dense lush)
-      // 2 — lighter yellowish-green (sunny patch)
-      // 3 — dark muted green (shaded/sparse)
-      // 4 — cool blue-green (wet patch)
-      const grassStyles = [
-        { hue: 115, sat: 52, lig: 32 },  // 0: standard
-        { hue: 122, sat: 60, lig: 26 },  // 1: deep rich
-        { hue: 105, sat: 48, lig: 40 },  // 2: sunny
-        { hue: 118, sat: 35, lig: 22 },  // 3: dark sparse
-        { hue: 155, sat: 40, lig: 28 },  // 4: cool wet
-      ];
-      const gs = grassStyles[variant];
-
-      // Small per-tile random shift so tiles of same variant are not identical
-      const shift = (r - 0.5) * 6;
-      mapCx.fillStyle = `hsl(${gs.hue + shift}, ${gs.sat}%, ${gs.lig + shift * 0.5}%)`;
+      // Original base color (saved variant)
+      mapCx.fillStyle = `hsl(${110 + r*20}, ${40 + r*20}%, ${25 + r*10}%)`;
       mapCx.fillRect(sx, sy, T, T);
 
-      // Pixel-art flowers — drawn with fillRect only (no arcs)
+      // Slight darker/lighter sub-patches for texture depth (2 small rects, no blobs)
+      const r2 = h(gx, gy, 2);
+      const r3 = h(gx, gy, 3);
+      // dark sub-patch
+      mapCx.fillStyle = `hsl(${112 + r2*15}, ${38 + r2*15}%, ${20 + r2*8}%)`;
+      mapCx.fillRect(sx + Math.floor(r2 * (T-8)), sy + Math.floor(r3 * (T-8)), 8, 8);
+      // light sub-patch
+      const r4 = h(gx, gy, 4);
+      const r5 = h(gx, gy, 5);
+      mapCx.fillStyle = `hsl(${108 + r4*18}, ${42 + r4*18}%, ${30 + r4*10}%)`;
+      mapCx.fillRect(sx + Math.floor(r4 * (T-6)), sy + Math.floor(r5 * (T-6)), 6, 6);
+
+      // Pixel-art flower — appears on ~18% of tiles, size 4x4 px cross
       const flowerChance = h(gx, gy, 99);
-      if (flowerChance > 0.78) {
-        const fx = sx + Math.floor(h(gx, gy, 50) * (T - 6) / 2) * 2 + 2;
-        const fy = sy + Math.floor(h(gx, gy, 51) * (T - 6) / 2) * 2 + 2;
+      if (flowerChance > 0.82) {
+        const fx = sx + Math.floor(h(gx, gy, 50) * (T - 10) / 2) * 2 + 4;
+        const fy = sy + Math.floor(h(gx, gy, 51) * (T - 10) / 2) * 2 + 4;
         const ft = h(gx, gy, 52);
+        const petalCol = ft > 0.6 ? '#ffdf44' : (ft > 0.3 ? '#ff88bb' : '#ffffff');
+        const centerCol = ft > 0.6 ? '#ff8800' : (ft > 0.3 ? '#ffffaa' : '#ffdd00');
+        // Petals: 4px wide cross
+        mapCx.fillStyle = petalCol;
+        mapCx.fillRect(fx,     fy - 4, 4, 4); // top
+        mapCx.fillRect(fx,     fy + 4, 4, 4); // bottom
+        mapCx.fillRect(fx - 4, fy,     4, 4); // left
+        mapCx.fillRect(fx + 4, fy,     4, 4); // right
+        // Center 4x4
+        mapCx.fillStyle = centerCol;
+        mapCx.fillRect(fx, fy, 4, 4);
+      }
 
-        const petalColor = ft > 0.5 ? '#ffe566' : '#ff99bb';
-        const centerColor = ft > 0.5 ? '#ff9900' : '#ffffff';
-
-        // 4 petals (each 2x2 px), cross pattern
-        mapCx.fillStyle = petalColor;
-        mapCx.fillRect(fx,     fy - 2, 2, 2); // top
-        mapCx.fillRect(fx,     fy + 2, 2, 2); // bottom
-        mapCx.fillRect(fx - 2, fy,     2, 2); // left
-        mapCx.fillRect(fx + 2, fy,     2, 2); // right
-
-        // Center pixel
-        mapCx.fillStyle = centerColor;
-        mapCx.fillRect(fx, fy, 2, 2);
+      // Pixel pebble — appears on only ~8% of tiles (rare!)
+      const pebbleChance = h(gx, gy, 77);
+      if (pebbleChance > 0.92) {
+        const px = sx + Math.floor(h(gx, gy, 70) * (T - 6));
+        const py = sy + Math.floor(h(gx, gy, 71) * (T - 6));
+        const pt = h(gx, gy, 72);
+        // Pebble: 2-3 px irregular shape using 2 fillRects
+        mapCx.fillStyle = `hsl(${30 + pt*20}, ${15 + pt*10}%, ${45 + pt*15}%)`;
+        mapCx.fillRect(px,     py,     3, 2);
+        mapCx.fillRect(px + 1, py + 2, 2, 1);
+        // Dark edge on pebble for depth
+        mapCx.fillStyle = `hsl(${30 + pt*20}, ${15 + pt*10}%, ${30 + pt*10}%)`;
+        mapCx.fillRect(px,     py + 2, 1, 1);
+        mapCx.fillRect(px + 3, py,     1, 2);
       }
     }
     

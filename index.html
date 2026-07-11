@@ -1320,65 +1320,40 @@ function renderCellToMap(gx,gy,now){
       mapCx.drawImage(window.customTextures.forest, sx, sy, T, T);
     } else {
       const r = h(gx, gy, 1);
-      const sparse = h(gx, gy, 7); // determines if this tile has sparse grass
+      const sparse = h(gx, gy, 7);
 
-      // Base grass — brighter on dense tiles, darker on sparse ones
+      // Base grass — sparse tiles are 10-15% darker
       const baseL = sparse > 0.72
-        ? 22 + r * 8          // sparse tile: 10-15% darker
-        : 30 + r * 10;        // normal tile: full lush green
+        ? 22 + r * 8
+        : 30 + r * 10;
       const baseS = sparse > 0.72
-        ? 40 + r * 15         // sparse: slightly less saturated
-        : 55 + r * 15;        // normal: vivid
+        ? 40 + r * 15
+        : 55 + r * 15;
 
       mapCx.fillStyle = `hsl(${113 + r * 12}, ${baseS}%, ${baseL}%)`;
       mapCx.fillRect(sx, sy, T, T);
 
-      // Subtle soft blobs that vary the shade across the tile (no harsh lines)
-      for (let p = 0; p < 3; p++) {
-        const px = h(gx, gy, p * 5 + 10);
-        const py = h(gx, gy, p * 5 + 11);
-        const pr = h(gx, gy, p * 5 + 12);
-        const pa = h(gx, gy, p * 5 + 13);
-        const dark = h(gx, gy, p * 5 + 14) > 0.5;
-        const blobL = dark ? baseL - 5 : baseL + 6;
-        mapCx.fillStyle = `hsla(${118 + pr * 18}, ${baseS + 5}%, ${blobL}%, 0.45)`;
-        mapCx.beginPath();
-        mapCx.ellipse(sx + px * T, sy + py * T, 4 + pr * 7, 3 + pr * 5, pa * Math.PI, 0, Math.PI * 2);
-        mapCx.fill();
-      }
-
-      // On sparse tiles: add a couple of exposed-dirt dots (bare patches)
-      if (sparse > 0.72) {
-        for (let d = 0; d < 2; d++) {
-          const dx = h(gx, gy, d * 3 + 60);
-          const dy = h(gx, gy, d * 3 + 61);
-          const dr = h(gx, gy, d * 3 + 62);
-          mapCx.fillStyle = `hsla(35, 40%, ${18 + dr * 8}%, 0.35)`;
-          mapCx.beginPath();
-          mapCx.ellipse(sx + dx * T, sy + dy * T, 2 + dr * 4, 1 + dr * 3, dr * Math.PI, 0, Math.PI * 2);
-          mapCx.fill();
-        }
-      }
-
-      // Small flowers/dandelions — kept as unique signature
+      // Pixel-art flowers — drawn with fillRect only (no arcs)
       const flowerChance = h(gx, gy, 99);
       if (flowerChance > 0.78) {
-        const fx = sx + h(gx, gy, 50) * T;
-        const fy = sy + h(gx, gy, 51) * T;
+        // Snap flower position to 2px grid for pixel feel
+        const fx = sx + Math.floor(h(gx, gy, 50) * (T - 6) / 2) * 2 + 2;
+        const fy = sy + Math.floor(h(gx, gy, 51) * (T - 6) / 2) * 2 + 2;
         const ft = h(gx, gy, 52);
-        // Flower center
-        mapCx.fillStyle = ft > 0.5 ? '#ffe566' : '#ffbbdd';
-        mapCx.beginPath();
-        mapCx.arc(fx, fy, 2.5, 0, Math.PI * 2);
-        mapCx.fill();
-        // Tiny white petals around it
-        mapCx.fillStyle = 'rgba(255,255,255,0.6)';
-        for (let pe = 0; pe < 4; pe++) {
-          const ang = (pe / 4) * Math.PI * 2;
-          mapCx.beginPath();
-          mapCx.arc(fx + Math.cos(ang) * 3, fy + Math.sin(ang) * 3, 1.2, 0, Math.PI * 2);
-          mapCx.fill();
-        }
+
+        const petalColor = ft > 0.5 ? '#ffe566' : '#ff99bb';
+        const centerColor = ft > 0.5 ? '#ff9900' : '#ffffff';
+
+        // 4 petals (each 2x2 px), cross pattern
+        mapCx.fillStyle = petalColor;
+        mapCx.fillRect(fx,     fy - 2, 2, 2); // top
+        mapCx.fillRect(fx,     fy + 2, 2, 2); // bottom
+        mapCx.fillRect(fx - 2, fy,     2, 2); // left
+        mapCx.fillRect(fx + 2, fy,     2, 2); // right
+
+        // Center pixel
+        mapCx.fillStyle = centerColor;
+        mapCx.fillRect(fx, fy, 2, 2);
       }
     }
     

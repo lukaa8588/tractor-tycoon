@@ -1320,23 +1320,33 @@ function renderCellToMap(gx,gy,now){
       mapCx.drawImage(window.customTextures.forest, sx, sy, T, T);
     } else {
       const r = h(gx, gy, 1);
-      const sparse = h(gx, gy, 7);
 
-      // Base grass — sparse tiles are 10-15% darker
-      const baseL = sparse > 0.72
-        ? 30 + r * 10   // sparse tile: darker
-        : 42 + r * 10;  // normal tile: bright lush green
-      const baseS = sparse > 0.72
-        ? 50 + r * 15   // sparse: less saturated
-        : 65 + r * 15;  // normal: vivid
+      // Pick one of 5 grass variants per tile based on hash
+      const variant = Math.floor(h(gx, gy, 3) * 5); // 0..4
 
-      mapCx.fillStyle = `hsl(${113 + r * 12}, ${baseS}%, ${baseL}%)`;
+      // 5 distinct grass tile styles:
+      // 0 — standard medium green
+      // 1 — deep rich green (dense lush)
+      // 2 — lighter yellowish-green (sunny patch)
+      // 3 — dark muted green (shaded/sparse)
+      // 4 — cool blue-green (wet patch)
+      const grassStyles = [
+        { hue: 115, sat: 52, lig: 32 },  // 0: standard
+        { hue: 122, sat: 60, lig: 26 },  // 1: deep rich
+        { hue: 105, sat: 48, lig: 40 },  // 2: sunny
+        { hue: 118, sat: 35, lig: 22 },  // 3: dark sparse
+        { hue: 155, sat: 40, lig: 28 },  // 4: cool wet
+      ];
+      const gs = grassStyles[variant];
+
+      // Small per-tile random shift so tiles of same variant are not identical
+      const shift = (r - 0.5) * 6;
+      mapCx.fillStyle = `hsl(${gs.hue + shift}, ${gs.sat}%, ${gs.lig + shift * 0.5}%)`;
       mapCx.fillRect(sx, sy, T, T);
 
       // Pixel-art flowers — drawn with fillRect only (no arcs)
       const flowerChance = h(gx, gy, 99);
       if (flowerChance > 0.78) {
-        // Snap flower position to 2px grid for pixel feel
         const fx = sx + Math.floor(h(gx, gy, 50) * (T - 6) / 2) * 2 + 2;
         const fy = sy + Math.floor(h(gx, gy, 51) * (T - 6) / 2) * 2 + 2;
         const ft = h(gx, gy, 52);

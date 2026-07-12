@@ -1432,10 +1432,9 @@ function renderCellToMap(gx,gy,now){
   
   // Детальная текстура земли под культурами
   const drawSoil = () => {
-    // Base earthy brown
-    mapCx.fillStyle = `hsl(${30 + h1*8}, ${40+h2*15}%, ${32+h3*10}%)`;
+    // Base dark earthy brown
+    mapCx.fillStyle = `hsl(${28 + h1*6}, ${45+h2*12}%, ${18+h3*7}%)`;
     mapCx.fillRect(sx, sy, T, T);
-    // Overlay 5 dirt patches — только тёмные и средние тона, без белого
     for (let di = 0; di < 5; di++) {
       const dx = h(gx*11+di, gy*7+di, di*3);
       const dy = h(gx*5+di, gy*13+di, di*3+1);
@@ -1443,9 +1442,9 @@ function renderCellToMap(gx,gy,now){
       const dw = 3 + Math.floor(ds * 5);
       const shade = h(gx+di, gy-di, di*7);
       if (shade < 0.5) {
-        mapCx.fillStyle = `hsl(${25+di*2}, 48%, ${20+Math.floor(ds*10)}%)`; // тёмный комок
+        mapCx.fillStyle = `hsl(${22+di*2}, 50%, ${12+Math.floor(ds*8)}%)`; // очень тёмный
       } else {
-        mapCx.fillStyle = `hsl(${33+di*2}, 40%, ${38+Math.floor(ds*8)}%)`; // средний тон
+        mapCx.fillStyle = `hsl(${30+di*2}, 42%, ${26+Math.floor(ds*8)}%)`; // тёмный средний
       }
       mapCx.fillRect(sx + Math.floor(dx*(T-dw)), sy + Math.floor(dy*(T-dw)), dw, dw);
     }

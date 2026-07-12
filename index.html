@@ -1319,9 +1319,47 @@ function renderCellToMap(gx,gy,now){
     if (window.customTextures && window.customTextures.forest) {
       mapCx.drawImage(window.customTextures.forest, sx, sy, T, T);
     } else {
-      const r=h(gx,gy,1);
-      mapCx.fillStyle=`hsl(${110+r*20}, ${40+r*20}%, ${25+r*10}%)`;
-      mapCx.fillRect(sx,sy,T,T);
+      const r = h(gx, gy, 1);
+      // Original base color
+      mapCx.fillStyle = `hsl(${110 + r*20}, ${40 + r*20}%, ${25 + r*10}%)`;
+      mapCx.fillRect(sx, sy, T, T);
+
+      // Two small rect sub-patches for texture depth
+      const r2 = h(gx, gy, 2), r3 = h(gx, gy, 3);
+      mapCx.fillStyle = `hsl(${112 + r2*15}, ${38 + r2*15}%, ${20 + r2*8}%)`;
+      mapCx.fillRect(sx + Math.floor(r2 * (T-8)), sy + Math.floor(r3 * (T-8)), 8, 8);
+      const r4 = h(gx, gy, 4), r5 = h(gx, gy, 5);
+      mapCx.fillStyle = `hsl(${108 + r4*18}, ${42 + r4*18}%, ${30 + r4*10}%)`;
+      mapCx.fillRect(sx + Math.floor(r4 * (T-6)), sy + Math.floor(r5 * (T-6)), 6, 6);
+
+      // Pixel-art flower on ~18% of tiles — 4x4 px cross
+      if (h(gx, gy, 99) > 0.82) {
+        const fx = sx + Math.floor(h(gx, gy, 50) * (T - 10) / 2) * 2 + 4;
+        const fy = sy + Math.floor(h(gx, gy, 51) * (T - 10) / 2) * 2 + 4;
+        const ft = h(gx, gy, 52);
+        const petalCol  = ft > 0.6 ? '#ffdf44' : (ft > 0.3 ? '#ff88bb' : '#ffffff');
+        const centerCol = ft > 0.6 ? '#ff8800' : (ft > 0.3 ? '#ffffaa' : '#ffdd00');
+        mapCx.fillStyle = petalCol;
+        mapCx.fillRect(fx,     fy - 4, 4, 4);
+        mapCx.fillRect(fx,     fy + 4, 4, 4);
+        mapCx.fillRect(fx - 4, fy,     4, 4);
+        mapCx.fillRect(fx + 4, fy,     4, 4);
+        mapCx.fillStyle = centerCol;
+        mapCx.fillRect(fx, fy, 4, 4);
+      }
+
+      // Rare pixel pebble on ~8% of tiles
+      if (h(gx, gy, 77) > 0.92) {
+        const px = sx + Math.floor(h(gx, gy, 70) * (T - 6));
+        const py = sy + Math.floor(h(gx, gy, 71) * (T - 6));
+        const pt = h(gx, gy, 72);
+        mapCx.fillStyle = `hsl(${30 + pt*20}, ${15 + pt*10}%, ${45 + pt*15}%)`;
+        mapCx.fillRect(px,     py,     3, 2);
+        mapCx.fillRect(px + 1, py + 2, 2, 1);
+        mapCx.fillStyle = `hsl(${30 + pt*20}, ${15 + pt*10}%, ${30 + pt*10}%)`;
+        mapCx.fillRect(px,     py + 2, 1, 1);
+        mapCx.fillRect(px + 3, py,     1, 2);
+      }
     }
     
     // Draw fences on edges bordering open areas

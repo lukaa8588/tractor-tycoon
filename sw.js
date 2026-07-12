@@ -1,40 +1,23 @@
-const CACHE_NAME = 'tractor-cache-v100';
-const ASSETS = [
-  './',
-  './index.html?v=100',
-  './yandex-sdk.js',
-  './manifest.json?v=91',
-  './icon.png?v=91',
-  './fence.jpg',
-  './hay.jpg',
-  './dirt.jpg',
-  './grass.jpg''
-];
-
-self.addEventListener('install', (e) => {
+// Self-destructing service worker - clears all caches and unregisters itself
+self.addEventListener('install', () => {
   self.skipWaiting();
-  e.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-  );
 });
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
+    caches.keys().then(cacheNames => {
+      return Promise.all(cacheNames.map(name => {
+        console.log('Deleting cache:', name);
+        return caches.delete(name);
+      }));
+    }).then(() => {
+      console.log('All caches cleared. Unregistering SW...');
+      return self.registration.unregister();
+    }).then(() => {
+      // Tell all open clients to reload
+      return self.clients.matchAll();
+    }).then(clients => {
+      clients.forEach(client => client.navigate(client.url));
     })
-  );
-  self.clients.claim();
-});
-
-self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
   );
 });

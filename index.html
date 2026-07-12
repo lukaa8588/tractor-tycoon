@@ -1494,26 +1494,14 @@ function renderCellToMap(gx,gy,now){
            }
         }
       } else {
-        // Natural organic dirt for harvested fields
-        mapCx.fillStyle = '#5c3e21'; // Base dark brown
+        // Original grey dirt texture for harvested fields
+        mapCx.fillStyle = '#8c8c82';
         mapCx.fillRect(sx, sy, T, T);
-        
-        // Add random dirt clumps and variations
-        for(let pz=0; pz<6; pz++) {
-          let px2 = h(gx, gy, pz*3);
-          let py2 = h(gx, gy, pz*3+1);
-          let ptype = h(gx, gy, pz*3+2);
-          
-          if (ptype < 0.4) {
-            mapCx.fillStyle = '#4a301a'; // Darker dirt clump
-            mapCx.fillRect(sx + Math.floor(px2*(T-6)), sy + Math.floor(py2*(T-6)), 6, 6);
-          } else if (ptype < 0.8) {
-            mapCx.fillStyle = '#6b4929'; // Lighter dirt clump
-            mapCx.fillRect(sx + Math.floor(px2*(T-4)), sy + Math.floor(py2*(T-4)), 4, 4);
-          } else {
-            mapCx.fillStyle = '#785635'; // Small dry highlight
-            mapCx.fillRect(sx + Math.floor(px2*(T-2)), sy + Math.floor(py2*(T-2)), 2, 2);
-          }
+        for(let pz=0; pz<5; pz++) {
+          let px2 = h(gx, gy, pz*2);
+          let py2 = h(gx, gy, pz*2+1);
+          mapCx.fillStyle = pz%2===0 ? '#7a7a72' : '#9c9c92';
+          mapCx.fillRect(sx + Math.floor(px2*(T-4)), sy + Math.floor(py2*(T-4)), 4, 4);
         }
       }
     }

@@ -1494,9 +1494,27 @@ function renderCellToMap(gx,gy,now){
            }
         }
       } else {
-        // Harvested fields already have dirt from above, but we can add a slight shadow
-        // or just let it use the dirt we drew at the start.
-        // Actually, since we already called drawOrganicDirt(), we don't need to do anything else here!
+        // Natural organic dirt for harvested fields
+        mapCx.fillStyle = '#5c3e21'; // Base dark brown
+        mapCx.fillRect(sx, sy, T, T);
+        
+        // Add random dirt clumps and variations
+        for(let pz=0; pz<6; pz++) {
+          let px2 = h(gx, gy, pz*3);
+          let py2 = h(gx, gy, pz*3+1);
+          let ptype = h(gx, gy, pz*3+2);
+          
+          if (ptype < 0.4) {
+            mapCx.fillStyle = '#4a301a'; // Darker dirt clump
+            mapCx.fillRect(sx + Math.floor(px2*(T-6)), sy + Math.floor(py2*(T-6)), 6, 6);
+          } else if (ptype < 0.8) {
+            mapCx.fillStyle = '#6b4929'; // Lighter dirt clump
+            mapCx.fillRect(sx + Math.floor(px2*(T-4)), sy + Math.floor(py2*(T-4)), 4, 4);
+          } else {
+            mapCx.fillStyle = '#785635'; // Small dry highlight
+            mapCx.fillRect(sx + Math.floor(px2*(T-2)), sy + Math.floor(py2*(T-2)), 2, 2);
+          }
+        }
       }
     }
     if (st === L) {

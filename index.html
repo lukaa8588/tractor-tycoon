@@ -1493,12 +1493,17 @@ function renderCellToMap(gx,gy,now){
         // Draw exactly one sign per road, vertically centered at gy=59
         // Only draw on the left gate to avoid duplication
         if (drawLeftGate && gy === 59) {
-           let signX = gateX + 8;
-           const landCostRaw = UPGRADES.find(u => u.id === 'land').cost[upgLvl.land || 0];
-           const costText = landCostRaw ? Number(landCostRaw).toLocaleString() : 'MAX';
-           
            const sw = 56;
            const sh = 28;
+           
+           // Center the sign post on the fence post (gateX)
+           // Fence post is at gateX, width 6.
+           // Sign post is at signX + 26.
+           // To align: signX + 26 = gateX => signX = gateX - 26
+           let signX = gateX - 26;
+           
+           const landCostRaw = UPGRADES.find(u => u.id === 'land').cost[upgLvl.land || 0];
+           const costText = landCostRaw ? Number(landCostRaw).toLocaleString() : 'MAX';
            
            // Post shadow & base
            mapCx.fillStyle = '#654321';

@@ -1497,22 +1497,45 @@ function renderCellToMap(gx,gy,now){
            const landCostRaw = UPGRADES.find(u => u.id === 'land').cost[upgLvl.land || 0];
            const costText = landCostRaw ? Number(landCostRaw).toLocaleString() : 'MAX';
            
-           // Board
-           mapCx.fillStyle = '#d2b48c';
-           mapCx.fillRect(signX, sy, 54, 24);
-           // Post
+           const sw = 56;
+           const sh = 28;
+           
+           // Post shadow & base
+           mapCx.fillStyle = '#654321';
+           mapCx.fillRect(signX + 26, sy + 24, 6, T - 24);
            mapCx.fillStyle = '#8B5A2B';
-           mapCx.fillRect(signX + 25, sy + 24, 4, T - 24);
+           mapCx.fillRect(signX + 24, sy + 24, 4, T - 24);
+           
+           // Board Outer Border
+           mapCx.fillStyle = '#5A3A1A';
+           mapCx.fillRect(signX, sy, sw, sh);
+           // Board Inner
+           mapCx.fillStyle = '#d2b48c';
+           mapCx.fillRect(signX + 2, sy + 2, sw - 4, sh - 4);
+           // Board Highlight
+           mapCx.fillStyle = '#e5cead';
+           mapCx.fillRect(signX + 2, sy + 2, sw - 4, 2);
+           mapCx.fillRect(signX + 2, sy + 4, 2, sh - 6);
+           
+           // Nails
+           mapCx.fillStyle = '#444';
+           mapCx.fillRect(signX + 4, sy + 4, 2, 2);
+           mapCx.fillRect(signX + sw - 6, sy + 4, 2, 2);
+           mapCx.fillRect(signX + 4, sy + sh - 6, 2, 2);
+           mapCx.fillRect(signX + sw - 6, sy + sh - 6, 2, 2);
            
            // SALE Text
            mapCx.fillStyle = '#ff0000';
-           mapCx.font = 'bold 12px Arial';
-           mapCx.fillText("SALE", signX + 12, sy + 11);
+           mapCx.textAlign = 'center';
+           mapCx.font = 'bold 11px Arial';
+           mapCx.fillText("SALE", signX + sw / 2, sy + 14);
            
            // Price Text
            mapCx.fillStyle = '#000000';
-           mapCx.font = 'bold 10px Arial';
-           mapCx.fillText(costText + " \uD83C\uDF3E", signX + 2, sy + 21);
+           mapCx.font = 'bold 9px Arial';
+           mapCx.fillText(costText + " \uD83C\uDF3E", signX + sw / 2, sy + 24);
+           
+           mapCx.textAlign = 'left'; // Reset
         }
       }
     }

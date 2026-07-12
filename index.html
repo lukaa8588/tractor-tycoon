@@ -777,7 +777,7 @@ const UPGRADES = [
     id:'land', icon:'🗺️',
     iconBg:'rgba(100,255,100,.15)',
     maxLevel:2,
-    cost:[135000, 1350000],
+    cost:[87750, 877500],
     statKey:'statLand',
     statFn:(lvl)=>lvl===0?'Сено':lvl===1?'Кукуруза':'Подсолнухи',
   },
@@ -786,7 +786,7 @@ const UPGRADES = [
     id:'speed', icon:'⚡',
     iconBg:'rgba(255,180,30,.15)',
     maxLevel:5,
-    cost:[630, 2025, 4860, 11340, 24300],
+    cost:[410, 1320, 3160, 7370, 15800],
     statKey:'statSpeed',
     statFn:(lvl)=>`${BASE_SPD + lvl*50} px/s`,
   },
@@ -794,7 +794,7 @@ const UPGRADES = [
     id:'width', icon:'⚙️',
     iconBg:'rgba(80,160,255,.15)',
     maxLevel:5,
-    cost:[810, 2430, 5670, 12960, 28350],
+    cost:[530, 1580, 3690, 8420, 18430],
     statKey:'statWidth',
     statFn:(lvl)=>`${1 + lvl} 🟩`,
   },
@@ -802,7 +802,7 @@ const UPGRADES = [
     id:'stamina', icon:'🔋',
     iconBg:'rgba(40,200,80,.15)',
     maxLevel:5,
-    cost:[630, 1620, 4050, 9720, 24300],
+    cost:[410, 1050, 2630, 6320, 15800],
     statKey:'statStamina',
     statFn:(lvl)=>`${45 + lvl*60} ⚡`,
   },
@@ -810,7 +810,7 @@ const UPGRADES = [
     id:'bonus', icon:'🏚️',
     iconBg:'rgba(255,215,0,.12)',
     maxLevel:5,
-    cost:[1215, 3240, 9720, 28350, 85050],
+    cost:[790, 2110, 6320, 18430, 55280],
     statKey:'statBonus',
     statFn:(lvl)=>`${1 + lvl} \uD83C\uDF3E`,
   },
@@ -818,7 +818,7 @@ const UPGRADES = [
     id:'autopilot', icon:'🤖',
     iconBg:'rgba(180,80,255,.15)',
     maxLevel:3,
-    cost:[2430, 12150, 56700],
+    cost:[1580, 7900, 36860],
     statKey:'statAutopilot',
     statFn:(lvl)=>`${lvl} 🤖`,
   },
@@ -826,7 +826,7 @@ const UPGRADES = [
     id:'botSpeed', icon:'🚀',
     iconBg:'rgba(0,255,200,.15)',
     maxLevel:5,
-    cost:[1215, 4050, 11340, 28350, 64800],
+    cost:[790, 2630, 7370, 18430, 42120],
     statKey:'statBotSpeed',
     statFn:(lvl)=>`${lvl * 25}%`,
   },
@@ -835,10 +835,10 @@ const UPGRADES = [
 const upgLvl = {land:0, speed:0, width:0, stamina:0, bonus:0, autopilot:0, botSpeed:0, quest:0};
 
 const QUESTS = [
-  { cost: 12150 },
-  { cost: 40500 },
-  { cost: 202500 },
-  { cost: 810000 }
+  { cost: 7900 },
+  { cost: 26330 },
+  { cost: 131630 },
+  { cost: 526500 }
 ];
 
 // Применяем эффекты прокачки

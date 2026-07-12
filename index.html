@@ -1513,49 +1513,121 @@ function renderCellToMap(gx,gy,now){
     }
     return;
   }
-  const cnt=7+(h3*4)|0;
-  for(let j=0; j<cnt; j++){
-    const hx =h(gx*7+j,gy*3+j,10+j);
-    const hh2=h(gx*3+j,gy*9+j,20+j);
-    const hc =h(gx*5+j,gy*2+j,30+j);
-    const stx=sx+3+hx*(T-6);
-    
+  // ── PIXEL-ART CROPS ──────────────────────────────────────────
+  const cnt = 5 + (h3 * 4) | 0;
+  for (let j = 0; j < cnt; j++) {
+    const hx  = h(gx*7+j, gy*3+j, 10+j);
+    const hh2 = h(gx*3+j, gy*9+j, 20+j);
+    const hc  = h(gx*5+j, gy*2+j, 30+j);
+    const stx = sx + 2 + Math.floor(hx * (T - 6));
+
     if (isHay) {
-      const maxH=T*(.22+hh2*.45);
-      const hp=p<.33?(p/.33)*.33:p<.66?.33+(p-.33)/.34*.34:.67+(p-.66)/.34*.33;
-      const sth=maxH*Math.min(1,hp);
-      const colorT=Math.max(0,(p-.33)/.67);
-      const hue=110-colorT*66;
-      const light=32+colorT*30;
-      const alpha=.38+hc*.42;
-      mapCx.fillStyle=`hsla(${hue},75%,${light}%,${alpha})`;
-      mapCx.fillRect(stx,sy+T-3-sth,1,sth);
-      if(p>.35){
-        const tA=Math.min(1,(p-.35)/.3)*alpha;
-        mapCx.fillStyle=`hsla(${hue-8},78%,${light-5}%,${tA})`;
-        mapCx.fillRect(stx-1,sy+T-3-sth-3,3,4);
+      // ── WHEAT ─────────────────────────────────────────────────
+      const maxH = Math.floor(T * (0.45 + hh2 * 0.45));
+      const sth  = Math.floor(maxH * p);
+      const bot  = sy + T - 2;
+
+      // Stalk (2px wide, golden-brown at base)
+      mapCx.fillStyle = `hsl(${42 + hc*10}, 72%, ${38 + hc*10}%)`;
+      mapCx.fillRect(stx, bot - sth, 2, sth);
+
+      if (p > 0.5) {
+        // Ear body — 4px wide, 7px tall
+        const earY = bot - sth - 7;
+        mapCx.fillStyle = `hsl(${47 + hc*8}, 88%, ${62 + hh2*8}%)`;
+        mapCx.fillRect(stx - 1, earY, 4, 7);
+        // Ear tip — 2px tapering top
+        mapCx.fillStyle = `hsl(${50 + hc*8}, 85%, ${70 + hh2*6}%)`;
+        mapCx.fillRect(stx,     earY - 3, 2, 3);
+        // Ear dark shadow side
+        mapCx.fillStyle = `hsl(${40 + hc*8}, 78%, ${45 + hh2*8}%)`;
+        mapCx.fillRect(stx + 2, earY, 2, 7);
+        // Whisker left
+        if (p > 0.7) {
+          mapCx.fillStyle = `hsl(${48}, 80%, 68%)`;
+          mapCx.fillRect(stx - 3, earY + 2, 2, 1);
+          mapCx.fillRect(stx - 3, earY + 5, 2, 1);
+        }
       }
+
     } else if (isCorn) {
-      const maxH=T*(.5+hh2*.5);
-      const sth=maxH*p;
-      mapCx.fillStyle=`hsl(${90+hc*20}, 70%, ${35+hc*15}%)`;
-      mapCx.fillRect(stx-1,sy+T-2-sth,2,sth);
-      if(p>0.8) {
-        // Corn cob
-        mapCx.fillStyle=`hsl(50, 90%, 60%)`;
-        mapCx.fillRect(stx-1,sy+T-2-sth*.7,3,sth*.3);
+      // ── CORN ──────────────────────────────────────────────────
+      const maxH = Math.floor(T * (0.55 + hh2 * 0.35));
+      const sth  = Math.floor(maxH * p);
+      const bot  = sy + T - 2;
+
+      // Green stalk (3px)
+      mapCx.fillStyle = `hsl(${108 + hc*12}, 65%, ${32 + hc*10}%)`;
+      mapCx.fillRect(stx, bot - sth, 3, sth);
+      // Stalk highlight
+      mapCx.fillStyle = `hsl(${110 + hc*10}, 60%, ${44 + hc*8}%)`;
+      mapCx.fillRect(stx + 1, bot - sth, 1, sth);
+
+      // Leaf (small rectangle angled out)
+      if (p > 0.3) {
+        mapCx.fillStyle = `hsl(${105 + hc*10}, 62%, ${36 + hc*8}%)`;
+        mapCx.fillRect(stx + 3, bot - Math.floor(sth * 0.5), 4, 2);
       }
+
+      if (p > 0.65) {
+        // Cob body — 5px wide, 10px tall
+        const cobY = bot - sth - 10;
+        mapCx.fillStyle = `hsl(${50 + hc*8}, 92%, ${62 + hh2*8}%)`;
+        mapCx.fillRect(stx - 1, cobY, 5, 10);
+        // Cob kernel rows (dark lines)
+        mapCx.fillStyle = `hsl(${45 + hc*6}, 85%, ${48 + hh2*6}%)`;
+        mapCx.fillRect(stx, cobY + 3, 5, 1);
+        mapCx.fillRect(stx, cobY + 6, 5, 1);
+        // Cob husk at top (green)
+        mapCx.fillStyle = `hsl(${108}, 65%, 35%)`;
+        mapCx.fillRect(stx, cobY - 3, 3, 3);
+        // Cob highlight side
+        mapCx.fillStyle = `hsl(${52}, 95%, 75%)`;
+        mapCx.fillRect(stx, cobY, 2, 10);
+      }
+
     } else if (isSun) {
-      const maxH=T*(.4+hh2*.3);
-      const sth=maxH*p;
-      mapCx.fillStyle=`hsl(${100+hc*10}, 60%, 30%)`;
-      mapCx.fillRect(stx,sy+T-2-sth,2,sth);
-      if(p>0.9) {
-        // Sunflower head
-        mapCx.fillStyle=`hsl(50, 100%, 55%)`;
-        mapCx.beginPath(); mapCx.arc(stx+1, sy+T-2-sth, 4, 0, Math.PI*2); mapCx.fill();
-        mapCx.fillStyle=`hsl(30, 80%, 20%)`;
-        mapCx.beginPath(); mapCx.arc(stx+1, sy+T-2-sth, 2, 0, Math.PI*2); mapCx.fill();
+      // ── SUNFLOWER ─────────────────────────────────────────────
+      const maxH = Math.floor(T * (0.5 + hh2 * 0.3));
+      const sth  = Math.floor(maxH * p);
+      const bot  = sy + T - 2;
+
+      // Stem (2px, dark green)
+      mapCx.fillStyle = `hsl(${115 + hc*8}, 58%, ${28 + hc*8}%)`;
+      mapCx.fillRect(stx, bot - sth, 2, sth);
+      // Stem highlight
+      mapCx.fillStyle = `hsl(${112 + hc*8}, 55%, ${40 + hc*6}%)`;
+      mapCx.fillRect(stx + 1, bot - sth, 1, sth);
+
+      // Leaf pair
+      if (p > 0.3) {
+        mapCx.fillStyle = `hsl(${110}, 60%, 33%)`;
+        mapCx.fillRect(stx - 4, bot - Math.floor(sth * 0.45), 4, 2);
+        mapCx.fillRect(stx + 2, bot - Math.floor(sth * 0.65), 4, 2);
+      }
+
+      if (p > 0.6) {
+        const headX = stx - 3;
+        const headY = bot - sth - 7;
+        // Petals — 4 sides, 2px each (pixel cross)
+        mapCx.fillStyle = `hsl(${48 + hc*8}, 95%, ${62 + hh2*10}%)`;
+        mapCx.fillRect(headX + 1, headY - 3, 4, 3); // top
+        mapCx.fillRect(headX + 1, headY + 7, 4, 3); // bottom
+        mapCx.fillRect(headX - 3, headY + 2, 3, 4); // left
+        mapCx.fillRect(headX + 7, headY + 2, 3, 4); // right
+        // Diagonal petals (smaller)
+        mapCx.fillStyle = `hsl(${46 + hc*8}, 90%, ${56 + hh2*8}%)`;
+        mapCx.fillRect(headX - 1, headY - 1, 2, 2);
+        mapCx.fillRect(headX + 7, headY - 1, 2, 2);
+        mapCx.fillRect(headX - 1, headY + 7, 2, 2);
+        mapCx.fillRect(headX + 7, headY + 7, 2, 2);
+        // Head center (dark brown 6x7)
+        mapCx.fillStyle = `hsl(${24 + hc*6}, 65%, ${22 + hc*8}%)`;
+        mapCx.fillRect(headX, headY, 6, 7);
+        // Center highlight (lighter dots)
+        mapCx.fillStyle = `hsl(${26}, 60%, 35%)`;
+        mapCx.fillRect(headX + 1, headY + 1, 2, 2);
+        mapCx.fillRect(headX + 3, headY + 4, 2, 2);
       }
     }
   }
@@ -1580,28 +1652,32 @@ function drawStalksMap(sx,sy,p,h1,h2,h3,gx,gy){
     mapCx.fillStyle=`hsl(${44+h1*12},80%,${57+h2*12}%)`;
     mapCx.fillRect(sx,sy,T,T);
   }
-  const cnt=4+(h3*4)|0;
-  for(let i=0;i<cnt;i++){
-    const hx =h(gx*7+i,gy*3+i,10+i);
-    const hh2=h(gx*3+i,gy*9+i,20+i);
-    const hc =h(gx*5+i,gy*2+i,30+i);
-    const stx=sx+3+hx*(T-6);
-    const maxH=T*(.22+hh2*.45);
-    const hp=p<.33?(p/.33)*.33:p<.66?.33+(p-.33)/.34*.34:.67+(p-.66)/.34*.33;
-    const sth=maxH*Math.min(1,hp);
-    const colorT=Math.max(0,(p-.33)/.67);
-    const hue=110-colorT*66;
-    const light=32+colorT*30;
-    const alpha=.38+hc*.42;
-    mapCx.fillStyle=`hsla(${hue},75%,${light}%,${alpha})`;
-    mapCx.fillRect(stx,sy+T-3-sth,1,sth);
-    if(p>.35){
-      const tA=Math.min(1,(p-.35)/.3)*alpha;
-      mapCx.fillStyle=`hsla(${hue-8},78%,${light-5}%,${tA})`;
-      mapCx.fillRect(stx-1,sy+T-3-sth-3,3,4);
+  // Pixel wheat stalks for growing phase
+  const cnt = 4 + (h3 * 4) | 0;
+  for (let i = 0; i < cnt; i++) {
+    const hx  = h(gx*7+i, gy*3+i, 10+i);
+    const hh2 = h(gx*3+i, gy*9+i, 20+i);
+    const hc  = h(gx*5+i, gy*2+i, 30+i);
+    const stx = sx + 2 + Math.floor(hx * (T - 6));
+    const maxH = Math.floor(T * (0.45 + hh2 * 0.45));
+    const sth  = Math.floor(maxH * p);
+    const bot  = sy + T - 2;
+
+    // Stalk
+    mapCx.fillStyle = `hsl(${42 + hc*10}, 72%, ${38 + hc*10}%)`;
+    mapCx.fillRect(stx, bot - sth, 2, sth);
+
+    if (p > 0.5) {
+      const earY = bot - sth - 7;
+      mapCx.fillStyle = `hsl(${47 + hc*8}, 88%, ${62 + hh2*8}%)`;
+      mapCx.fillRect(stx - 1, earY, 4, 7);
+      mapCx.fillStyle = `hsl(${50 + hc*8}, 85%, ${70 + hh2*6}%)`;
+      mapCx.fillRect(stx,     earY - 3, 2, 3);
+      mapCx.fillStyle = `hsl(${40 + hc*8}, 78%, ${45 + hh2*8}%)`;
+      mapCx.fillRect(stx + 2, earY, 2, 7);
     }
   }
-  mapCx.fillStyle='rgba(0,0,0,.05)';mapCx.fillRect(sx,sy,T,1);mapCx.fillRect(sx,sy,1,T);
+  mapCx.fillStyle = 'rgba(0,0,0,.05)'; mapCx.fillRect(sx,sy,T,1); mapCx.fillRect(sx,sy,1,T);
 }
 
 function drawPlayer(){

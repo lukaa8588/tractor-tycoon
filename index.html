@@ -1466,29 +1466,28 @@ function renderCellToMap(gx,gy,now){
       mapCx.fillStyle = 'rgba(255,255,255,0.1)';
       mapCx.fillRect(sx, sy, T, T);
     } else {
-      // Premium cobblestone path
-      mapCx.fillStyle = '#65605a'; // dark grout
+      // Premium plowed dirt with furrows
+      mapCx.fillStyle = '#5c3a21'; // Base dark brown
       mapCx.fillRect(sx, sy, T, T);
       
-      for (let cy=0; cy<4; cy++) {
-         for (let px=0; px<4; px++) {
-            let idx = cy*4 + px;
-            let jx = h(gx, gy, idx) * 4 - 2;
-            let jy = h(gx, gy, idx + 16) * 4 - 2;
-            let stW = 10 + Math.floor(h(gx, gy, idx + 32) * 6);
-            let stH = 10 + Math.floor(h(gx, gy, idx + 48) * 6);
-            
-            let drawX = sx + px*16 + jx + 2;
-            let drawY = sy + cy*16 + jy + 2;
-            
-            // Stone base
-            mapCx.fillStyle = (idx % 3 === 0) ? '#8a857e' : '#9c9790';
-            mapCx.fillRect(drawX, drawY, stW, stH);
-            
-            // Highlight (top edge)
-            mapCx.fillStyle = '#b5b1a9';
-            mapCx.fillRect(drawX, drawY, stW, 2);
-         }
+      // Draw horizontal furrows (shadows)
+      mapCx.fillStyle = '#4a2e1a';
+      for (let fy = 0; fy < T; fy += 16) {
+         mapCx.fillRect(sx, sy + fy + 4, T, 6);
+      }
+      
+      // Draw highlights on the ridges
+      mapCx.fillStyle = '#734a2a';
+      for (let fy = 0; fy < T; fy += 16) {
+         mapCx.fillRect(sx, sy + fy + 10, T, 2);
+      }
+      
+      // Add some random dirt clumps
+      for(let pz=0; pz<4; pz++) {
+        let px2 = h(gx, gy, pz*2);
+        let py2 = h(gx, gy, pz*2+1);
+        mapCx.fillStyle = '#3d2514';
+        mapCx.fillRect(sx + Math.floor(px2*(T-4)), sy + Math.floor(py2*(T-4)), 4, 4);
       }
     }
     if (st === L) {

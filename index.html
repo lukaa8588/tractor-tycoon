@@ -1489,15 +1489,30 @@ function renderCellToMap(gx,gy,now){
         mapCx.fillStyle = '#A0522D';
         mapCx.fillRect(gateX - 2, sy + T/3, 10, 4);
         mapCx.fillRect(gateX - 2, sy + 2*T/3, 10, 4);
-        if (gy % 2 === 0) {
-           let signX = drawLeftGate ? gateX + 8 : gateX - 28;
+        
+        // Draw exactly one sign per road, vertically centered at gy=59
+        // Only draw on the left gate to avoid duplication
+        if (drawLeftGate && gy === 59) {
+           let signX = gateX + 8;
+           const landCostRaw = UPGRADES.find(u => u.id === 'land').cost[upgLvl.land || 0];
+           const costText = landCostRaw ? Number(landCostRaw).toLocaleString() : 'MAX';
+           
+           // Board
            mapCx.fillStyle = '#d2b48c';
-           mapCx.fillRect(signX, sy + 4, 24, 14);
+           mapCx.fillRect(signX, sy, 54, 24);
+           // Post
            mapCx.fillStyle = '#8B5A2B';
-           mapCx.fillRect(signX + 10, sy + 18, 4, T - 18);
+           mapCx.fillRect(signX + 25, sy + 24, 4, T - 24);
+           
+           // SALE Text
            mapCx.fillStyle = '#ff0000';
+           mapCx.font = 'bold 12px Arial';
+           mapCx.fillText("SALE", signX + 12, sy + 11);
+           
+           // Price Text
+           mapCx.fillStyle = '#000000';
            mapCx.font = 'bold 10px Arial';
-           mapCx.fillText("SALE", signX + 2, sy + 15);
+           mapCx.fillText(costText + " \uD83C\uDF3E", signX + 2, sy + 21);
         }
       }
     }

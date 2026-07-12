@@ -1430,31 +1430,24 @@ function renderCellToMap(gx,gy,now){
   
   const p = (st===H || st===C || st===S) ? 1 : 0;
   
-  const drawOrganicDirt = () => {
-    mapCx.fillStyle = '#5c3e21';
-    mapCx.fillRect(sx, sy, T, T);
-    for(let pz=0; pz<6; pz++) {
-      let px2 = h(gx, gy, pz*3);
-      let py2 = h(gx, gy, pz*3+1);
-      let ptype = h(gx, gy, pz*3+2);
-      if (ptype < 0.4) {
-        mapCx.fillStyle = '#4a301a';
-        mapCx.fillRect(sx + Math.floor(px2*(T-6)), sy + Math.floor(py2*(T-6)), 6, 6);
-      } else if (ptype < 0.8) {
-        mapCx.fillStyle = '#6b4929';
-        mapCx.fillRect(sx + Math.floor(px2*(T-4)), sy + Math.floor(py2*(T-4)), 4, 4);
-      } else {
-        mapCx.fillStyle = '#785635';
-        mapCx.fillRect(sx + Math.floor(px2*(T-2)), sy + Math.floor(py2*(T-2)), 2, 2);
-      }
-    }
-  };
-
+  // Коричневая грязь под культурами
+  const dirtColor = `hsl(35, 50%, ${20 + h1 * 10}%)`;
+  
   if (window.customTextures && window.customTextures.dirt) {
     mapCx.drawImage(window.customTextures.dirt, sx, sy, T, T);
   } else {
-    // Base ground is always dirt now, not flat bright colors
-    drawOrganicDirt();
+    // Base ground
+    if (isHay) {
+      if(p<.33) mapCx.fillStyle = dirtColor;
+      else mapCx.fillStyle = `hsl(${44+h1*12}, 80%, ${57+h2*12}%)`; // Желтое сено
+    } else if (isCorn) {
+      if(p<.33) mapCx.fillStyle = dirtColor;
+      else mapCx.fillStyle = `hsl(${65+h1*10}, 75%, ${50+h2*10}%)`; // Салатовая кукуруза
+    } else if (isSun) {
+      if(p<.33) mapCx.fillStyle = dirtColor;
+      else mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`; // Оранжевый подсолнух
+    }
+    mapCx.fillRect(sx,sy,T,T);
   }
   
   let customCrop = null;
@@ -1528,8 +1521,7 @@ function renderCellToMap(gx,gy,now){
     }
     return;
   }
-  const baseCnt = isHay ? 50 : 30;
-  const cnt = baseCnt + (h3 * 15) | 0;
+  const cnt=7+(h3*4)|0;
   for(let j=0; j<cnt; j++){
     const hx =h(gx*7+j,gy*3+j,10+j);
     const hh2=h(gx*3+j,gy*9+j,20+j);

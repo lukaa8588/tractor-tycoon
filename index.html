@@ -1430,8 +1430,8 @@ function renderCellToMap(gx,gy,now){
   
   const p = (st===H || st===C || st===S) ? 1 : 0;
   
-  // Коричневая грязь под культурами
-  const dirtColor = `hsl(35, 50%, ${20 + h1 * 10}%)`;
+  // Цвет земли под культурами — светло-серый с оттенком
+  const dirtColor = `hsl(38, 30%, ${50 + h1 * 10}%)`;
   
   if (window.customTextures && window.customTextures.dirt) {
     mapCx.drawImage(window.customTextures.dirt, sx, sy, T, T);

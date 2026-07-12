@@ -1793,7 +1793,7 @@ function drawAITractor(b){
 function drawSigns(mapSx, mapSy) {
   const landLvl = Number(upgLvl.land) || 0;
   
-  const drawSignAt = (gx, gy, isLeftGate) => {
+  const drawSignAt = (gx, gy, isLeftGate, costLevel) => {
     let worldX = gx * T;
     let worldY = gy * T;
     
@@ -1806,7 +1806,7 @@ function drawSigns(mapSx, mapSy) {
     
     if (screenX + 56 < 0 || screenX > CW || screenY + 28 < 0 || screenY > CH) return;
     
-    const landCostRaw = UPGRADES.find(u => u.id === 'land').cost[landLvl];
+    const landCostRaw = UPGRADES.find(u => u.id === 'land').cost[costLevel];
     const costText = landCostRaw ? Number(landCostRaw).toLocaleString() : 'MAX';
     
     const sw = 56;
@@ -1847,10 +1847,11 @@ function drawSigns(mapSx, mapSy) {
     cx.textAlign = 'left';
   };
 
-  if (landLvl === 0) {
-    drawSignAt(64, 59, false); // Right gate of the left locked area
-  } else if (landLvl === 1) {
-    drawSignAt(115, 59, true); // Left gate of the right locked area
+  if (landLvl < 1) {
+    drawSignAt(64, 59, false, 0); // Right gate of the left locked area (Corn)
+  }
+  if (landLvl < 2) {
+    drawSignAt(115, 59, true, 1); // Left gate of the right locked area (Sunflowers)
   }
 }
 

@@ -1100,6 +1100,23 @@ function loadCustomTextures() {
       if (typeof mapCx !== 'undefined' && mapCx) initGrid();
     };
   }
+
+  // Auto-load default pixel-art crop textures from GitHub (if not overridden by user)
+  const baseUrl = 'https://lukaa8588.github.io/tractor-tycoon/';
+  const defaultCrops = { hay: 'wheat.png', corn: 'corn.png', sun: 'sun.png' };
+  for (const [key, file] of Object.entries(defaultCrops)) {
+    if (data[key]) continue; // user has custom texture for this, skip
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.src = baseUrl + file;
+    img.onload = () => {
+      const cv = document.createElement('canvas');
+      cv.width = 64; cv.height = 64;
+      cv.getContext('2d').drawImage(img, 0, 0, 64, 64);
+      window.customTextures[key] = cv;
+      if (typeof mapCx !== 'undefined' && mapCx) initGrid();
+    };
+  }
 }
 
 function clearCustomTextures() {

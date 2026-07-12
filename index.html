@@ -1492,56 +1492,7 @@ function renderCellToMap(gx,gy,now){
         
         // Draw exactly one sign per road, vertically centered at gy=59
         // Only draw on the left gate to avoid duplication
-        if (drawLeftGate && gy === 59) {
-           const sw = 56;
-           const sh = 28;
-           
-           // Center the sign post on the fence post (gateX)
-           // Fence post is at gateX, width 6.
-           // Sign post is at signX + 26.
-           // To align: signX + 26 = gateX => signX = gateX - 26
-           let signX = gateX - 26;
-           
-           const landCostRaw = UPGRADES.find(u => u.id === 'land').cost[upgLvl.land || 0];
-           const costText = landCostRaw ? Number(landCostRaw).toLocaleString() : 'MAX';
-           
-           // Post shadow & base
-           mapCx.fillStyle = '#654321';
-           mapCx.fillRect(signX + 26, sy + 24, 6, T - 24);
-           mapCx.fillStyle = '#8B5A2B';
-           mapCx.fillRect(signX + 24, sy + 24, 4, T - 24);
-           
-           // Board Outer Border
-           mapCx.fillStyle = '#5A3A1A';
-           mapCx.fillRect(signX, sy, sw, sh);
-           // Board Inner
-           mapCx.fillStyle = '#d2b48c';
-           mapCx.fillRect(signX + 2, sy + 2, sw - 4, sh - 4);
-           // Board Highlight
-           mapCx.fillStyle = '#e5cead';
-           mapCx.fillRect(signX + 2, sy + 2, sw - 4, 2);
-           mapCx.fillRect(signX + 2, sy + 4, 2, sh - 6);
-           
-           // Nails
-           mapCx.fillStyle = '#444';
-           mapCx.fillRect(signX + 4, sy + 4, 2, 2);
-           mapCx.fillRect(signX + sw - 6, sy + 4, 2, 2);
-           mapCx.fillRect(signX + 4, sy + sh - 6, 2, 2);
-           mapCx.fillRect(signX + sw - 6, sy + sh - 6, 2, 2);
-           
-           // SALE Text
-           mapCx.fillStyle = '#ff0000';
-           mapCx.textAlign = 'center';
-           mapCx.font = 'bold 11px Arial';
-           mapCx.fillText("SALE", signX + sw / 2, sy + 14);
-           
-           // Price Text
-           mapCx.fillStyle = '#000000';
-           mapCx.font = 'bold 9px Arial';
-           mapCx.fillText(costText + " \uD83C\uDF3E", signX + sw / 2, sy + 24);
-           
-           mapCx.textAlign = 'left'; // Reset
-        }
+        // Sign rendering moved to renderMap to draw over all cells
       }
     }
     return;
@@ -1839,6 +1790,70 @@ function drawAITractor(b){
   cx.restore();
 }
 
+function drawSigns(mapSx, mapSy) {
+  const landLvl = Number(upgLvl.land) || 0;
+  
+  const drawSignAt = (gx, gy, isLeftGate) => {
+    let worldX = gx * T;
+    let worldY = gy * T;
+    
+    let gateX = isLeftGate ? worldX : (worldX + T - 6);
+    let signWorldX = gateX - 26;
+    let signWorldY = worldY;
+    
+    let screenX = signWorldX - mapSx;
+    let screenY = signWorldY - mapSy;
+    
+    if (screenX + 56 < 0 || screenX > CW || screenY + 28 < 0 || screenY > CH) return;
+    
+    const landCostRaw = UPGRADES.find(u => u.id === 'land').cost[landLvl];
+    const costText = landCostRaw ? Number(landCostRaw).toLocaleString() : 'MAX';
+    
+    const sw = 56;
+    const sh = 28;
+    
+    // Post
+    cx.fillStyle = '#654321';
+    cx.fillRect(screenX + 26, screenY + 24, 6, T - 24);
+    cx.fillStyle = '#8B5A2B';
+    cx.fillRect(screenX + 24, screenY + 24, 4, T - 24);
+    
+    // Board
+    cx.fillStyle = '#5A3A1A';
+    cx.fillRect(screenX, screenY, sw, sh);
+    cx.fillStyle = '#d2b48c';
+    cx.fillRect(screenX + 2, screenY + 2, sw - 4, sh - 4);
+    cx.fillStyle = '#e5cead';
+    cx.fillRect(screenX + 2, screenY + 2, sw - 4, 2);
+    cx.fillRect(screenX + 2, screenY + 4, 2, sh - 6);
+    
+    // Nails
+    cx.fillStyle = '#444';
+    cx.fillRect(screenX + 4, screenY + 4, 2, 2);
+    cx.fillRect(screenX + sw - 6, screenY + 4, 2, 2);
+    cx.fillRect(screenX + 4, screenY + sh - 6, 2, 2);
+    cx.fillRect(screenX + sw - 6, screenY + sh - 6, 2, 2);
+    
+    // Text
+    cx.fillStyle = '#ff0000';
+    cx.textAlign = 'center';
+    cx.font = 'bold 11px Arial';
+    cx.fillText("SALE", screenX + sw / 2, screenY + 14);
+    
+    cx.fillStyle = '#000000';
+    cx.font = 'bold 9px Arial';
+    cx.fillText(costText + " \uD83C\uDF3E", screenX + sw / 2, screenY + 24);
+    
+    cx.textAlign = 'left';
+  };
+
+  if (landLvl === 0) {
+    drawSignAt(64, 59, false); // Right gate of the left locked area
+  } else if (landLvl === 1) {
+    drawSignAt(115, 59, true); // Left gate of the right locked area
+  }
+}
+
 // ── РЕНДЕР ───────────────────────────────────────────────────
 function render(now){
   cx.clearRect(0,0,CW,CH);
@@ -1849,6 +1864,7 @@ function render(now){
 
   try {
     cx.drawImage(mapCv, mapSx, mapSy, CW, CH, 0, 0, CW, CH);
+    drawSigns(mapSx, mapSy);
   } catch(e) {}
   
   if (!isNight || nightAlpha < 0.85) {

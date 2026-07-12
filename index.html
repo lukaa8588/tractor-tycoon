@@ -1483,6 +1483,11 @@ function renderCellToMap(gx,gy,now){
   if (isSun && window.customTextures && window.customTextures.sun) customCrop = window.customTextures.sun;
 
   if (p >= .33 && customCrop) {
+    // Fill background first to eliminate any white PNG border artifacts
+    if (isHay) mapCx.fillStyle = `hsl(${44+h1*12}, 80%, ${57+h2*12}%)`;
+    else if (isCorn) mapCx.fillStyle = `hsl(${65+h1*10}, 75%, ${50+h2*10}%)`;
+    else if (isSun) mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`;
+    mapCx.fillRect(sx, sy, T, T);
     mapCx.drawImage(customCrop, sx, sy, T, T);
     return;
   }

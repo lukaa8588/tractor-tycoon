@@ -1466,13 +1466,29 @@ function renderCellToMap(gx,gy,now){
       mapCx.fillStyle = 'rgba(255,255,255,0.1)';
       mapCx.fillRect(sx, sy, T, T);
     } else {
-      mapCx.fillStyle = '#8c8c82';
+      // Premium cobblestone path
+      mapCx.fillStyle = '#65605a'; // dark grout
       mapCx.fillRect(sx, sy, T, T);
-      for(let pz=0; pz<5; pz++) {
-        let px2 = h(gx, gy, pz*2);
-        let py2 = h(gx, gy, pz*2+1);
-        mapCx.fillStyle = pz%2===0 ? '#7a7a72' : '#9c9c92';
-        mapCx.fillRect(sx + px2*(T-4), sy + py2*(T-4), 4, 4);
+      
+      for (let cy=0; cy<4; cy++) {
+         for (let px=0; px<4; px++) {
+            let idx = cy*4 + px;
+            let jx = h(gx, gy, idx) * 4 - 2;
+            let jy = h(gx, gy, idx + 16) * 4 - 2;
+            let stW = 10 + Math.floor(h(gx, gy, idx + 32) * 6);
+            let stH = 10 + Math.floor(h(gx, gy, idx + 48) * 6);
+            
+            let drawX = sx + px*16 + jx + 2;
+            let drawY = sy + cy*16 + jy + 2;
+            
+            // Stone base
+            mapCx.fillStyle = (idx % 3 === 0) ? '#8a857e' : '#9c9790';
+            mapCx.fillRect(drawX, drawY, stW, stH);
+            
+            // Highlight (top edge)
+            mapCx.fillStyle = '#b5b1a9';
+            mapCx.fillRect(drawX, drawY, stW, 2);
+         }
       }
     }
     if (st === L) {

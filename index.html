@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8"/>
@@ -573,7 +573,8 @@ function updateLanguage(lang) {
   document.getElementById('map-title').textContent = t('mapTitle');
   document.getElementById('shop-title').textContent = t('shopTitle');
   document.getElementById('booster-btn-text').textContent = t('boosterBtn');
-  document.getElementById('rest-btn').title = t('restBtn');
+  let restBtn = document.getElementById('rest-btn');
+  if(restBtn) restBtn.title = t('restBtn');
   document.getElementById('quests-btn').title = t('questsTitle');
   
   document.getElementById('settings-btn').title = t('settingsTitle');
@@ -2287,7 +2288,8 @@ function startNight() {
   isNight = true;
   nightPhase = 'darkening';
   nightStartTime = performance.now();
-  document.getElementById('rest-btn').disabled = true;
+  let restBtn = document.getElementById('rest-btn');
+  if(restBtn) restBtn.disabled = true;
   animateNight();
 }
 
@@ -2349,7 +2351,8 @@ function animateNight() {
       nightAlpha = 0;
       isNight = false;
       nightPhase = '';
-      document.getElementById('rest-btn').disabled = false;
+      let restBtn = document.getElementById('rest-btn');
+      if(restBtn) restBtn.disabled = false;
       // Скрываем надпись через 2 сек после полного рассвета
       setTimeout(() => {
         document.getElementById('day-label').classList.remove('visible');

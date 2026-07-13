@@ -26,6 +26,8 @@ function initGameSDK(onReady) {
     console.warn("CrazyGames SDK not found on this domain. Running in local/mock mode.");
     
     // Mock callbacks
+    window.cgGameplayStart = () => { console.log("Mock gameplay start"); };
+    window.cgGameplayStop = () => { console.log("Mock gameplay stop"); };
     window.showRewardedBooster = (cb) => { 
         console.log("Mock rewarded video"); 
         if (cb) cb(); 
@@ -50,6 +52,8 @@ function initGameSDK(onReady) {
   // If explicitly disabled by SDK, immediately fallback
   if (SDK.environment === 'disabled' || location.hostname.includes('github.io')) {
     console.warn("CrazyGames SDK is disabled on this domain (or github.io). Running in local/mock mode.");
+    window.cgGameplayStart = () => { console.log("Mock gameplay start"); };
+    window.cgGameplayStop = () => { console.log("Mock gameplay stop"); };
     window.showRewardedBooster = (cb) => { console.log("Mock rewarded video"); if (cb) cb(); };
     window.showInterstitialAd = () => { console.log("Mock interstitial ad"); };
     window.saveProgress = (score, upgLvl, currentDay) => { localStorage.setItem('tractorTycoonSave', JSON.stringify({score, upgLvl, currentDay})); };
@@ -66,6 +70,13 @@ function initGameSDK(onReady) {
   
   console.log("CrazyGames SDK initialized");
 
+  window.cgGameplayStart = () => {
+    try { SDK.game.gameplayStart(); } catch(e) { console.warn("gameplayStart error", e); }
+  };
+  window.cgGameplayStop = () => {
+    try { SDK.game.gameplayStop(); } catch(e) { console.warn("gameplayStop error", e); }
+  };
+
   // Global save function
   window.saveProgress = (score, upgLvl, currentDay) => {
     const data = { score, upgLvl, currentDay };
@@ -77,6 +88,7 @@ function initGameSDK(onReady) {
     SDK.ad.requestAd('rewarded', {
       adStarted: () => {
         console.log("Rewarded ad started");
+        if (window.cgGameplayStop) window.cgGameplayStop();
         // Pause audio in game
         if (typeof audioCtx !== 'undefined' && audioCtx.state === 'running') {
             audioCtx.suspend();
@@ -88,6 +100,7 @@ function initGameSDK(onReady) {
             audioCtx.resume();
         }
         if (onSuccess) onSuccess();
+        if (window.cgGameplayStart) window.cgGameplayStart();
       },
       adError: (err) => {
         console.error("Rewarded ad error", err);
@@ -102,6 +115,7 @@ function initGameSDK(onReady) {
   window.showInterstitialAd = () => {
     SDK.ad.requestAd('midgame', {
       adStarted: () => {
+        if (window.cgGameplayStop) window.cgGameplayStop();
         if (typeof audioCtx !== 'undefined' && audioCtx.state === 'running') {
             audioCtx.suspend();
         }
@@ -110,6 +124,7 @@ function initGameSDK(onReady) {
         if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
             audioCtx.resume();
         }
+        if (window.cgGameplayStart) window.cgGameplayStart();
       },
       adError: (err) => {
         if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {

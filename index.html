@@ -132,14 +132,12 @@
 
     /* ── Мини-карта ── */
     #minimap-wrap{
-      position:fixed;
-      top:50%;left:50%;
-      transform:translate(-50%,-50%);
-      background:rgba(5,12,4,.92);backdrop-filter:blur(12px);
-      border:2px solid rgba(60,160,80,.4);border-radius:16px;
-      padding:14px 14px 14px 14px;z-index:25;
-      display:none;flex-direction:column;gap:8px;align-items:center;
-      box-shadow:0 8px 40px rgba(0,0,0,.6);
+      position:fixed;right:90px;top:16px;
+      background:rgba(5,12,4,.88);backdrop-filter:blur(12px);
+      border:1px solid rgba(60,160,80,.3);border-radius:16px;
+      padding:14px;z-index:25;
+      display:none;flex-direction:column;gap:8px;
+      box-shadow:0 8px 40px rgba(0,0,0,.5);
     }
     #minimap-wrap.open{display:flex}
     #minimap-wrap h3{
@@ -277,15 +275,15 @@
         border-left: none;
       }
       #minimap-wrap {
-        right: auto;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        padding: 14px;
+        right: 16px;
+        top: 136px;
+        padding: 10px;
+        transform: none;
+        left: auto;
       }
       #minimap {
-        width: 260px;
-        height: 260px;
+        width: 130px;
+        height: 130px;
       }
       .shop-item {
         padding: 10px;

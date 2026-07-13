@@ -22,8 +22,8 @@ function initGameSDK(onReady) {
       }
   }
 
-  if (typeof window.CrazyGames === 'undefined' || !window.CrazyGames.SDK) {
-    console.warn("CrazyGames SDK not found. Running in local/mock mode.");
+  if (typeof window.CrazyGames === 'undefined' || !window.CrazyGames.SDK || window.CrazyGames.SDK.environment === 'disabled') {
+    console.warn("CrazyGames SDK not found or disabled on this domain. Running in local/mock mode.");
     
     // Mock callbacks
     window.showRewardedBooster = (cb) => { 
@@ -37,7 +37,10 @@ function initGameSDK(onReady) {
         localStorage.setItem('tractorTycoonSave', JSON.stringify({score, upgLvl, currentDay}));
     };
     
-    onReady(loadSaveData(), lang);
+    // Slight delay to ensure the game doesn't load instantly before fonts
+    setTimeout(() => {
+      onReady(loadSaveData(), lang);
+    }, 100);
     return;
   }
 

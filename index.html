@@ -1193,9 +1193,9 @@ window.devCutterWidth = 0;
   let lastTouch = 0;
   document.addEventListener('touchstart', (e) => {
     const now = Date.now();
-    if (now - lastTouch < 500) {
+    if (now - lastTouch < 400) {
       touchCount++;
-      if (touchCount >= 7) {
+      if (touchCount >= 2) {
         touchCount = 0;
         if (typeof toggleDevPanel === 'function') toggleDevPanel();
       }

@@ -348,10 +348,7 @@
     <label id="lbl-music-vol">Музыка</label>
     <input type="range" id="ui-vol-music" min="0" max="1" step="0.05" value="0.5" oninput="updateVolumesUI()">
   </div>
-  <div class="settings-row">
-    <label id="lbl-sfx-vol">Звуки</label>
-    <input type="range" id="ui-vol-sfx" min="0" max="1" step="0.05" value="0.2" oninput="updateVolumesUI()">
-  </div>
+  <input type="hidden" id="ui-vol-sfx" value="0.2">
   <div class="settings-row settings-row-flex">
     <label id="lbl-lang" style="margin:0;">Язык / Language</label>
     <button id="ui-lang-btn" onclick="toggleLanguage()" style="padding:4px 12px;background:rgba(80,160,255,0.2);border:1px solid rgba(80,160,255,0.5);color:#fff;border-radius:6px;cursor:pointer;font-weight:bold;">RU / EN</button>
@@ -584,7 +581,6 @@ function updateLanguage(lang) {
   document.getElementById('settings-btn').title = t('settingsTitle');
   document.getElementById('settings-title').textContent = t('settingsTitle');
   document.getElementById('lbl-music-vol').textContent = t('musicVol');
-  document.getElementById('lbl-sfx-vol').textContent = t('sfxVol');
 
   document.getElementById('lbl-lang').textContent = t('langToggle');
   document.getElementById('close-settings-btn').textContent = t('closeBtn');
@@ -2391,7 +2387,12 @@ function loop(now){
 let mapOpen = false;
 const mmCanvas = document.getElementById('minimap');
 const mmCtx    = mmCanvas.getContext('2d');
-const MM = 2; // px на тайл (200px / 100 тайлов)
+const MM = 2; // px на тайл
+// Подогнать canvas под реальный размер карты
+mmCanvas.width  = MW * MM;
+mmCanvas.height = MH * MM;
+mmCanvas.style.width  = (MW * MM) + 'px';
+mmCanvas.style.height = (MH * MM) + 'px';
 
 function toggleMap() {
   playClick();

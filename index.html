@@ -1211,6 +1211,14 @@ function toggleDevPanel() {
   document.getElementById('dev-panel').classList.toggle('open', devPanelOpen);
 }
 
+// Открытие панели разработчика по клавише 7 (работает всегда)
+document.addEventListener('keydown', function(e) {
+  if (e.code === 'Digit7' || e.key === '7') {
+    e.preventDefault();
+    toggleDevPanel();
+  }
+});
+
 function toggleHitbox() {
   showHitboxes = document.getElementById('show-hitbox').checked;
 }

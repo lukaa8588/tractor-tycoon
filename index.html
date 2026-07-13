@@ -671,6 +671,7 @@ function toggleSettings() {
     modal.classList.remove('open');
     setTimeout(() => modal.style.display = 'none', 300);
   }
+  if (typeof checkGameplayState === 'function') checkGameplayState();
 }
 
 function updateVolumesUI() {
@@ -920,12 +921,6 @@ function toggleShop() {
   if (typeof checkGameplayState === 'function') checkGameplayState();
 }
 
-function toggleSettings() {
-  playClick();
-  settingsOpen = !settingsOpen;
-  document.getElementById('settings').classList.toggle('open', settingsOpen);
-  if (typeof checkGameplayState === 'function') checkGameplayState();
-}
 
 function checkGameplayState() {
   const isAnyMenuOpen = (typeof shopOpen !== 'undefined' && shopOpen) || 

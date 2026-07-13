@@ -132,12 +132,14 @@
 
     /* ── Мини-карта ── */
     #minimap-wrap{
-      position:fixed;right:90px;top:16px;
-      background:rgba(5,12,4,.88);backdrop-filter:blur(12px);
-      border:1px solid rgba(60,160,80,.3);border-radius:16px;
-      padding:14px;z-index:25;
-      display:none;flex-direction:column;gap:8px;
-      box-shadow:0 8px 40px rgba(0,0,0,.5);
+      position:fixed;
+      top:50%;left:50%;
+      transform:translate(-50%,-50%);
+      background:rgba(5,12,4,.92);backdrop-filter:blur(12px);
+      border:2px solid rgba(60,160,80,.4);border-radius:16px;
+      padding:16px;z-index:25;
+      display:none;flex-direction:column;gap:8px;align-items:center;
+      box-shadow:0 8px 40px rgba(0,0,0,.6);
     }
     #minimap-wrap.open{display:flex}
     #minimap-wrap h3{
@@ -275,13 +277,15 @@
         border-left: none;
       }
       #minimap-wrap {
-        right: 16px;
-        top: 136px; /* Под кнопками магазина и карты */
-        padding: 10px;
+        right: auto;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: 14px;
       }
       #minimap {
-        width: 130px;
-        height: 130px;
+        width: 260px;
+        height: 260px;
       }
       .shop-item {
         padding: 10px;
@@ -340,14 +344,8 @@
 
 <div id="settings-modal">
   <h2 id="settings-title" style="margin-top:0;text-align:center;margin-bottom:20px;">⚙️ Настройки</h2>
-  <div class="settings-row">
-    <label id="lbl-music-vol">Музыка</label>
-    <input type="range" id="ui-vol-music" min="0" max="1" step="0.05" value="0.5" oninput="updateVolumesUI()">
-  </div>
-  <div class="settings-row">
-    <label id="lbl-sfx-vol">Звуки</label>
-    <input type="range" id="ui-vol-sfx" min="0" max="1" step="0.05" value="0.2" oninput="updateVolumesUI()">
-  </div>
+  <input type="hidden" id="ui-vol-music" value="0.5">
+  <input type="hidden" id="ui-vol-sfx" value="0.2">
   <div class="settings-row settings-row-flex">
     <label id="lbl-lang" style="margin:0;">Язык / Language</label>
     <button id="ui-lang-btn" onclick="toggleLanguage()" style="padding:4px 12px;background:rgba(80,160,255,0.2);border:1px solid rgba(80,160,255,0.5);color:#fff;border-radius:6px;cursor:pointer;font-weight:bold;">RU / EN</button>

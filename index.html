@@ -581,7 +581,7 @@ function updateLanguage(lang) {
   document.getElementById('settings-title').textContent = t('settingsTitle');
   document.getElementById('lbl-music-vol').textContent = t('musicVol');
   document.getElementById('lbl-sfx-vol').textContent = t('sfxVol');
-  document.getElementById('lbl-vibration').textContent = t('vibration');
+
   document.getElementById('lbl-lang').textContent = t('langToggle');
   document.getElementById('close-settings-btn').textContent = t('closeBtn');
 
@@ -682,10 +682,7 @@ function updateVolumesUI() {
   if (!audioMuted) playClick();
 }
 
-function toggleVibration() {
-  vibrationEnabled = document.getElementById('ui-vibration').checked;
-  if (vibrationEnabled) vibrate(50);
-}
+function toggleVibration() {}
 
 function vibrate(ms) {
   if (vibrationEnabled && navigator.vibrate) {

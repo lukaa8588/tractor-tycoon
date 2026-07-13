@@ -1134,9 +1134,6 @@ const keydownHandler = e => {
   if (e.key) K[e.key.toLowerCase()]=true;
   if (e.keyCode && keyCodeMap[e.keyCode]) K[keyCodeMap[e.keyCode]]=true;
   if(e.code==='Tab'||/^Arrow/.test(e.code)||(e.keyCode>=37&&e.keyCode<=40)) e.preventDefault();
-  
-  // Открытие панели разработчика
-  if(e.code==='Digit7'||e.key==='7'||e.keyCode===55) toggleDevPanel();
 };
 const keyupHandler = e => { 
   if (e.code) K[e.code]=false;

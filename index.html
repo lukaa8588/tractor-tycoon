@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8"/>
@@ -14,7 +14,7 @@
     body{background:#0d1a0a;overflow:hidden;font-family:'Segoe UI',sans-serif}
     canvas{display:block}
 
-    /* ── HUD ── */
+    /* в”Ђв”Ђ HUD в”Ђв”Ђ */
     #hud{
       position:fixed;top:16px;left:50%;transform:translateX(-50%);
       background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
@@ -25,7 +25,7 @@
     }
     #hud .lbl{font-size:1rem;opacity:.7;font-weight:500}
 
-    /* ── Кнопки правый верхний угол ── */
+    /* в”Ђв”Ђ РљРЅРѕРїРєРё РїСЂР°РІС‹Р№ РІРµСЂС…РЅРёР№ СѓРіРѕР» в”Ђв”Ђ */
     .corner-btn{
       position:fixed;right:24px;
       width:52px;height:52px;
@@ -83,7 +83,7 @@
     #settings-btn:hover{background:rgba(90,90,90,.9);transform:translateY(2px) scale(1.08);
       box-shadow:0 8px 30px rgba(0,0,0,.35)}
 
-    /* ── Настройки ── */
+    /* в”Ђв”Ђ РќР°СЃС‚СЂРѕР№РєРё в”Ђв”Ђ */
     #settings-modal {
       position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);
       width:320px;background:rgba(15,20,15,.95);backdrop-filter:blur(10px);
@@ -97,7 +97,7 @@
     .settings-row input[type="range"] { width: 100%; }
     .settings-row-flex { display:flex; justify-content:space-between; align-items:center; }
 
-    /* ── Надпись дня ── */
+    /* в”Ђв”Ђ РќР°РґРїРёСЃСЊ РґРЅСЏ в”Ђв”Ђ */
     #day-label{
       position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
       font-size:3.5rem;font-weight:900;color:#fff;letter-spacing:.05em;
@@ -107,7 +107,7 @@
     }
     #day-label.visible{opacity:1}
 
-    /* ── Шкала Выносливости ── */
+    /* в”Ђв”Ђ РЁРєР°Р»Р° Р’С‹РЅРѕСЃР»РёРІРѕСЃС‚Рё в”Ђв”Ђ */
     #stamina-wrap {
       position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
       width:260px;height:24px;background:rgba(0,0,0,0.7);
@@ -130,7 +130,7 @@
     }
     #stamina-wrap.flashing { animation: flash-red 1s infinite; border-color: #ff3333; }
 
-    /* ── Мини-карта ── */
+    /* в”Ђв”Ђ РњРёРЅРё-РєР°СЂС‚Р° в”Ђв”Ђ */
     #minimap-wrap{
       position:fixed;right:90px;top:16px;
       background:rgba(5,12,4,.88);backdrop-filter:blur(12px);
@@ -146,7 +146,7 @@
     }
     #minimap{border-radius:6px;image-rendering:pixelated}
 
-    /* ── Джойстик ── */
+    /* в”Ђв”Ђ Р”Р¶РѕР№СЃС‚РёРє в”Ђв”Ђ */
     #joystick-zone {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 5; touch-action: none;
@@ -163,7 +163,7 @@
       top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;
     }
 
-    /* ── Панель прокачки ── */
+    /* в”Ђв”Ђ РџР°РЅРµР»СЊ РїСЂРѕРєР°С‡РєРё в”Ђв”Ђ */
     #shop{
       position:fixed;right:0;top:0;bottom:0;width:360px;
       background:rgba(8,18,6,.92);backdrop-filter:blur(20px);
@@ -190,7 +190,7 @@
     }
     .shop-close:hover{background:rgba(255,80,80,.2);color:#f88}
 
-    /* ── Карточки улучшений ── */
+    /* в”Ђв”Ђ РљР°СЂС‚РѕС‡РєРё СѓР»СѓС‡С€РµРЅРёР№ в”Ђв”Ђ */
     .shop-list{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
     .shop-list::-webkit-scrollbar{width:4px}
     .shop-list::-webkit-scrollbar-thumb{background:rgba(100,220,60,.3);border-radius:2px}
@@ -215,7 +215,7 @@
     .upg-name{color:#e8f8e0;font-weight:700;font-size:.95rem;margin-bottom:3px}
     .upg-desc{color:rgba(255,255,255,.45);font-size:.78rem}
 
-    /* Уровень — точки */
+    /* РЈСЂРѕРІРµРЅСЊ вЂ” С‚РѕС‡РєРё */
     .upg-dots{display:flex;gap:5px;align-items:center}
     .dot{
       width:10px;height:10px;border-radius:50%;
@@ -225,7 +225,7 @@
     .dot.filled{background:#6ab82a;border-color:#6ab82a;box-shadow:0 0 6px #6ab82a80}
     .dot.filled.gold{background:#f0c030;border-color:#f0c030;box-shadow:0 0 6px #f0c03080}
 
-    /* Кнопка купить */
+    /* РљРЅРѕРїРєР° РєСѓРїРёС‚СЊ */
     .upg-footer{display:flex;align-items:center;justify-content:space-between}
     .upg-stat{color:rgba(255,255,255,.5);font-size:.78rem}
     .upg-stat span{color:#a0e060;font-weight:700}
@@ -246,7 +246,7 @@
     .buy-btn.maxed-btn{background:rgba(255,215,0,.15);border-color:rgba(255,215,0,.3);
       color:#f0c030}
 
-    /* ── Панель Разработчика ── */
+    /* в”Ђв”Ђ РџР°РЅРµР»СЊ Р Р°Р·СЂР°Р±РѕС‚С‡РёРєР° в”Ђв”Ђ */
     #dev-panel{
       position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
       background:rgba(20,10,30,.95);backdrop-filter:blur(15px);
@@ -268,7 +268,7 @@
     .dev-close{position:absolute;top:12px;right:16px;background:none;border:none;color:#aaa;font-size:1.2rem;cursor:pointer}
     .dev-close:hover{color:#fff}
 
-    /* ── Мобильная адаптация ── */
+    /* в”Ђв”Ђ РњРѕР±РёР»СЊРЅР°СЏ Р°РґР°РїС‚Р°С†РёСЏ в”Ђв”Ђ */
     @media (max-width: 600px) {
       #shop {
         width: 100%;
@@ -314,7 +314,7 @@
 <body>
 <canvas id="c"></canvas>
 
-<!-- ── Джойстик ── -->
+<!-- в”Ђв”Ђ Р”Р¶РѕР№СЃС‚РёРє в”Ђв”Ђ -->
 <div id="joystick-zone">
   <div id="joystick-base">
     <div id="joystick-knob"></div>
@@ -322,125 +322,124 @@
 </div>
 
 <div id="hud" style="flex-direction: column; gap: 0;">
-  <div style="display:flex; align-items:center; gap:8px;">🌾 <span id="sc">0</span><span class="lbl" id="lbl-hay">сена</span></div>
-  <div id="mps-display" style="font-size: 1.1rem; color: #a0e060; display: none; font-weight: bold; margin-top: -2px;">+0 🌾/сек</div>
+  <div style="display:flex; align-items:center; gap:8px;">рџЊѕ <span id="sc">0</span><span class="lbl" id="lbl-hay">СЃРµРЅР°</span></div>
+  <div id="mps-display" style="font-size: 1.1rem; color: #a0e060; display: none; font-weight: bold; margin-top: -2px;">+0 рџЊѕ/СЃРµРє</div>
 </div>
 <div id="day-label"></div>
-<button id="shop-btn" class="corner-btn" onclick="toggleShop()" title="Прокачка">🛒</button>
-<button id="map-btn" class="corner-btn" onclick="toggleMap()" title="Карта">🗺️</button>
-<button id="quests-btn" class="corner-btn" onclick="toggleQuests()" title="Доска Заказов">📜</button>
+<button id="shop-btn" class="corner-btn" onclick="toggleShop()" title="РџСЂРѕРєР°С‡РєР°">рџ›’</button>
+<button id="map-btn" class="corner-btn" onclick="toggleMap()" title="РљР°СЂС‚Р°">рџ—єпёЏ</button>
+<button id="quests-btn" class="corner-btn" onclick="toggleQuests()" title="Р”РѕСЃРєР° Р—Р°РєР°Р·РѕРІ">рџ“њ</button>
 
 <div id="quests-modal">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-    <h2 style="margin:0;font-size:1.8rem;">📜 Доска Заказов</h2>
-    <button onclick="toggleQuests()" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;">✕</button>
+    <h2 style="margin:0;font-size:1.8rem;">рџ“њ Р”РѕСЃРєР° Р—Р°РєР°Р·РѕРІ</h2>
+    <button onclick="toggleQuests()" style="background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer;">вњ•</button>
   </div>
   <div id="quests-content"></div>
 </div>
 
-<button id="rest-btn" class="corner-btn" onclick="startNight()" title="Отдыхать">🌙</button>
-<button id="settings-btn" onclick="toggleSettings()" title="Настройки">⚙️</button>
+<button id="settings-btn" onclick="toggleSettings()" title="РќР°СЃС‚СЂРѕР№РєРё">вљ™пёЏ</button>
 
 <div id="settings-modal">
-  <h2 id="settings-title" style="margin-top:0;text-align:center;margin-bottom:20px;">⚙️ Настройки</h2>
+  <h2 id="settings-title" style="margin-top:0;text-align:center;margin-bottom:20px;">вљ™пёЏ РќР°СЃС‚СЂРѕР№РєРё</h2>
   <div class="settings-row">
-    <label id="lbl-music-vol">Музыка</label>
+    <label id="lbl-music-vol">РњСѓР·С‹РєР°</label>
     <input type="range" id="ui-vol-music" min="0" max="1" step="0.05" value="0.5" oninput="updateVolumesUI()">
   </div>
   <input type="hidden" id="ui-vol-sfx" value="0.2">
   <div class="settings-row settings-row-flex">
-    <label id="lbl-lang" style="margin:0;">Язык / Language</label>
+    <label id="lbl-lang" style="margin:0;">РЇР·С‹Рє / Language</label>
     <button id="ui-lang-btn" onclick="toggleLanguage()" style="padding:4px 12px;background:rgba(80,160,255,0.2);border:1px solid rgba(80,160,255,0.5);color:#fff;border-radius:6px;cursor:pointer;font-weight:bold;">RU / EN</button>
   </div>
 
-  <button id="close-settings-btn" onclick="toggleSettings()" style="width:100%;padding:10px;margin-top:10px;background:rgba(80,160,255,0.2);border:1px solid rgba(80,160,255,0.5);color:#fff;border-radius:6px;cursor:pointer;font-weight:bold;">Закрыть</button>
+  <button id="close-settings-btn" onclick="toggleSettings()" style="width:100%;padding:10px;margin-top:10px;background:rgba(80,160,255,0.2);border:1px solid rgba(80,160,255,0.5);color:#fff;border-radius:6px;cursor:pointer;font-weight:bold;">Р—Р°РєСЂС‹С‚СЊ</button>
 </div>
 
-<!-- ── Секретная Панель Разработчика ── -->
+<!-- в”Ђв”Ђ РЎРµРєСЂРµС‚РЅР°СЏ РџР°РЅРµР»СЊ Р Р°Р·СЂР°Р±РѕС‚С‡РёРєР° в”Ђв”Ђ -->
 <div id="dev-panel">
-  <button class="dev-close" onclick="toggleDevPanel()">✕</button>
-  <h2>🛠 Dev Panel</h2>
+  <button class="dev-close" onclick="toggleDevPanel()">вњ•</button>
+  <h2>рџ›  Dev Panel</h2>
   
   <div class="dev-row">
-    <label>Музыка</label>
+    <label>РњСѓР·С‹РєР°</label>
     <input type="range" id="vol-music" class="dev-slider" min="0" max="1" step="0.05" value="0.3" oninput="updateVolumes()">
   </div>
   <div class="dev-row">
-    <label>Звуки (SFX)</label>
+    <label>Р—РІСѓРєРё (SFX)</label>
     <input type="range" id="vol-sfx" class="dev-slider" min="0" max="1" step="0.05" value="0.5" oninput="updateVolumes()">
   </div>
   <div class="dev-row">
-    <label>Хитбоксы</label>
+    <label>РҐРёС‚Р±РѕРєСЃС‹</label>
     <input type="checkbox" id="show-hitbox" onchange="toggleHitbox()" style="transform:scale(1.5);">
   </div>
   <div class="dev-row">
-    <label>Радиус трактора</label>
+    <label>Р Р°РґРёСѓСЃ С‚СЂР°РєС‚РѕСЂР°</label>
     <input type="range" id="hitbox-radius" class="dev-slider" min="5" max="30" step="1" value="14" oninput="updateHitboxes()">
   </div>
   <div class="dev-row">
-    <label>Ковш (Чит-Ширина)</label>
+    <label>РљРѕРІС€ (Р§РёС‚-РЁРёСЂРёРЅР°)</label>
     <input type="range" id="cutter-width" class="dev-slider" min="-20" max="200" step="2" value="0" oninput="updateHitboxes()">
   </div>
   <div class="dev-row">
-    <label>Множитель цен в магазине</label>
+    <label>РњРЅРѕР¶РёС‚РµР»СЊ С†РµРЅ РІ РјР°РіР°Р·РёРЅРµ</label>
     <input type="range" id="price-mult" class="dev-slider" min="0" max="10" step="0.1" value="1" oninput="window.devPriceMult=parseFloat(this.value);if(shopOpen)renderShop();">
   </div>
   
   <hr style="border:1px solid #ffffff15;margin:8px 0">
   
   <div style="display:flex;gap:8px">
-    <div class="dev-btn" style="flex:1" onclick="devAddHay()">+ 10,000 🌾</div>
-    <div class="dev-btn" style="flex:1; background:#cc5500" onclick="score+=1000000;scEl.textContent=score;if(typeof saveProgress === 'function')saveProgress(score,upgLvl,currentDay);">+ 1,000,000 🌾</div>
+    <div class="dev-btn" style="flex:1" onclick="devAddHay()">+ 10,000 рџЊѕ</div>
+    <div class="dev-btn" style="flex:1; background:#cc5500" onclick="score+=1000000;scEl.textContent=score;if(typeof saveProgress === 'function')saveProgress(score,upgLvl,currentDay);">+ 1,000,000 рџЊѕ</div>
   </div>
   <div style="display:flex;gap:8px">
-    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('speed')">Max ⚡</div>
-    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('width')">Max ⚙️</div>
+    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('speed')">Max вљЎ</div>
+    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('width')">Max вљ™пёЏ</div>
   </div>
   <div style="display:flex;gap:8px">
-    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('stamina')">Max 🔋</div>
-    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('bonus')">Max 🏚️</div>
+    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('stamina')">Max рџ”‹</div>
+    <div class="dev-btn" style="flex:1" onclick="devMaxUpgrade('bonus')">Max рџЏљпёЏ</div>
   </div>
-  <div class="dev-btn" style="background:rgba(180,40,40,0.8);margin-top:8px" onclick="newGame()">СБРОС ИГРЫ</div>
+  <div class="dev-btn" style="background:rgba(180,40,40,0.8);margin-top:8px" onclick="newGame()">РЎР‘Р РћРЎ РР“Р Р«</div>
 
   <hr style="border:1px solid #ffffff15;margin:8px 0">
-  <h3 style="text-align:center;color:#d0a0ff;margin:5px 0;">Текстуры (Моды)</h3>
-  <p style="font-size:12px;margin:5px 0;text-align:center;color:#aaa;">Загрузите свою картинку!</p>
+  <h3 style="text-align:center;color:#d0a0ff;margin:5px 0;">РўРµРєСЃС‚СѓСЂС‹ (РњРѕРґС‹)</h3>
+  <p style="font-size:12px;margin:5px 0;text-align:center;color:#aaa;">Р—Р°РіСЂСѓР·РёС‚Рµ СЃРІРѕСЋ РєР°СЂС‚РёРЅРєСѓ!</p>
   <select id="tex-type" style="width:100%;margin-bottom:10px;padding:5px;background:#333;color:#fff;border:1px solid #a060ff;">
-    <option value="dirt">Земля (подложка)</option>
-    <option value="hay">Сено</option>
-    <option value="corn">Кукуруза</option>
-    <option value="sun">Подсолнух</option>
-    <option value="forest">Лес (Деревья)</option>
-    <option value="tractor">Трактор</option>
+    <option value="dirt">Р—РµРјР»СЏ (РїРѕРґР»РѕР¶РєР°)</option>
+    <option value="hay">РЎРµРЅРѕ</option>
+    <option value="corn">РљСѓРєСѓСЂСѓР·Р°</option>
+    <option value="sun">РџРѕРґСЃРѕР»РЅСѓС…</option>
+    <option value="forest">Р›РµСЃ (Р”РµСЂРµРІСЊСЏ)</option>
+    <option value="tractor">РўСЂР°РєС‚РѕСЂ</option>
   </select>
   <input type="file" id="tex-upload" accept="image/*" style="width:100%;margin-bottom:10px;"/>
-  <button onclick="clearCustomTextures()" class="dev-btn" style="background:#8b2b2b;border-color:#ff5050;color:#ffc0c0;width:100%;">Сбросить все моды</button>
+  <button onclick="clearCustomTextures()" class="dev-btn" style="background:#8b2b2b;border-color:#ff5050;color:#ffc0c0;width:100%;">РЎР±СЂРѕСЃРёС‚СЊ РІСЃРµ РјРѕРґС‹</button>
 </div>
 
-<!-- ── Шкала Выносливости ── -->
+<!-- в”Ђв”Ђ РЁРєР°Р»Р° Р’С‹РЅРѕСЃР»РёРІРѕСЃС‚Рё в”Ђв”Ђ -->
 <div id="stamina-wrap">
   <div id="stamina-fill"></div>
   <div id="stamina-text">100%</div>
 </div>
 
-<!-- ── Мини-карта ── -->
+<!-- в”Ђв”Ђ РњРёРЅРё-РєР°СЂС‚Р° в”Ђв”Ђ -->
 <div id="minimap-wrap">
-  <h3 id="map-title">🗺️ Карта</h3>
+  <h3 id="map-title">рџ—єпёЏ РљР°СЂС‚Р°</h3>
   <canvas id="minimap" width="320" height="320"></canvas>
 </div>
 
-<!-- ── Панель прокачки ── -->
+<!-- в”Ђв”Ђ РџР°РЅРµР»СЊ РїСЂРѕРєР°С‡РєРё в”Ђв”Ђ -->
 <div id="shop">
   <div class="shop-header">
-    <h2 id="shop-title">🛒 Прокачка</h2>
+    <h2 id="shop-title">рџ›’ РџСЂРѕРєР°С‡РєР°</h2>
     <div style="display:flex;align-items:center;gap:8px">
-      <div class="balance">🌾 <span id="bal">0</span></div>
-      <button class="shop-close" onclick="toggleShop()">✕</button>
+      <div class="balance">рџЊѕ <span id="bal">0</span></div>
+      <button class="shop-close" onclick="toggleShop()">вњ•</button>
     </div>
   </div>
   <div style="padding: 0 16px;">
     <button id="booster-btn-text" class="buy-btn" style="width: 100%; justify-content: center; background: rgba(255,180,30,.2); border-color: rgba(255,180,30,.4); color: #f0c030;" onclick="triggerBooster()">
-      📺 Реклама: +1000 🌾
+      рџ“є Р РµРєР»Р°РјР°: +1000 рџЊѕ
     </button>
   </div>
   <div class="shop-list" id="shop-list"></div>
@@ -449,58 +448,58 @@
 <script>
 'use strict';
 
-// ── МУЛЬТИЯЗЫЧНОСТЬ ──────────────────────────────────────────
+// в”Ђв”Ђ РњРЈР›Р¬РўРРЇР—Р«Р§РќРћРЎРўР¬ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const i18n = {
   ru: {
-    title: "Трактор Магнат",
-    hay: "сена",
-    shopBtn: "Прокачка",
-    mapBtn: "Карта",
-    mapTitle: "🗺️ Карта",
-    shopTitle: "🛒 Прокачка",
-    boosterBtn: "📺 Реклама: +1000 🌾",
-    maxLabel: "МАКС",
-    buyHay: "сена",
-    statSpeed: "Скорость",
-    statWidth: "Ширина",
-    statFertilizer: "Бонус сена",
-    statStamina: "Выносливость",
-    statBonus: "Сена с блока",
-    statAutopilot: "Ботов",
-    statBotSpeed: "Скор. ботов",
-    statLand: "Территория",
-    restBtn: "⛺ Отдохнуть",
-    newGameBtn: "🔄 Новая игра",
-    newGameConfirm: "Начать новую игру? Весь прогресс будет сброшен.",
-    dayText: "День",
-    nightText: "Ночь...",
-    settingsTitle: "⚙️ Настройки",
-    musicVol: "Музыка",
-    sfxVol: "Звуки",
-    vibration: "Вибрация",
-    langToggle: "Язык",
-    closeBtn: "Закрыть",
+    title: "РўСЂР°РєС‚РѕСЂ РњР°РіРЅР°С‚",
+    hay: "СЃРµРЅР°",
+    shopBtn: "РџСЂРѕРєР°С‡РєР°",
+    mapBtn: "РљР°СЂС‚Р°",
+    mapTitle: "рџ—єпёЏ РљР°СЂС‚Р°",
+    shopTitle: "рџ›’ РџСЂРѕРєР°С‡РєР°",
+    boosterBtn: "рџ“є Р РµРєР»Р°РјР°: +1000 рџЊѕ",
+    maxLabel: "РњРђРљРЎ",
+    buyHay: "СЃРµРЅР°",
+    statSpeed: "РЎРєРѕСЂРѕСЃС‚СЊ",
+    statWidth: "РЁРёСЂРёРЅР°",
+    statFertilizer: "Р‘РѕРЅСѓСЃ СЃРµРЅР°",
+    statStamina: "Р’С‹РЅРѕСЃР»РёРІРѕСЃС‚СЊ",
+    statBonus: "РЎРµРЅР° СЃ Р±Р»РѕРєР°",
+    statAutopilot: "Р‘РѕС‚РѕРІ",
+    statBotSpeed: "РЎРєРѕСЂ. Р±РѕС‚РѕРІ",
+    statLand: "РўРµСЂСЂРёС‚РѕСЂРёСЏ",
+    restBtn: "в›є РћС‚РґРѕС…РЅСѓС‚СЊ",
+    newGameBtn: "рџ”„ РќРѕРІР°СЏ РёРіСЂР°",
+    newGameConfirm: "РќР°С‡Р°С‚СЊ РЅРѕРІСѓСЋ РёРіСЂСѓ? Р’РµСЃСЊ РїСЂРѕРіСЂРµСЃСЃ Р±СѓРґРµС‚ СЃР±СЂРѕС€РµРЅ.",
+    dayText: "Р”РµРЅСЊ",
+    nightText: "РќРѕС‡СЊ...",
+    settingsTitle: "вљ™пёЏ РќР°СЃС‚СЂРѕР№РєРё",
+    musicVol: "РњСѓР·С‹РєР°",
+    sfxVol: "Р—РІСѓРєРё",
+    vibration: "Р’РёР±СЂР°С†РёСЏ",
+    langToggle: "РЇР·С‹Рє",
+    closeBtn: "Р—Р°РєСЂС‹С‚СЊ",
     upgrades: {
-      speed: { name: "Двигатель", desc: "Увеличивает скорость трактора" },
-      width: { name: "Косилка",   desc: "Увеличивает ширину скоса" },
-      stamina: { name: "Бак",     desc: "Увеличивает запас хода" },
-      bonus: { name: "Амбар",     desc: "Ещё больше сена с каждого блока" },
-      autopilot: { name: "Тракторист", desc: "Нанимает бота-тракториста" },
-      land: { name: "Расширение фермы", desc: "Вырубает лес, открывая новые культуры" },
-      botSpeed: { name: "Скор. Ботов", desc: "Делает ботов быстрее" }
+      speed: { name: "Р”РІРёРіР°С‚РµР»СЊ", desc: "РЈРІРµР»РёС‡РёРІР°РµС‚ СЃРєРѕСЂРѕСЃС‚СЊ С‚СЂР°РєС‚РѕСЂР°" },
+      width: { name: "РљРѕСЃРёР»РєР°",   desc: "РЈРІРµР»РёС‡РёРІР°РµС‚ С€РёСЂРёРЅСѓ СЃРєРѕСЃР°" },
+      stamina: { name: "Р‘Р°Рє",     desc: "РЈРІРµР»РёС‡РёРІР°РµС‚ Р·Р°РїР°СЃ С…РѕРґР°" },
+      bonus: { name: "РђРјР±Р°СЂ",     desc: "Р•С‰С‘ Р±РѕР»СЊС€Рµ СЃРµРЅР° СЃ РєР°Р¶РґРѕРіРѕ Р±Р»РѕРєР°" },
+      autopilot: { name: "РўСЂР°РєС‚РѕСЂРёСЃС‚", desc: "РќР°РЅРёРјР°РµС‚ Р±РѕС‚Р°-С‚СЂР°РєС‚РѕСЂРёСЃС‚Р°" },
+      land: { name: "Р Р°СЃС€РёСЂРµРЅРёРµ С„РµСЂРјС‹", desc: "Р’С‹СЂСѓР±Р°РµС‚ Р»РµСЃ, РѕС‚РєСЂС‹РІР°СЏ РЅРѕРІС‹Рµ РєСѓР»СЊС‚СѓСЂС‹" },
+      botSpeed: { name: "РЎРєРѕСЂ. Р‘РѕС‚РѕРІ", desc: "Р”РµР»Р°РµС‚ Р±РѕС‚РѕРІ Р±С‹СЃС‚СЂРµРµ" }
     },
-    questsTitle: "📜 Доска Заказов",
-    questCompletedTitle: "🏆 ВЫ ПОБЕДИЛИ!",
-    questCompletedDesc: "Вы выполнили все заказы и стали настоящим Сельскохозяйственным Магнатом!",
-    questCostStr: "сена",
-    questBtnDo: "Выполнить заказ",
-    questBtnNoMoney: "Не хватает сена",
-    questPopupMsg: "ЗАКАЗ ВЫПОЛНЕН!",
+    questsTitle: "рџ“њ Р”РѕСЃРєР° Р—Р°РєР°Р·РѕРІ",
+    questCompletedTitle: "рџЏ† Р’Р« РџРћР‘Р•Р”РР›Р!",
+    questCompletedDesc: "Р’С‹ РІС‹РїРѕР»РЅРёР»Рё РІСЃРµ Р·Р°РєР°Р·С‹ Рё СЃС‚Р°Р»Рё РЅР°СЃС‚РѕСЏС‰РёРј РЎРµР»СЊСЃРєРѕС…РѕР·СЏР№СЃС‚РІРµРЅРЅС‹Рј РњР°РіРЅР°С‚РѕРј!",
+    questCostStr: "СЃРµРЅР°",
+    questBtnDo: "Р’С‹РїРѕР»РЅРёС‚СЊ Р·Р°РєР°Р·",
+    questBtnNoMoney: "РќРµ С…РІР°С‚Р°РµС‚ СЃРµРЅР°",
+    questPopupMsg: "Р—РђРљРђР— Р’Р«РџРћР›РќР•Рќ!",
     quests: [
-      { title: "Городской зоопарк", desc: "Зоопарку срочно нужна подстилка из чистого сена для вольеров со слонами.", reward: "Награда: навсегда +1 сено с блока" },
-      { title: "Местный Лорд", desc: "Лорду нужно кормить огромный табун лошадей.", reward: "Награда: Максимум ботов увеличен с 3 до 5" },
-      { title: "Король", desc: "Королевские амбары пусты! Зима близко.", reward: "Награда: Ваш трактор окрашивается в ЗОЛОТОЙ цвет" },
-      { title: "Мега-заказ Империи", desc: "Построить запасы на зиму для всей страны.", reward: "Титул Магната (Полная победа в игре!)" }
+      { title: "Р“РѕСЂРѕРґСЃРєРѕР№ Р·РѕРѕРїР°СЂРє", desc: "Р—РѕРѕРїР°СЂРєСѓ СЃСЂРѕС‡РЅРѕ РЅСѓР¶РЅР° РїРѕРґСЃС‚РёР»РєР° РёР· С‡РёСЃС‚РѕРіРѕ СЃРµРЅР° РґР»СЏ РІРѕР»СЊРµСЂРѕРІ СЃРѕ СЃР»РѕРЅР°РјРё.", reward: "РќР°РіСЂР°РґР°: РЅР°РІСЃРµРіРґР° +1 СЃРµРЅРѕ СЃ Р±Р»РѕРєР°" },
+      { title: "РњРµСЃС‚РЅС‹Р№ Р›РѕСЂРґ", desc: "Р›РѕСЂРґСѓ РЅСѓР¶РЅРѕ РєРѕСЂРјРёС‚СЊ РѕРіСЂРѕРјРЅС‹Р№ С‚Р°Р±СѓРЅ Р»РѕС€Р°РґРµР№.", reward: "РќР°РіСЂР°РґР°: РњР°РєСЃРёРјСѓРј Р±РѕС‚РѕРІ СѓРІРµР»РёС‡РµРЅ СЃ 3 РґРѕ 5" },
+      { title: "РљРѕСЂРѕР»СЊ", desc: "РљРѕСЂРѕР»РµРІСЃРєРёРµ Р°РјР±Р°СЂС‹ РїСѓСЃС‚С‹! Р—РёРјР° Р±Р»РёР·РєРѕ.", reward: "РќР°РіСЂР°РґР°: Р’Р°С€ С‚СЂР°РєС‚РѕСЂ РѕРєСЂР°С€РёРІР°РµС‚СЃСЏ РІ Р—РћР›РћРўРћР™ С†РІРµС‚" },
+      { title: "РњРµРіР°-Р·Р°РєР°Р· РРјРїРµСЂРёРё", desc: "РџРѕСЃС‚СЂРѕРёС‚СЊ Р·Р°РїР°СЃС‹ РЅР° Р·РёРјСѓ РґР»СЏ РІСЃРµР№ СЃС‚СЂР°РЅС‹.", reward: "РўРёС‚СѓР» РњР°РіРЅР°С‚Р° (РџРѕР»РЅР°СЏ РїРѕР±РµРґР° РІ РёРіСЂРµ!)" }
     ]
   },
   en: {
@@ -508,9 +507,9 @@ const i18n = {
     hay: "hay",
     shopBtn: "Upgrades",
     mapBtn: "Map",
-    mapTitle: "🗺️ Map",
-    shopTitle: "🛒 Upgrades",
-    boosterBtn: "📺 Watch Ad for +1000 🌾",
+    mapTitle: "рџ—єпёЏ Map",
+    shopTitle: "рџ›’ Upgrades",
+    boosterBtn: "рџ“є Watch Ad for +1000 рџЊѕ",
     maxLabel: "MAX",
     buyHay: "hay",
     statSpeed: "Speed",
@@ -521,12 +520,12 @@ const i18n = {
     statAutopilot: "Bots count",
     statBotSpeed: "Bots Speed",
     statLand: "Territory",
-    restBtn: "🌙 Rest",
-    newGameBtn: "🔄 New Game",
+    restBtn: "рџЊ™ Rest",
+    newGameBtn: "рџ”„ New Game",
     newGameConfirm: "Start a new game? All progress will be reset.",
     dayText: "Day",
     nightText: "Night...",
-    settingsTitle: "⚙️ Settings",
+    settingsTitle: "вљ™пёЏ Settings",
     musicVol: "Music",
     sfxVol: "SFX",
     vibration: "Vibration",
@@ -541,8 +540,8 @@ const i18n = {
       land: { name: "Farm Expansion", desc: "Clears the forest, unlocking new crops" },
       botSpeed: { name: "Bots Speed", desc: "Makes AI bots drive faster" }
     },
-    questsTitle: "📜 Quest Board",
-    questCompletedTitle: "🏆 YOU WON!",
+    questsTitle: "рџ“њ Quest Board",
+    questCompletedTitle: "рџЏ† YOU WON!",
     questCompletedDesc: "You completed all orders and became a true Agricultural Tycoon!",
     questCostStr: "hay",
     questBtnDo: "Complete Order",
@@ -574,7 +573,8 @@ function updateLanguage(lang) {
   document.getElementById('map-title').textContent = t('mapTitle');
   document.getElementById('shop-title').textContent = t('shopTitle');
   document.getElementById('booster-btn-text').textContent = t('boosterBtn');
-  document.getElementById('rest-btn').title = t('restBtn');
+  let restBtn = document.getElementById('rest-btn');
+  if(restBtn) restBtn.title = t('restBtn');
   document.getElementById('quests-btn').title = t('questsTitle');
   
   document.getElementById('settings-btn').title = t('settingsTitle');
@@ -588,20 +588,20 @@ function updateLanguage(lang) {
   const mps = getAutopilotMPS();
   if (mpsDisp && mps > 0) {
     mpsDisp.style.display = 'block';
-    mpsDisp.textContent = `+${mps} 🌾/${currentLang==='ru'?'сек':'s'}`;
+    mpsDisp.textContent = `+${mps} рџЊѕ/${currentLang==='ru'?'СЃРµРє':'s'}`;
   }
   
   if (shopOpen) renderShop();
   if (typeof questsOpen !== 'undefined' && questsOpen) renderQuests();
 }
 
-// ── АУДИО ДВИЖОК (8-bit Web Audio API) ───────────────────────
+// в”Ђв”Ђ РђРЈР”РРћ Р”Р’РР–РћРљ (8-bit Web Audio API) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 let audioMuted = false;
 let musicVol = 0.5;
 let sfxVol = 0.2;
 
-// Узлы громкости
+// РЈР·Р»С‹ РіСЂРѕРјРєРѕСЃС‚Рё
 const masterGain = audioCtx.createGain();
 const musicGain = audioCtx.createGain();
 const sfxGain = audioCtx.createGain();
@@ -609,9 +609,9 @@ const sfxGain = audioCtx.createGain();
 musicGain.connect(masterGain);
 sfxGain.connect(masterGain);
 masterGain.connect(audioCtx.destination);
-masterGain.gain.value = 1; // Звук включен по умолчанию
+masterGain.gain.value = 1; // Р—РІСѓРє РІРєР»СЋС‡РµРЅ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 
-// Автоматический запуск звука по первому клику (требование браузеров)
+// РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРёР№ Р·Р°РїСѓСЃРє Р·РІСѓРєР° РїРѕ РїРµСЂРІРѕРјСѓ РєР»РёРєСѓ (С‚СЂРµР±РѕРІР°РЅРёРµ Р±СЂР°СѓР·РµСЂРѕРІ)
 const startAudioOnInteract = () => {
   if (!audioMuted) initAudio();
   window.removeEventListener('click', startAudioOnInteract);
@@ -634,7 +634,7 @@ function toggleAudio() {
   audioMuted = !audioMuted;
   masterGain.gain.value = audioMuted ? 0 : 1;
   const btn = document.getElementById('audio-btn');
-  btn.textContent = audioMuted ? '🔇' : '🎵';
+  btn.textContent = audioMuted ? 'рџ”‡' : 'рџЋµ';
   btn.classList.toggle('muted', audioMuted);
   if (!audioMuted) initAudio();
 }
@@ -712,19 +712,19 @@ function playTone(freq, type, duration, volScale = 1) {
 function playClick() { playTone(400, 'triangle', 0.05, 0.2); vibrate(15); }
 function playCut() { playTone(120, 'triangle', 0.08, 0.015); vibrate(3); }
 
-// Более длинная и разнообразная кантри-мелодия
+// Р‘РѕР»РµРµ РґР»РёРЅРЅР°СЏ Рё СЂР°Р·РЅРѕРѕР±СЂР°Р·РЅР°СЏ РєР°РЅС‚СЂРё-РјРµР»РѕРґРёСЏ
 const melody = [
-  // Фраза 1 (куплет)
+  // Р¤СЂР°Р·Р° 1 (РєСѓРїР»РµС‚)
   {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.4}, {f: 523.25, d: 0.4},
   {f: 392.00, d: 0.4}, {f: 329.63, d: 0.4}, {f: 261.63, d: 0.4}, {f: 196.00, d: 0.4},
   {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.4}, {f: 440.00, d: 0.4},
   {f: 392.00, d: 0.8}, {f: 0, d: 0.4},
-  // Фраза 2
+  // Р¤СЂР°Р·Р° 2
   {f: 261.63, d: 0.2}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.4}, {f: 523.25, d: 0.4},
   {f: 587.33, d: 0.4}, {f: 523.25, d: 0.4}, {f: 440.00, d: 0.4}, {f: 392.00, d: 0.4},
   {f: 349.23, d: 0.4}, {f: 392.00, d: 0.4}, {f: 261.63, d: 0.8},
   {f: 0, d: 0.8},
-  // Припев
+  // РџСЂРёРїРµРІ
   {f: 523.25, d: 0.4}, {f: 523.25, d: 0.2}, {f: 440.00, d: 0.2}, {f: 392.00, d: 0.4}, {f: 329.63, d: 0.4},
   {f: 261.63, d: 0.4}, {f: 329.63, d: 0.2}, {f: 392.00, d: 0.2}, {f: 440.00, d: 0.8},
   {f: 523.25, d: 0.4}, {f: 440.00, d: 0.4}, {f: 392.00, d: 0.4}, {f: 329.63, d: 0.4},
@@ -737,7 +737,7 @@ function playMusicSequence() {
   if (melody[noteIdx].f > 0) {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-    osc.type = 'triangle'; // Мягкий звук
+    osc.type = 'triangle'; // РњСЏРіРєРёР№ Р·РІСѓРє
     osc.frequency.value = melody[noteIdx].f;
     gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + melody[noteIdx].d);
@@ -750,36 +750,36 @@ function playMusicSequence() {
   noteIdx = (noteIdx + 1) % melody.length;
 }
 
-// ── КОНФИГ ───────────────────────────────────────────────────
+// в”Ђв”Ђ РљРћРќР¤РР“ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const T    = 32;
 const MW   = 180;
 const MH   = 120;
 const BRD  = 12;
 const LRP  = 0.12;
-// GROW_BASE удалён — авторост заменён системой дней
+// GROW_BASE СѓРґР°Р»С‘РЅ вЂ” Р°РІС‚РѕСЂРѕСЃС‚ Р·Р°РјРµРЅС‘РЅ СЃРёСЃС‚РµРјРѕР№ РґРЅРµР№
 
-// Базовые значения (без прокачки)
+// Р‘Р°Р·РѕРІС‹Рµ Р·РЅР°С‡РµРЅРёСЏ (Р±РµР· РїСЂРѕРєР°С‡РєРё)
 const BASE_SPD = 200;
-const BASE_PW  = 12; // 12px на уровне 0 (меньше тайла 32px, режет строго 1 блок)
+const BASE_PW  = 12; // 12px РЅР° СѓСЂРѕРІРЅРµ 0 (РјРµРЅСЊС€Рµ С‚Р°Р№Р»Р° 32px, СЂРµР¶РµС‚ СЃС‚СЂРѕРіРѕ 1 Р±Р»РѕРє)
 const BASE_PH  = 35;
 
-// Состояния: F=лес, H=сено, G=растёт
+// РЎРѕСЃС‚РѕСЏРЅРёСЏ: F=Р»РµСЃ, H=СЃРµРЅРѕ, G=СЂР°СЃС‚С‘С‚
 const F=0,H=1,C=2,S=3,T_S=4,G_S=5,R_S=6,P=7,L=8;
 const G=9,CG=10,SG=11;
 
-// ── ПРОКАЧКА ─────────────────────────────────────────────────
+// в”Ђв”Ђ РџР РћРљРђР§РљРђ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const UPGRADES = [
   {
-    id:'land', icon:'🗺️',
+    id:'land', icon:'рџ—єпёЏ',
     iconBg:'rgba(100,255,100,.15)',
     maxLevel:2,
     cost:[87750, 300000],
     statKey:'statLand',
-    statFn:(lvl)=>lvl===0?'Сено':lvl===1?'Кукуруза':'Подсолнухи',
+    statFn:(lvl)=>lvl===0?'РЎРµРЅРѕ':lvl===1?'РљСѓРєСѓСЂСѓР·Р°':'РџРѕРґСЃРѕР»РЅСѓС…Рё',
   },
 
   {
-    id:'speed', icon:'⚡',
+    id:'speed', icon:'вљЎ',
     iconBg:'rgba(255,180,30,.15)',
     maxLevel:5,
     cost:[410, 1320, 3160, 7370, 15800],
@@ -787,23 +787,23 @@ const UPGRADES = [
     statFn:(lvl)=>`${BASE_SPD + lvl*50} px/s`,
   },
   {
-    id:'width', icon:'⚙️',
+    id:'width', icon:'вљ™пёЏ',
     iconBg:'rgba(80,160,255,.15)',
     maxLevel:5,
     cost:[530, 1580, 3690, 8420, 18430],
     statKey:'statWidth',
-    statFn:(lvl)=>`${1 + lvl} 🟩`,
+    statFn:(lvl)=>`${1 + lvl} рџџ©`,
   },
   {
-    id:'stamina', icon:'🔋',
+    id:'stamina', icon:'рџ”‹',
     iconBg:'rgba(40,200,80,.15)',
     maxLevel:5,
     cost:[410, 1050, 2630, 6320, 15800],
     statKey:'statStamina',
-    statFn:(lvl)=>`${45 + lvl*60} ⚡`,
+    statFn:(lvl)=>`${45 + lvl*60} вљЎ`,
   },
   {
-    id:'bonus', icon:'🏚️',
+    id:'bonus', icon:'рџЏљпёЏ',
     iconBg:'rgba(255,215,0,.12)',
     maxLevel:5,
     cost:[790, 2110, 6320, 18430, 55280],
@@ -811,15 +811,15 @@ const UPGRADES = [
     statFn:(lvl)=>`${1 + lvl} \uD83C\uDF3E`,
   },
   {
-    id:'autopilot', icon:'🤖',
+    id:'autopilot', icon:'рџ¤–',
     iconBg:'rgba(180,80,255,.15)',
     maxLevel:3,
     cost:[1580, 7900, 36860],
     statKey:'statAutopilot',
-    statFn:(lvl)=>`${lvl} 🤖`,
+    statFn:(lvl)=>`${lvl} рџ¤–`,
   },
   {
-    id:'botSpeed', icon:'🚀',
+    id:'botSpeed', icon:'рџљЂ',
     iconBg:'rgba(0,255,200,.15)',
     maxLevel:5,
     cost:[790, 2630, 7370, 18430, 42120],
@@ -837,23 +837,23 @@ const QUESTS = [
   { cost: 526500 }
 ];
 
-// Применяем эффекты прокачки
+// РџСЂРёРјРµРЅСЏРµРј СЌС„С„РµРєС‚С‹ РїСЂРѕРєР°С‡РєРё
 function getSpeed()     { return BASE_SPD + upgLvl.speed * 50; }
 function getMowW()      { return BASE_PW  + upgLvl.width * 28 + (window.devCutterWidth || 0); }
 function getMowH()      { return BASE_PH; }
-// Амбар дает бонус сена с каждого блока
+// РђРјР±Р°СЂ РґР°РµС‚ Р±РѕРЅСѓСЃ СЃРµРЅР° СЃ РєР°Р¶РґРѕРіРѕ Р±Р»РѕРєР°
 function getScoreBonus(){ return upgLvl.bonus + (upgLvl.quest >= 1 ? 1 : 0); }
 function getAutopilotMPS() { return 0; } // obsolete, but keep stub for backwards compat just in case
 
-// ── ВЫНОСЛИВОСТЬ ──────────────────────────────────────────────
-let maxStamina = 45; // Базовые 45 единиц
+// в”Ђв”Ђ Р’Р«РќРћРЎР›РР’РћРЎРўР¬ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
+let maxStamina = 45; // Р‘Р°Р·РѕРІС‹Рµ 45 РµРґРёРЅРёС†
 let currentStamina = 45;
-let fractionalScore = 0; // Для плавного начисления автопилота
+let fractionalScore = 0; // Р”Р»СЏ РїР»Р°РІРЅРѕРіРѕ РЅР°С‡РёСЃР»РµРЅРёСЏ Р°РІС‚РѕРїРёР»РѕС‚Р°
 function updateMaxStamina() {
-  maxStamina = 45 + upgLvl.stamina * 60; // Увеличено с 25 до 60!
+  maxStamina = 45 + upgLvl.stamina * 60; // РЈРІРµР»РёС‡РµРЅРѕ СЃ 25 РґРѕ 60!
 }
 
-// ── МАГАЗИН ──────────────────────────────────────────────────
+// в”Ђв”Ђ РњРђР“РђР—РРќ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 let shopOpen = false;
 
 let questsOpen = false;
@@ -888,7 +888,7 @@ function renderQuests() {
       <div class="quest-title">${qText.title}</div>
       <div class="quest-desc">${qText.desc}</div>
       <div class="quest-reward">${qText.reward}</div>
-      <div class="quest-cost">🌾 ${q.cost} ${t('questCostStr')}</div>
+      <div class="quest-cost">рџЊѕ ${q.cost} ${t('questCostStr')}</div>
       <button class="quest-btn" ${!canAfford ? 'disabled' : ''} onclick="completeQuest()">${canAfford ? t('questBtnDo') : t('questBtnNoMoney')}</button>
     </div>
   `;
@@ -933,7 +933,7 @@ function renderShop() {
     const card = document.createElement('div');
     card.className = 'upg-card' + (maxed ? ' maxed' : canBuy ? ' affordable' : '');
 
-    // Точки уровня
+    // РўРѕС‡РєРё СѓСЂРѕРІРЅСЏ
     const dots = Array.from({length: upg.maxLevel}, (_, i) =>
       `<div class="dot${i < lvl ? (maxed ? ' filled gold' : ' filled') : ''}"></div>`
     ).join('');
@@ -954,9 +954,9 @@ function renderShop() {
       <div class="upg-footer">
         <div class="upg-stat">${t(upg.statKey)}: <span>${upg.statFn(lvl)}</span></div>
         ${maxed
-          ? `<button class="buy-btn maxed-btn" disabled>✓ ${t('maxLabel')}</button>`
+          ? `<button class="buy-btn maxed-btn" disabled>вњ“ ${t('maxLabel')}</button>`
           : `<button class="buy-btn" ${canBuy?'':'disabled'} onclick="buy('${upg.id}')">
-               🌾 ${cost} <span style="font-size:.7rem;opacity:.6">${t('buyHay')}</span>
+               рџЊѕ ${cost} <span style="font-size:.7rem;opacity:.6">${t('buyHay')}</span>
              </button>`
         }
       </div>
@@ -1016,7 +1016,7 @@ window.addEventListener('keydown', e => {
   if (e.code === 'Tab') { e.preventDefault(); toggleShop(); }
 });
 
-// ── ДАННЫЕ КАРТЫ ─────────────────────────────────────────────
+// в”Ђв”Ђ Р”РђРќРќР«Р• РљРђР РўР« в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const gState  = new Uint8Array(MW * MH);
 const gCutAt  = new Float64Array(MW * MH);
 const growSet = new Set();
@@ -1063,7 +1063,7 @@ function blocked(gx, gy) {
   return gState[gy*MW+gx]===F || gState[gy*MW+gx]===L;
 }
 
-// ── ИГРОК И ИИ ────────────────────────────────────────────────
+// в”Ђв”Ђ РР“Р РћРљ Р РР в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 let px=MW/2*T, py=MH/2*T, pAng=0;
 let bots = [];
 for (let i = 0; i < 3; i++) {
@@ -1107,19 +1107,19 @@ function clearCustomTextures() {
   }
 }
 
-const floatTexts = []; // Всплывающий текст (счет)
+const floatTexts = []; // Р’СЃРїР»С‹РІР°СЋС‰РёР№ С‚РµРєСЃС‚ (СЃС‡РµС‚)
 
-// ── СИСТЕМА ДНЕЙ И НОЧЕЙ ─────────────────────────────────────
+// в”Ђв”Ђ РЎРРЎРўР•РњРђ Р”РќР•Р™ Р РќРћР§Р•Р™ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 let currentDay = 1;
 let isNight = false;
 let nightAlpha = 0;
 let nightPhase = ''; // 'darkening' | 'brightening'
 let nightStartTime = 0;
-const NIGHT_DURATION = 1800; // мс на одну фазу (темнение / рассвет)
+const NIGHT_DURATION = 1800; // РјСЃ РЅР° РѕРґРЅСѓ С„Р°Р·Сѓ (С‚РµРјРЅРµРЅРёРµ / СЂР°СЃСЃРІРµС‚)
 const GROW_DUR = 60000; // Legacy fallback for growth duration
 const scEl=document.getElementById('sc');
 
-// ── ВВОД ─────────────────────────────────────────────────────
+// в”Ђв”Ђ Р’Р’РћР” в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const K={};
 const keyCodeMap = {
   87: 'w', 83: 's', 65: 'a', 68: 'd',
@@ -1140,7 +1140,7 @@ const keyupHandler = e => {
 window.addEventListener('keydown', keydownHandler);
 window.addEventListener('keyup', keyupHandler);
 
-// ── CANVAS ───────────────────────────────────────────────────
+// в”Ђв”Ђ CANVAS в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 const cv=document.getElementById('c');
 const cx=cv.getContext('2d');
 let CW=0,CH=0;
@@ -1165,7 +1165,7 @@ document.getElementById('joystick-zone').addEventListener('touchcancel', (e) => 
   }
 }, { passive: false });
 
-// Сброс всех клавиш и джойстика при потере фокуса окном (чтобы трактор не залипал)
+// РЎР±СЂРѕСЃ РІСЃРµС… РєР»Р°РІРёС€ Рё РґР¶РѕР№СЃС‚РёРєР° РїСЂРё РїРѕС‚РµСЂРµ С„РѕРєСѓСЃР° РѕРєРЅРѕРј (С‡С‚РѕР±С‹ С‚СЂР°РєС‚РѕСЂ РЅРµ Р·Р°Р»РёРїР°Р»)
 window.addEventListener('blur', () => {
   for (let key in K) K[key] = false;
   if (joyActive) {
@@ -1176,7 +1176,7 @@ window.addEventListener('blur', () => {
   }
 });
 
-// ── ПАНЕЛЬ РАЗРАБОТЧИКА ──────────────────────────────────────
+// в”Ђв”Ђ РџРђРќР•Р›Р¬ Р РђР—Р РђР‘РћРўР§РРљРђ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 let devPanelOpen = false;
 let showHitboxes = false;
 window.devTractorRadius = 14;
@@ -1204,7 +1204,7 @@ function toggleDevPanel() {
   document.getElementById('dev-panel').classList.toggle('open', devPanelOpen);
 }
 
-// Открытие панели разработчика по клавише 7 (работает всегда)
+// РћС‚РєСЂС‹С‚РёРµ РїР°РЅРµР»Рё СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР° РїРѕ РєР»Р°РІРёС€Рµ 7 (СЂР°Р±РѕС‚Р°РµС‚ РІСЃРµРіРґР°)
 document.addEventListener('keydown', function(e) {
   if (e.code === 'Digit7' || e.key === '7') {
     e.preventDefault();
@@ -1239,7 +1239,7 @@ function devMaxUpgrade(id) {
   }
 }
 
-// Виртуальный плавающий джойстик
+// Р’РёСЂС‚СѓР°Р»СЊРЅС‹Р№ РїР»Р°РІР°СЋС‰РёР№ РґР¶РѕР№СЃС‚РёРє
 let joyActive = false;
 let joyDX = 0, joyDY = 0;
 let jBaseX = 0, jBaseY = 0;
@@ -1297,8 +1297,8 @@ function stopJoy(e) {
 jZone.addEventListener('touchend', stopJoy);
 jZone.addEventListener('touchcancel', stopJoy);
 
-// ── CANVAS MOVED UP ──
-// ── ХЭШ ─────────────────────────────────────────────────────
+// в”Ђв”Ђ CANVAS MOVED UP в”Ђв”Ђ
+// в”Ђв”Ђ РҐР­РЁ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function h(a,b,s){
   let v=(a*73856093)^(b*19349663)^(s*83492791);
   v=Math.imul(v^(v>>>16),0x45d9f3b);
@@ -1306,7 +1306,7 @@ function h(a,b,s){
   return((v^(v>>>16))&0x7FFFFFFF)/0x7FFFFFFF;
 }
 
-// ── РИСОВАНИЕ ────────────────────────────────────────────────
+// в”Ђв”Ђ Р РРЎРћР’РђРќРР• в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function renderCellToMap(gx,gy,now){
   if (!mapCx) return;
   if(gx<0||gx>=MW||gy<0||gy>=MH)return;
@@ -1333,7 +1333,7 @@ function renderCellToMap(gx,gy,now){
       mapCx.fillStyle = `hsl(${108 + r4*18}, ${42 + r4*18}%, ${30 + r4*10}%)`;
       mapCx.fillRect(sx + Math.floor(r4 * (T-6)), sy + Math.floor(r5 * (T-6)), 6, 6);
 
-      // Pixel-art flower on ~18% of tiles — 4x4 px cross
+      // Pixel-art flower on ~18% of tiles вЂ” 4x4 px cross
       if (h(gx, gy, 99) > 0.82) {
         const fx = sx + Math.floor(h(gx, gy, 50) * (T - 10) / 2) * 2 + 4;
         const fy = sy + Math.floor(h(gx, gy, 51) * (T - 10) / 2) * 2 + 4;
@@ -1431,7 +1431,7 @@ function renderCellToMap(gx,gy,now){
   
   const p = (st===H || st===C || st===S) ? 1 : 0;
   
-  // Детальная текстура земли под культурами
+  // Р”РµС‚Р°Р»СЊРЅР°СЏ С‚РµРєСЃС‚СѓСЂР° Р·РµРјР»Рё РїРѕРґ РєСѓР»СЊС‚СѓСЂР°РјРё
   const drawSoil = () => {
     // Base dark earthy brown
     mapCx.fillStyle = `hsl(${28 + h1*6}, ${45+h2*12}%, ${18+h3*7}%)`;
@@ -1443,9 +1443,9 @@ function renderCellToMap(gx,gy,now){
       const dw = 3 + Math.floor(ds * 5);
       const shade = h(gx+di, gy-di, di*7);
       if (shade < 0.5) {
-        mapCx.fillStyle = `hsl(${22+di*2}, 50%, ${12+Math.floor(ds*8)}%)`; // очень тёмный
+        mapCx.fillStyle = `hsl(${22+di*2}, 50%, ${12+Math.floor(ds*8)}%)`; // РѕС‡РµРЅСЊ С‚С‘РјРЅС‹Р№
       } else {
-        mapCx.fillStyle = `hsl(${30+di*2}, 42%, ${26+Math.floor(ds*8)}%)`; // тёмный средний
+        mapCx.fillStyle = `hsl(${30+di*2}, 42%, ${26+Math.floor(ds*8)}%)`; // С‚С‘РјРЅС‹Р№ СЃСЂРµРґРЅРёР№
       }
       mapCx.fillRect(sx + Math.floor(dx*(T-dw)), sy + Math.floor(dy*(T-dw)), dw, dw);
     }
@@ -1458,13 +1458,13 @@ function renderCellToMap(gx,gy,now){
     // Base ground
     if (isHay) {
       if(p<.33) { drawSoil(); }
-      else mapCx.fillStyle = `hsl(${44+h1*12}, 80%, ${57+h2*12}%)`, mapCx.fillRect(sx,sy,T,T); // Желтое сено
+      else mapCx.fillStyle = `hsl(${44+h1*12}, 80%, ${57+h2*12}%)`, mapCx.fillRect(sx,sy,T,T); // Р–РµР»С‚РѕРµ СЃРµРЅРѕ
     } else if (isCorn) {
       if(p<.33) { drawSoil(); }
-      else mapCx.fillStyle = `hsl(${65+h1*10}, 75%, ${50+h2*10}%)`, mapCx.fillRect(sx,sy,T,T); // Кукуруза
+      else mapCx.fillStyle = `hsl(${65+h1*10}, 75%, ${50+h2*10}%)`, mapCx.fillRect(sx,sy,T,T); // РљСѓРєСѓСЂСѓР·Р°
     } else if (isSun) {
       if(p<.33) { drawSoil(); }
-      else mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`, mapCx.fillRect(sx,sy,T,T); // Подсолнух
+      else mapCx.fillStyle = `hsl(${35+h1*10}, 70%, ${45+h2*10}%)`, mapCx.fillRect(sx,sy,T,T); // РџРѕРґСЃРѕР»РЅСѓС…
     }
 
   }
@@ -1488,7 +1488,7 @@ function renderCellToMap(gx,gy,now){
                    (gx >= 115 && gx <= 124 && gy >= 55 && gy <= 64);
                    
       if (isRoad) {
-        // Premium cobblestone path for roads — STRICTLY clipped to tile bounds
+        // Premium cobblestone path for roads вЂ” STRICTLY clipped to tile bounds
         mapCx.fillStyle = '#65605a'; // dark grout
         mapCx.fillRect(sx, sy, T, T);
         
@@ -1654,45 +1654,45 @@ function drawPlayer(){
   const sx = Math.round(px - camX + CW/2);
   const sy = Math.round(py - camY + CH/2);
 
-  // Константные размеры самого трактора
+  // РљРѕРЅСЃС‚Р°РЅС‚РЅС‹Рµ СЂР°Р·РјРµСЂС‹ СЃР°РјРѕРіРѕ С‚СЂР°РєС‚РѕСЂР°
   const bodyW = 24;
   const bodyH = 35;
 
-  // --- Глобальная тень ---
+  // --- Р“Р»РѕР±Р°Р»СЊРЅР°СЏ С‚РµРЅСЊ ---
   cx.save();
-  cx.translate(sx + 4, sy + 4); // Смещение тени на экране
+  cx.translate(sx + 4, sy + 4); // РЎРјРµС‰РµРЅРёРµ С‚РµРЅРё РЅР° СЌРєСЂР°РЅРµ
   cx.rotate(pAng+Math.PI/2);
   cx.fillStyle='rgba(0,0,0,.28)';
-  cx.fillRect(-bodyW/2, -bodyH/2, bodyW, bodyH); // Кузов
-  cx.fillRect(-PW/2, -bodyH/2 - 10, PW, 7); // Ковш
+  cx.fillRect(-bodyW/2, -bodyH/2, bodyW, bodyH); // РљСѓР·РѕРІ
+  cx.fillRect(-PW/2, -bodyH/2 - 10, PW, 7); // РљРѕРІС€
   const ww=5,wh=bodyH*.30|0;
-  cx.fillRect(-bodyW/2-ww, -bodyH/2+6, ww,wh); // Колеса
+  cx.fillRect(-bodyW/2-ww, -bodyH/2+6, ww,wh); // РљРѕР»РµСЃР°
   cx.fillRect( bodyW/2,    -bodyH/2+6, ww,wh);
   cx.fillRect(-bodyW/2-ww,  bodyH/2-6-wh, ww,wh);
   cx.fillRect( bodyW/2,     bodyH/2-6-wh, ww,wh);
   cx.restore();
 
-  // --- Сам трактор ---
+  // --- РЎР°Рј С‚СЂР°РєС‚РѕСЂ ---
   cx.save();
   cx.translate(sx,sy);
   cx.rotate(pAng+Math.PI/2);
 
-  // 🚜 Металлический ковш/жатка спереди (ширина PW растягивается при апгрейдах)
-  // Крепления ковша к трактору
+  // рџљњ РњРµС‚Р°Р»Р»РёС‡РµСЃРєРёР№ РєРѕРІС€/Р¶Р°С‚РєР° СЃРїРµСЂРµРґРё (С€РёСЂРёРЅР° PW СЂР°СЃС‚СЏРіРёРІР°РµС‚СЃСЏ РїСЂРё Р°РїРіСЂРµР№РґР°С…)
+  // РљСЂРµРїР»РµРЅРёСЏ РєРѕРІС€Р° Рє С‚СЂР°РєС‚РѕСЂСѓ
   cx.fillStyle = '#555555';
   cx.fillRect(-6, -bodyH/2 - 4, 3, 5);
   cx.fillRect(3, -bodyH/2 - 4, 3, 5);
 
-  // Сам ковш (основная балка)
+  // РЎР°Рј РєРѕРІС€ (РѕСЃРЅРѕРІРЅР°СЏ Р±Р°Р»РєР°)
   cx.fillStyle = '#b0b8c0';
   cx.fillRect(-PW/2, -bodyH/2 - 10, PW, 7);
 
-  // Боковые защитные щитки
+  // Р‘РѕРєРѕРІС‹Рµ Р·Р°С‰РёС‚РЅС‹Рµ С‰РёС‚РєРё
   cx.fillStyle = '#606870';
   cx.fillRect(-PW/2 - 2, -bodyH/2 - 12, 2, 10);
   cx.fillRect( PW/2,     -bodyH/2 - 12, 2, 10);
 
-  // Желто-черные предупреждающие полосы на ковше
+  // Р–РµР»С‚Рѕ-С‡РµСЂРЅС‹Рµ РїСЂРµРґСѓРїСЂРµР¶РґР°СЋС‰РёРµ РїРѕР»РѕСЃС‹ РЅР° РєРѕРІС€Рµ
   cx.fillStyle = '#e0a800';
   const stripeStep = 6;
   const stripeW = 2;
@@ -1703,7 +1703,7 @@ function drawPlayer(){
     cx.fillRect(-PW/2 + offsetX + i*stripeStep, -bodyH/2 - 10, stripeW, 7);
   }
 
-  // 🚜 Сам трактор (Красный или градиентный Золотой)
+  // рџљњ РЎР°Рј С‚СЂР°РєС‚РѕСЂ (РљСЂР°СЃРЅС‹Р№ РёР»Рё РіСЂР°РґРёРµРЅС‚РЅС‹Р№ Р—РѕР»РѕС‚РѕР№)
   if (upgLvl.quest >= 3) {
     let grad = cx.createLinearGradient(-bodyW/2, -bodyH/2, bodyW/2, bodyH/2);
     grad.addColorStop(0, '#ffeeaa');
@@ -1715,15 +1715,15 @@ function drawPlayer(){
   }
   cx.fillRect(-bodyW/2,-bodyH/2,bodyW,bodyH);
 
-  // Желтый капот (или светлый блик для золотого)
+  // Р–РµР»С‚С‹Р№ РєР°РїРѕС‚ (РёР»Рё СЃРІРµС‚Р»С‹Р№ Р±Р»РёРє РґР»СЏ Р·РѕР»РѕС‚РѕРіРѕ)
   cx.fillStyle = (upgLvl.quest >= 3) ? 'rgba(255,255,255,0.5)' : '#ffb81c';
   cx.fillRect(-bodyW/2+3,-bodyH/2+3,bodyW-6,bodyH*.42);
 
-  // Синее лобовое стекло
+  // РЎРёРЅРµРµ Р»РѕР±РѕРІРѕРµ СЃС‚РµРєР»Рѕ
   cx.fillStyle='#87ceeb';
   cx.fillRect(-bodyW/2+6,-bodyH/2+6,bodyW-12,bodyH*.24);
 
-  // Квадратные блестки для золотого трактора
+  // РљРІР°РґСЂР°С‚РЅС‹Рµ Р±Р»РµСЃС‚РєРё РґР»СЏ Р·РѕР»РѕС‚РѕРіРѕ С‚СЂР°РєС‚РѕСЂР°
   if (upgLvl.quest >= 3) {
     cx.fillStyle = '#ffffff';
     cx.fillRect(-bodyW/2 + 4, -bodyH/2 + 4, 3, 3);
@@ -1731,7 +1731,7 @@ function drawPlayer(){
     cx.fillRect(-bodyW/2 + 5, bodyH/2 - 6, 2, 2);
   }
 
-  // Колеса (не растягиваются, крепятся по бокам кузова)
+  // РљРѕР»РµСЃР° (РЅРµ СЂР°СЃС‚СЏРіРёРІР°СЋС‚СЃСЏ, РєСЂРµРїСЏС‚СЃСЏ РїРѕ Р±РѕРєР°Рј РєСѓР·РѕРІР°)
   cx.fillStyle='#111';
   cx.fillRect(-bodyW/2-ww, -bodyH/2+6,     ww,wh);
   cx.fillRect( bodyW/2,    -bodyH/2+6,     ww,wh);
@@ -1742,28 +1742,28 @@ function drawPlayer(){
 
 
   if (showHitboxes) {
-    // Хитбокс трактора (круг)
+    // РҐРёС‚Р±РѕРєСЃ С‚СЂР°РєС‚РѕСЂР° (РєСЂСѓРі)
     cx.save();
-    cx.strokeStyle = '#ff00ff'; // Яркий пурпурный (неоновый)
-    cx.fillStyle = 'rgba(255, 0, 255, 0.2)'; // Полупрозрачная заливка
+    cx.strokeStyle = '#ff00ff'; // РЇСЂРєРёР№ РїСѓСЂРїСѓСЂРЅС‹Р№ (РЅРµРѕРЅРѕРІС‹Р№)
+    cx.fillStyle = 'rgba(255, 0, 255, 0.2)'; // РџРѕР»СѓРїСЂРѕР·СЂР°С‡РЅР°СЏ Р·Р°Р»РёРІРєР°
     cx.lineWidth = 4;
     cx.beginPath();
     cx.arc(sx, sy, window.devTractorRadius, 0, Math.PI * 2);
     cx.fill();
     cx.stroke();
     
-    // Линия среза ковша
+    // Р›РёРЅРёСЏ СЃСЂРµР·Р° РєРѕРІС€Р°
     const PW = getMowW();
     const cutterDist = 35 / 2 + 6;
     const sDX = -Math.sin(pAng) * (PW / 2);
     const sDY =  Math.cos(pAng) * (PW / 2);
     
-    // Центр ковша относительно центра экрана (трактора)
+    // Р¦РµРЅС‚СЂ РєРѕРІС€Р° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ С†РµРЅС‚СЂР° СЌРєСЂР°РЅР° (С‚СЂР°РєС‚РѕСЂР°)
     const cutterCx = sx + Math.cos(pAng) * cutterDist;
     const cutterCy = sy + Math.sin(pAng) * cutterDist;
     
-    cx.strokeStyle = '#00ff00'; // Яркий неоновый зелёный
-    cx.lineWidth = 5; // Более толстая линия для ковша
+    cx.strokeStyle = '#00ff00'; // РЇСЂРєРёР№ РЅРµРѕРЅРѕРІС‹Р№ Р·РµР»С‘РЅС‹Р№
+    cx.lineWidth = 5; // Р‘РѕР»РµРµ С‚РѕР»СЃС‚Р°СЏ Р»РёРЅРёСЏ РґР»СЏ РєРѕРІС€Р°
     cx.beginPath();
     cx.moveTo(cutterCx + sDX, cutterCy + sDY);
     cx.lineTo(cutterCx - sDX, cutterCy - sDY);
@@ -1777,11 +1777,11 @@ function drawAITractor(b){
   const sx = Math.round(b.x - camX + CW/2);
   const sy = Math.round(b.y - camY + CH/2);
 
-  // Константные размеры самого трактора
+  // РљРѕРЅСЃС‚Р°РЅС‚РЅС‹Рµ СЂР°Р·РјРµСЂС‹ СЃР°РјРѕРіРѕ С‚СЂР°РєС‚РѕСЂР°
   const bodyW = 24;
   const bodyH = 35;
 
-  // --- Глобальная тень ---
+  // --- Р“Р»РѕР±Р°Р»СЊРЅР°СЏ С‚РµРЅСЊ ---
   cx.save();
   cx.translate(sx + 4, sy + 4);
   cx.rotate(b.ang+Math.PI/2);
@@ -1795,38 +1795,38 @@ function drawAITractor(b){
   cx.fillRect( bodyW/2,     bodyH/2-6-wh, ww,wh);
   cx.restore();
 
-  // --- Сам бот ---
+  // --- РЎР°Рј Р±РѕС‚ ---
   cx.save();
   cx.translate(sx,sy);
   cx.rotate(b.ang+Math.PI/2);
 
-  // Крепления ковша
+  // РљСЂРµРїР»РµРЅРёСЏ РєРѕРІС€Р°
   cx.fillStyle = '#555555';
   cx.fillRect(-6, -bodyH/2 - 4, 3, 5);
   cx.fillRect(3, -bodyH/2 - 4, 3, 5);
 
-  // Ковш
+  // РљРѕРІС€
   cx.fillStyle = '#b0b8c0';
   cx.fillRect(-PW/2, -bodyH/2 - 10, PW, 7);
 
-  // Боковые щитки
+  // Р‘РѕРєРѕРІС‹Рµ С‰РёС‚РєРё
   cx.fillStyle = '#606870';
   cx.fillRect(-PW/2 - 2, -bodyH/2 - 12, 2, 10);
   cx.fillRect( PW/2,     -bodyH/2 - 12, 2, 10);
 
-  // Синий кузов бота
+  // РЎРёРЅРёР№ РєСѓР·РѕРІ Р±РѕС‚Р°
   cx.fillStyle = '#1e88e5';
   cx.fillRect(-bodyW/2,-bodyH/2,bodyW,bodyH);
 
-  // Серебристый капот
+  // РЎРµСЂРµР±СЂРёСЃС‚С‹Р№ РєР°РїРѕС‚
   cx.fillStyle='#cfd8dc';
   cx.fillRect(-bodyW/2+3,-bodyH/2+3,bodyW-6,bodyH*.42);
 
-  // Голубое лобовое стекло
+  // Р“РѕР»СѓР±РѕРµ Р»РѕР±РѕРІРѕРµ СЃС‚РµРєР»Рѕ
   cx.fillStyle='#87ceeb';
   cx.fillRect(-bodyW/2+6,-bodyH/2+6,bodyW-12,bodyH*.24);
 
-  // Антеннка робота сзади
+  // РђРЅС‚РµРЅРЅРєР° СЂРѕР±РѕС‚Р° СЃР·Р°РґРё
   cx.fillStyle='#333';
   cx.fillRect(-1, 0, 2, bodyH/2 - 4);
   cx.fillStyle='#ff3333';
@@ -1834,14 +1834,14 @@ function drawAITractor(b){
   cx.arc(0, bodyH/2 - 4, 3, 0, Math.PI*2);
   cx.fill();
 
-  // Колеса
+  // РљРѕР»РµСЃР°
   cx.fillStyle='#111';
   cx.fillRect(-bodyW/2-ww, -bodyH/2+6,     ww,wh);
   cx.fillRect( bodyW/2,    -bodyH/2+6,     ww,wh);
   cx.fillRect(-bodyW/2-ww,  bodyH/2-wh-6,  ww,wh);
   cx.fillRect( bodyW/2,     bodyH/2-wh-6,  ww,wh);
 
-  // Колпаки на колесах
+  // РљРѕР»РїР°РєРё РЅР° РєРѕР»РµСЃР°С…
   cx.fillStyle='#555';
   cx.fillRect(-bodyW/2-ww+1, -bodyH/2+8, ww-2, wh-4);
   cx.fillRect( bodyW/2+1,    -bodyH/2+8, ww-2, wh-4);
@@ -1916,11 +1916,11 @@ function drawSigns(mapSx, mapSy) {
   }
 }
 
-// ── РЕНДЕР ───────────────────────────────────────────────────
+// в”Ђв”Ђ Р Р•РќР”Р•Р  в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function render(now){
   cx.clearRect(0,0,CW,CH);
   
-  // Рисуем кэшированную карту за один вызов!
+  // Р РёСЃСѓРµРј РєСЌС€РёСЂРѕРІР°РЅРЅСѓСЋ РєР°СЂС‚Сѓ Р·Р° РѕРґРёРЅ РІС‹Р·РѕРІ!
   const mapSx = Math.max(0, Math.min(MW * T - CW, camX - CW / 2));
   const mapSy = Math.max(0, Math.min(MH * T - CH, camY - CH / 2));
 
@@ -1930,7 +1930,7 @@ function render(now){
   } catch(e) {}
   
   if (!isNight || nightAlpha < 0.85) {
-    // Всплывающий текст поверх карты, но под трактором
+    // Р’СЃРїР»С‹РІР°СЋС‰РёР№ С‚РµРєСЃС‚ РїРѕРІРµСЂС… РєР°СЂС‚С‹, РЅРѕ РїРѕРґ С‚СЂР°РєС‚РѕСЂРѕРј
     cx.save();
     cx.translate(-mapSx, -mapSy);
     cx.font = 'bold 16px "Segoe UI", sans-serif';
@@ -1950,18 +1950,18 @@ function render(now){
     for(let i=0; i<numBots; i++) drawAITractor(bots[i]);
   }
 
-  // ── Ночной оверлей ───────────────────────────────────────────
+  // в”Ђв”Ђ РќРѕС‡РЅРѕР№ РѕРІРµСЂР»РµР№ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
   if (nightAlpha > 0) {
-    // Тёмное небо
+    // РўС‘РјРЅРѕРµ РЅРµР±Рѕ
     cx.fillStyle = `rgba(0,8,30,${nightAlpha})`;
     cx.fillRect(0, 0, CW, CH);
 
-    // Звёзды появляются по мере затемнения
+    // Р—РІС‘Р·РґС‹ РїРѕСЏРІР»СЏСЋС‚СЃСЏ РїРѕ РјРµСЂРµ Р·Р°С‚РµРјРЅРµРЅРёСЏ
     const starA = Math.max(0, (nightAlpha - 0.55) / 0.45);
     if (starA > 0) {
       cx.fillStyle = `rgba(255,255,255,${starA})`;
       
-      // Генерируем звёзды один раз и кэшируем, чтобы они заполняли весь экран
+      // Р“РµРЅРµСЂРёСЂСѓРµРј Р·РІС‘Р·РґС‹ РѕРґРёРЅ СЂР°Р· Рё РєСЌС€РёСЂСѓРµРј, С‡С‚РѕР±С‹ РѕРЅРё Р·Р°РїРѕР»РЅСЏР»Рё РІРµСЃСЊ СЌРєСЂР°РЅ
       if (!window.nightStarsCache) {
         window.nightStarsCache = [];
         for (let i = 0; i < 200; i++) {
@@ -1977,7 +1977,7 @@ function render(now){
         cx.fillRect(st.x * CW, st.y * CH, st.s, st.s);
       }
       
-      // Луна (всегда в правом верхнем углу)
+      // Р›СѓРЅР° (РІСЃРµРіРґР° РІ РїСЂР°РІРѕРј РІРµСЂС…РЅРµРј СѓРіР»Сѓ)
       const moonA = Math.max(0, (nightAlpha - 0.7) / 0.3);
       if (moonA > 0) {
         cx.fillStyle = `rgba(240,240,200,${moonA})`;
@@ -1991,7 +1991,7 @@ function render(now){
       }
     }
 
-    // Текст «Ночь...» на пике темноты
+    // РўРµРєСЃС‚ В«РќРѕС‡СЊ...В» РЅР° РїРёРєРµ С‚РµРјРЅРѕС‚С‹
     if (nightPhase === 'darkening' && nightAlpha > 0.8) {
       const ta = (nightAlpha - 0.8) / 0.2;
       cx.fillStyle = `rgba(180,160,255,${ta})`;
@@ -2003,7 +2003,7 @@ function render(now){
   }
 }
 
-// ── UPDATE ───────────────────────────────────────────────────
+// в”Ђв”Ђ UPDATE в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function update(dt,now){
   if (nightPhase) return;
   if (isNaN(px) || isNaN(py)) { px = MW/2*T; py = MH/2*T; }
@@ -2012,14 +2012,14 @@ function update(dt,now){
   let SPD = getSpeed();
   if (isNaN(SPD) || SPD < 50) SPD = BASE_SPD;
 
-  // Боты-Трактористы
+  // Р‘РѕС‚С‹-РўСЂР°РєС‚РѕСЂРёСЃС‚С‹
   let numBots = upgLvl.autopilot || 0; let maxBots = upgLvl.quest >= 2 ? 5 : 3; if (numBots > maxBots) numBots = maxBots; while(bots.length < numBots) bots.push({ x: px + 50 + bots.length*40, y: py + 50, ang: 0, tgtI: -1, cd: 0 });
-  const bSpdMult = 1 + (upgLvl.botSpeed || 0) * 0.25; // +25% скорости за уровень
+  const bSpdMult = 1 + (upgLvl.botSpeed || 0) * 0.25; // +25% СЃРєРѕСЂРѕСЃС‚Рё Р·Р° СѓСЂРѕРІРµРЅСЊ
   for (let i = 0; i < numBots; i++) {
     let b = bots[i];
     b.cd -= dt;
     if (b.cd <= 0 || b.tgtI === -1 || gState[b.tgtI] !== H) {
-      b.cd = 0.5 + Math.random() * 0.5; // Ищем цель раз в 0.5-1.0 сек
+      b.cd = 0.5 + Math.random() * 0.5; // РС‰РµРј С†РµР»СЊ СЂР°Р· РІ 0.5-1.0 СЃРµРє
       let bestD = Infinity;
       let bestI = -1;
       const bx = Math.floor(b.x / T), by = Math.floor(b.y / T);
@@ -2045,12 +2045,12 @@ function update(dt,now){
       let diff = targetAng - b.ang;
       while (diff > Math.PI) diff -= Math.PI*2;
       while (diff < -Math.PI) diff += Math.PI*2;
-      b.ang += Math.sign(diff) * Math.min(Math.abs(diff), 3 * dt); // скорость поворота
+      b.ang += Math.sign(diff) * Math.min(Math.abs(diff), 3 * dt); // СЃРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р°
     } else {
-      b.ang += 0.5 * dt; // кружимся на месте
+      b.ang += 0.5 * dt; // РєСЂСѓР¶РёРјСЃСЏ РЅР° РјРµСЃС‚Рµ
     }
 
-    // Избегание препятствий (заборов)
+    // РР·Р±РµРіР°РЅРёРµ РїСЂРµРїСЏС‚СЃС‚РІРёР№ (Р·Р°Р±РѕСЂРѕРІ)
     const lookX = b.x + Math.cos(b.ang) * 35;
     const lookY = b.y + Math.sin(b.ang) * 35;
     if (col(lookX, lookY)) {
@@ -2067,7 +2067,7 @@ function update(dt,now){
     }
   }
 
-  // Обновление всплывающего текста
+  // РћР±РЅРѕРІР»РµРЅРёРµ РІСЃРїР»С‹РІР°СЋС‰РµРіРѕ С‚РµРєСЃС‚Р°
   for (let i = floatTexts.length - 1; i >= 0; i--) {
     const ft = floatTexts[i];
     ft.y -= 30 * dt;
@@ -2076,10 +2076,10 @@ function update(dt,now){
   }
 
   let kDX=0,kDY=0;
-  if(K['KeyW'] || K['ArrowUp'] || K['w'] || K['ц'])kDY-=1;
-  if(K['KeyS'] || K['ArrowDown'] || K['s'] || K['ы'])kDY+=1;
-  if(K['KeyA'] || K['ArrowLeft'] || K['a'] || K['ф'])kDX-=1;
-  if(K['KeyD'] || K['ArrowRight'] || K['d'] || K['в'])kDX+=1;
+  if(K['KeyW'] || K['ArrowUp'] || K['w'] || K['С†'])kDY-=1;
+  if(K['KeyS'] || K['ArrowDown'] || K['s'] || K['С‹'])kDY+=1;
+  if(K['KeyA'] || K['ArrowLeft'] || K['a'] || K['С„'])kDX-=1;
+  if(K['KeyD'] || K['ArrowRight'] || K['d'] || K['РІ'])kDX+=1;
   if(kDX&&kDY){kDX*=.7071;kDY*=.7071}
   
   let dx = kDX, dy = kDY;
@@ -2093,7 +2093,7 @@ function update(dt,now){
   let isMoving = false;
   
   if (dx || dy) {
-    // Избегаем тряски джойстика
+    // РР·Р±РµРіР°РµРј С‚СЂСЏСЃРєРё РґР¶РѕР№СЃС‚РёРєР°
     if (!joyActive || Math.hypot(dx, dy) > 0.15) {
       targetAngle = Math.atan2(dy, dx);
       isMoving = true;
@@ -2102,25 +2102,25 @@ function update(dt,now){
   
   let playedCutThisFrame = false;
 
-  // Плавный поворот и движение по дуге ("как машина")
+  // РџР»Р°РІРЅС‹Р№ РїРѕРІРѕСЂРѕС‚ Рё РґРІРёР¶РµРЅРёРµ РїРѕ РґСѓРіРµ ("РєР°Рє РјР°С€РёРЅР°")
   if (isMoving) {
     let diff = targetAngle - pAng;
-    // Нормализуем разницу углов от -PI до PI
+    // РќРѕСЂРјР°Р»РёР·СѓРµРј СЂР°Р·РЅРёС†Сѓ СѓРіР»РѕРІ РѕС‚ -PI РґРѕ PI
     while (diff > Math.PI) diff -= Math.PI * 2;
     while (diff < -Math.PI) diff += Math.PI * 2;
     
-    const turnSpeed = 5.0; // Скорость поворота руля
+    const turnSpeed = 5.0; // РЎРєРѕСЂРѕСЃС‚СЊ РїРѕРІРѕСЂРѕС‚Р° СЂСѓР»СЏ
     if (Math.abs(diff) < turnSpeed * dt) {
       pAng = targetAngle;
     } else {
       pAng += Math.sign(diff) * turnSpeed * dt;
     }
     
-    // Движемся ВПЕРЕД туда, куда смотрит трактор (автомобильная физика)
+    // Р”РІРёР¶РµРјСЃСЏ Р’РџР•Р Р•Р” С‚СѓРґР°, РєСѓРґР° СЃРјРѕС‚СЂРёС‚ С‚СЂР°РєС‚РѕСЂ (Р°РІС‚РѕРјРѕР±РёР»СЊРЅР°СЏ С„РёР·РёРєР°)
     const forwardX = Math.cos(pAng);
     const forwardY = Math.sin(pAng);
     
-    // ТРАТА ВЫНОСЛИВОСТИ (теперь тратится в 1.5 раза быстрее)
+    // РўР РђРўРђ Р’Р«РќРћРЎР›РР’РћРЎРўР (С‚РµРїРµСЂСЊ С‚СЂР°С‚РёС‚СЃСЏ РІ 1.5 СЂР°Р·Р° Р±С‹СЃС‚СЂРµРµ)
     if (isNaN(currentStamina)) currentStamina = maxStamina;
     currentStamina -= dt * 1.5;
     if (currentStamina < 0) currentStamina = 0;
@@ -2135,30 +2135,30 @@ function update(dt,now){
     if (pct <= 0.15) {
       stFill.style.backgroundColor = '#ff3333';
       document.getElementById('stamina-wrap').classList.add('flashing');
-      spdMult = Math.max(0.1, pct / 0.15); // от 1.0 до 0.1 (10% скорости)
+      spdMult = Math.max(0.1, pct / 0.15); // РѕС‚ 1.0 РґРѕ 0.1 (10% СЃРєРѕСЂРѕСЃС‚Рё)
     } else {
       stFill.style.backgroundColor = '#33ff33';
       document.getElementById('stamina-wrap').classList.remove('flashing');
     }
     
-    // Общий вектор движения за этот кадр
+    // РћР±С‰РёР№ РІРµРєС‚РѕСЂ РґРІРёР¶РµРЅРёСЏ Р·Р° СЌС‚РѕС‚ РєР°РґСЂ
     const moveX = forwardX * (SPD * spdMult) * dt;
     const moveY = forwardY * (SPD * spdMult) * dt;
     
-    // ── МИКРО-ШАГИ (чтобы не пропускать траву на поворотах и высокой скорости) ──
+    // в”Ђв”Ђ РњРРљР Рћ-РЁРђР“Р (С‡С‚РѕР±С‹ РЅРµ РїСЂРѕРїСѓСЃРєР°С‚СЊ С‚СЂР°РІСѓ РЅР° РїРѕРІРѕСЂРѕС‚Р°С… Рё РІС‹СЃРѕРєРѕР№ СЃРєРѕСЂРѕСЃС‚Рё) в”Ђв”Ђ
     const moveDist = Math.hypot(moveX, moveY);
-    const stepDist = 8; // Идеальная точность: проверяем ковш каждые 8 пикселей!
+    const stepDist = 8; // РРґРµР°Р»СЊРЅР°СЏ С‚РѕС‡РЅРѕСЃС‚СЊ: РїСЂРѕРІРµСЂСЏРµРј РєРѕРІС€ РєР°Р¶РґС‹Рµ 8 РїРёРєСЃРµР»РµР№!
     const steps = Math.max(1, Math.ceil(moveDist / stepDist));
     
     const stepX = moveX / steps;
     const stepY = moveY / steps;
     
     for (let s = 0; s < steps; s++) {
-      // Шаг трактора
+      // РЁР°Рі С‚СЂР°РєС‚РѕСЂР°
       const nx = px + stepX; if (!col(nx, py)) px = nx;
       const ny = py + stepY; if (!col(px, ny)) py = ny;
       
-      // Сразу косим траву в новой промежуточной точке
+      // РЎСЂР°Р·Сѓ РєРѕСЃРёРј С‚СЂР°РІСѓ РІ РЅРѕРІРѕР№ РїСЂРѕРјРµР¶СѓС‚РѕС‡РЅРѕР№ С‚РѕС‡РєРµ
       if (mowAt(px, py, pAng, now, false)) {
         playedCutThisFrame = true;
       }
@@ -2167,22 +2167,22 @@ function update(dt,now){
 
   if (playedCutThisFrame) {
     playCut();
-    // Обновляем текст счёта один раз за кадр, а не при каждой скошенной травинке (убирает лаги)
+    // РћР±РЅРѕРІР»СЏРµРј С‚РµРєСЃС‚ СЃС‡С‘С‚Р° РѕРґРёРЅ СЂР°Р· Р·Р° РєР°РґСЂ, Р° РЅРµ РїСЂРё РєР°Р¶РґРѕР№ СЃРєРѕС€РµРЅРЅРѕР№ С‚СЂР°РІРёРЅРєРµ (СѓР±РёСЂР°РµС‚ Р»Р°РіРё)
     scEl.textContent = score;
     if (shopOpen) document.getElementById('bal').textContent = score;
   }
 
   camX+=(px-camX)*LRP; camY+=(py-camY)*LRP;
   
-  // Идеальное ограничение камеры: не даём ей выйти за пределы карты,
-  // чтобы не было черной "пустоты" по краям экрана.
+  // РРґРµР°Р»СЊРЅРѕРµ РѕРіСЂР°РЅРёС‡РµРЅРёРµ РєР°РјРµСЂС‹: РЅРµ РґР°С‘Рј РµР№ РІС‹Р№С‚Рё Р·Р° РїСЂРµРґРµР»С‹ РєР°СЂС‚С‹,
+  // С‡С‚РѕР±С‹ РЅРµ Р±С‹Р»Рѕ С‡РµСЂРЅРѕР№ "РїСѓСЃС‚РѕС‚С‹" РїРѕ РєСЂР°СЏРј СЌРєСЂР°РЅР°.
   const halfW = MW * T / 2;
   const halfH = MH * T / 2;
   camX = Math.max(Math.min(CW/2, halfW), Math.min(Math.max(MW*T - CW/2, halfW), camX));
   camY = Math.max(Math.min(CH/2, halfH), Math.min(Math.max(MH*T - CH/2, halfH), camY));
 }
 
-// Быстрая функция дистанции (в квадрате), чтобы не вызывать медленный Math.sqrt тысячи раз
+// Р‘С‹СЃС‚СЂР°СЏ С„СѓРЅРєС†РёСЏ РґРёСЃС‚Р°РЅС†РёРё (РІ РєРІР°РґСЂР°С‚Рµ), С‡С‚РѕР±С‹ РЅРµ РІС‹Р·С‹РІР°С‚СЊ РјРµРґР»РµРЅРЅС‹Р№ Math.sqrt С‚С‹СЃСЏС‡Рё СЂР°Р·
 function distToSegSq(cx, cy, x1, y1, x2, y2) {
   const dx = x2 - x1, dy = y2 - y1;
   const l2 = dx * dx + dy * dy;
@@ -2192,10 +2192,10 @@ function distToSegSq(cx, cy, x1, y1, x2, y2) {
   return (cx - (x1 + t * dx))**2 + (cy - (y1 + t * dy))**2;
 }
 
-// ── ФУНКЦИЯ ПОКОСА ───────────────────────────────────────────
+// в”Ђв”Ђ Р¤РЈРќРљР¦РРЇ РџРћРљРћРЎРђ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function mowAt(tx, ty, tAng, now, isAI = false) {
   let didCut = false;
-  const PW = isAI ? BASE_PW : getMowW(); // У ИИ базовая косилка
+  const PW = isAI ? BASE_PW : getMowW(); // РЈ РР Р±Р°Р·РѕРІР°СЏ РєРѕСЃРёР»РєР°
   const cutterDist = 35 / 2 + 6;
   const cutterX = tx + Math.cos(tAng) * cutterDist;
   const cutterY = ty + Math.sin(tAng) * cutterDist;
@@ -2213,7 +2213,7 @@ function mowAt(tx, ty, tAng, now, isAI = false) {
   const gy1 = Math.min(MH-1, Math.floor((cutterY + rY) / T));
 
   const candidates = [];
-  const distSqLimit = 38 * 38; // Увеличенный порог (без извлечения корня)
+  const distSqLimit = 38 * 38; // РЈРІРµР»РёС‡РµРЅРЅС‹Р№ РїРѕСЂРѕРі (Р±РµР· РёР·РІР»РµС‡РµРЅРёСЏ РєРѕСЂРЅСЏ)
 
   for (let gy = gy0; gy <= gy1; gy++) {
     for (let gx = gx0; gx <= gx1; gx++) {
@@ -2229,7 +2229,7 @@ function mowAt(tx, ty, tAng, now, isAI = false) {
     }
   }
 
-  // Ограничиваем сбор N ближайшими блоками (чтобы не лагало)
+  // РћРіСЂР°РЅРёС‡РёРІР°РµРј СЃР±РѕСЂ N Р±Р»РёР¶Р°Р№С€РёРјРё Р±Р»РѕРєР°РјРё (С‡С‚РѕР±С‹ РЅРµ Р»Р°РіР°Р»Рѕ)
   const maxCollect = 1 + upgLvl.width; 
   if (candidates.length > maxCollect) {
     candidates.sort((a, b) => a.d2 - b.d2);
@@ -2260,7 +2260,7 @@ function mowAt(tx, ty, tAng, now, isAI = false) {
       life: isAI ? 0.4 : 1.0
     });
 
-    // DOM 업데이트 УБРАН отсюда, перерисовка только одного блока
+    // DOM м—…лЌ°мќґнЉё РЈР‘Р РђРќ РѕС‚СЃСЋРґР°, РїРµСЂРµСЂРёСЃРѕРІРєР° С‚РѕР»СЊРєРѕ РѕРґРЅРѕРіРѕ Р±Р»РѕРєР°
     renderCellToMap(i % MW, Math.floor(i / MW), now);
   }
 
@@ -2282,13 +2282,14 @@ function col(x,y){
   return false;
 }
 
-// ── НОЧЬ И РАССВЕТ ───────────────────────────────────────────
+// в”Ђв”Ђ РќРћР§Р¬ Р Р РђРЎРЎР’Р•Рў в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function startNight() {
   if (isNight) return;
   isNight = true;
   nightPhase = 'darkening';
   nightStartTime = performance.now();
-  document.getElementById('rest-btn').disabled = true;
+  let restBtn = document.getElementById('rest-btn');
+  if(restBtn) restBtn.disabled = true;
   animateNight();
 }
 
@@ -2297,8 +2298,8 @@ let staminaAtNightStart = 0;
 function animateNight() {
   const now = performance.now();
   const elapsed = now - nightStartTime;
-  const FADE_DUR = 2500; // 2.5 секунды темнеет/светлеет
-  const MIDNIGHT_DUR = 2000; // 2 секунды абсолютной ночи
+  const FADE_DUR = 2500; // 2.5 СЃРµРєСѓРЅРґС‹ С‚РµРјРЅРµРµС‚/СЃРІРµС‚Р»РµРµС‚
+  const MIDNIGHT_DUR = 2000; // 2 СЃРµРєСѓРЅРґС‹ Р°Р±СЃРѕР»СЋС‚РЅРѕР№ РЅРѕС‡Рё
 
   if (nightPhase === 'darkening') {
     nightAlpha = Math.min(0.93, elapsed / FADE_DUR);
@@ -2311,7 +2312,7 @@ function animateNight() {
       document.getElementById('stamina-wrap').classList.remove('flashing');
     }
   } else if (nightPhase === 'midnight') {
-    // Плавная анимация восстановления выносливости пока спим
+    // РџР»Р°РІРЅР°СЏ Р°РЅРёРјР°С†РёСЏ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅРёСЏ РІС‹РЅРѕСЃР»РёРІРѕСЃС‚Рё РїРѕРєР° СЃРїРёРј
     const progress = Math.min(1, elapsed / MIDNIGHT_DUR);
     currentStamina = staminaAtNightStart + (maxStamina - staminaAtNightStart) * progress;
     const pct = currentStamina / maxStamina;
@@ -2320,9 +2321,9 @@ function animateNight() {
     stFill.style.backgroundColor = '#33ff33';
     document.getElementById('stamina-text').textContent = Math.ceil(pct * 100) + '%';
 
-    // В полночь всё замерло, просто ждём рассвета
+    // Р’ РїРѕР»РЅРѕС‡СЊ РІСЃС‘ Р·Р°РјРµСЂР»Рѕ, РїСЂРѕСЃС‚Рѕ Р¶РґС‘Рј СЂР°СЃСЃРІРµС‚Р°
     if (elapsed >= MIDNIGHT_DUR) {
-      // ── РАССВЕТ: всё поле вырастает заново ───────────────────
+      // в”Ђв”Ђ Р РђРЎРЎР’Р•Рў: РІСЃС‘ РїРѕР»Рµ РІС‹СЂР°СЃС‚Р°РµС‚ Р·Р°РЅРѕРІРѕ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
       currentDay++;
       growSet.clear();
       for (let i = 0; i < gState.length; i++) {
@@ -2334,11 +2335,11 @@ function animateNight() {
           gState[i] = S; gCutAt[i] = 0; renderCellToMap(i % MW, Math.floor(i / MW), 0);
         }
       }
-      // Показываем номер дня
+      // РџРѕРєР°Р·С‹РІР°РµРј РЅРѕРјРµСЂ РґРЅСЏ
       const dayEl = document.getElementById('day-label');
       dayEl.textContent = `${t('dayText')} ${currentDay}`;
       dayEl.classList.add('visible');
-      // Сохраняем прогресс
+      // РЎРѕС…СЂР°РЅСЏРµРј РїСЂРѕРіСЂРµСЃСЃ
       if (typeof saveProgress === 'function') saveProgress(score, upgLvl, currentDay);
       
       nightPhase = 'brightening';
@@ -2350,8 +2351,9 @@ function animateNight() {
       nightAlpha = 0;
       isNight = false;
       nightPhase = '';
-      document.getElementById('rest-btn').disabled = false;
-      // Скрываем надпись через 2 сек после полного рассвета
+      let restBtn = document.getElementById('rest-btn');
+      if(restBtn) restBtn.disabled = false;
+      // РЎРєСЂС‹РІР°РµРј РЅР°РґРїРёСЃСЊ С‡РµСЂРµР· 2 СЃРµРє РїРѕСЃР»Рµ РїРѕР»РЅРѕРіРѕ СЂР°СЃСЃРІРµС‚Р°
       setTimeout(() => {
         document.getElementById('day-label').classList.remove('visible');
       }, 2000);
@@ -2361,7 +2363,7 @@ function animateNight() {
   if (nightPhase) requestAnimationFrame(animateNight);
 }
 
-// ── НОВАЯ ИГРА ────────────────────────────────────────────────
+// в”Ђв”Ђ РќРћР’РђРЇ РР“Р Рђ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 function newGame() {
   const msg = i18n[currentLang].newGameConfirm;
   if (!confirm(msg)) return;
@@ -2383,7 +2385,7 @@ function newGame() {
   if (typeof saveProgress === 'function') saveProgress(0, {speed:0,width:0,grow:0,bonus:0}, 1);
 }
 
-// ── GAME LOOP ────────────────────────────────────────────────
+// в”Ђв”Ђ GAME LOOP в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 let lastT=0;
 function loop(now){
   let dt=Math.min((now-lastT)/1000,.05);
@@ -2394,12 +2396,12 @@ function loop(now){
   requestAnimationFrame(loop);
 }
 
-// ── МИНИ-КАРТА ───────────────────────────────────────────────
+// в”Ђв”Ђ РњРРќР-РљРђР РўРђ в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 let mapOpen = false;
 const mmCanvas = document.getElementById('minimap');
 const mmCtx    = mmCanvas.getContext('2d');
-const MM = 2; // px на тайл
-// Подогнать canvas под реальный размер карты
+const MM = 2; // px РЅР° С‚Р°Р№Р»
+// РџРѕРґРѕРіРЅР°С‚СЊ canvas РїРѕРґ СЂРµР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ РєР°СЂС‚С‹
 mmCanvas.width  = MW * MM;
 mmCanvas.height = MH * MM;
 mmCanvas.style.width  = (MW * MM) + 'px';
@@ -2494,7 +2496,7 @@ function drawMinimap() {
   mmCtx.putImageData(img, 0, 0);
 }
 
-// Обновляем мини-карту каждые 200мс (не каждый кадр — экономим ресурсы)
+// РћР±РЅРѕРІР»СЏРµРј РјРёРЅРё-РєР°СЂС‚Сѓ РєР°Р¶РґС‹Рµ 200РјСЃ (РЅРµ РєР°Р¶РґС‹Р№ РєР°РґСЂ вЂ” СЌРєРѕРЅРѕРјРёРј СЂРµСЃСѓСЂСЃС‹)
 setInterval(() => { if (mapOpen) drawMinimap(); }, 200);
 
 if (typeof initGameSDK === 'function') {
@@ -2505,7 +2507,7 @@ if (typeof initGameSDK === 'function') {
       if (cloudData.upgLvl) {
         Object.assign(upgLvl, cloudData.upgLvl);
         if (upgLvl.autopilot > 3) upgLvl.autopilot = 3;
-        // Миграция старого сохранения Удобрений в Выносливость
+        // РњРёРіСЂР°С†РёСЏ СЃС‚Р°СЂРѕРіРѕ СЃРѕС…СЂР°РЅРµРЅРёСЏ РЈРґРѕР±СЂРµРЅРёР№ РІ Р’С‹РЅРѕСЃР»РёРІРѕСЃС‚СЊ
         if (typeof cloudData.upgLvl.grow !== 'undefined') {
           upgLvl.stamina = cloudData.upgLvl.grow;
           delete cloudData.upgLvl.grow;

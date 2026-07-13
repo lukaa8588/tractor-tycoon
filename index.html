@@ -308,7 +308,8 @@
     .quest-btn:hover { background:#00ff80; }
     .quest-btn:disabled { background:#555; color:#888; cursor:not-allowed; }
   </style>
-  <script src="yandex-sdk.js"></script>
+  <script src="https://sdk.crazygames.com/crazygames-sdk-v2.js"></script>
+  <script src="crazygames-sdk.js"></script>
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -2496,8 +2497,8 @@ function drawMinimap() {
 // Обновляем мини-карту каждые 200мс (не каждый кадр — экономим ресурсы)
 setInterval(() => { if (mapOpen) drawMinimap(); }, 200);
 
-if (typeof initYandexGame === 'function') {
-  initYandexGame((cloudData, lang) => {
+if (typeof initGameSDK === 'function') {
+  initGameSDK((cloudData, lang) => {
     updateLanguage(lang);
     if (cloudData && typeof cloudData.score !== 'undefined') {
       score = cloudData.score;

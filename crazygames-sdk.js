@@ -85,72 +85,29 @@ function initGameSDK(onReady) {
 
   // Global rewarded ad function
   window.showRewardedBooster = (onSuccess) => {
-    SDK.ad.requestAd('rewarded', {
-      adStarted: () => {
-        console.log("Rewarded ad started");
-        if (window.cgGameplayStop) window.cgGameplayStop();
-        // Pause audio in game
-        if (typeof audioCtx !== 'undefined' && audioCtx.state === 'running') {
-            audioCtx.suspend();
-        }
-      },
-      adFinished: () => {
-        console.log("Rewarded ad finished");
-        if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
-            audioCtx.resume();
-        }
-        if (onSuccess) onSuccess();
-        if (window.cgGameplayStart) window.cgGameplayStart();
-      },
-      adError: (err) => {
-        console.error("Rewarded ad error", err);
-        if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
-            audioCtx.resume();
-        }
-      }
-    });
+    /* TEMPORARY AD DISABLE FOR BASIC LAUNCH
+    SDK.ad.requestAd('rewarded', { ... });
+    */
+    console.log("Mock rewarded video for Basic Launch");
+    if (onSuccess) onSuccess();
   };
 
   // Global interstitial ad function
   window.showInterstitialAd = () => {
-    SDK.ad.requestAd('midgame', {
-      adStarted: () => {
-        if (window.cgGameplayStop) window.cgGameplayStop();
-        if (typeof audioCtx !== 'undefined' && audioCtx.state === 'running') {
-            audioCtx.suspend();
-        }
-      },
-      adFinished: () => {
-        if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
-            audioCtx.resume();
-        }
-        if (window.cgGameplayStart) window.cgGameplayStart();
-      },
-      adError: (err) => {
-        if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
-            audioCtx.resume();
-        }
-      }
-    });
+    /* TEMPORARY AD DISABLE FOR BASIC LAUNCH
+    SDK.ad.requestAd('midgame', { ... });
+    */
+    console.log("Mock interstitial ad for Basic Launch");
   };
 
   // Show Interstitial on initial load
   try {
-    SDK.ad.requestAd('midgame', {
-      adStarted: () => {
-        console.log("Initial midgame ad started");
-      },
-      adFinished: () => {
-        console.log("Initial midgame ad finished");
-        try { SDK.game.sdkGameLoadingStop(); } catch(e){}
-        onReady(loadSaveData(), lang);
-      },
-      adError: (err) => {
-        console.error("Initial midgame ad error", err);
-        try { SDK.game.sdkGameLoadingStop(); } catch(e){}
-        onReady(loadSaveData(), lang);
-      }
-    });
+    /* TEMPORARY AD DISABLE FOR BASIC LAUNCH
+    SDK.ad.requestAd('midgame', { ... });
+    */
+    console.log("Mock Initial midgame ad for Basic Launch");
+    try { SDK.game.sdkGameLoadingStop(); } catch(e){}
+    onReady(loadSaveData(), lang);
   } catch (err) {
     console.error("Failed to request initial ad", err);
     try { SDK.game.sdkGameLoadingStop(); } catch(e){}

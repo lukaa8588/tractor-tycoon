@@ -577,8 +577,7 @@ function updateLanguage(lang) {
   
   document.getElementById('settings-btn').title = t('settingsTitle');
   document.getElementById('settings-title').textContent = t('settingsTitle');
-  document.getElementById('lbl-music-vol').textContent = t('musicVol');
-  document.getElementById('lbl-sfx-vol').textContent = t('sfxVol');
+
 
   document.getElementById('lbl-lang').textContent = t('langToggle');
   document.getElementById('close-settings-btn').textContent = t('closeBtn');
@@ -647,8 +646,10 @@ function toggleLanguage() {
 function updateVolumes() {
   musicVol = parseFloat(document.getElementById('vol-music').value);
   sfxVol = parseFloat(document.getElementById('vol-sfx').value);
-  document.getElementById('ui-vol-music').value = musicVol;
-  document.getElementById('ui-vol-sfx').value = sfxVol;
+  const uvm = document.getElementById('ui-vol-music');
+  const uvs = document.getElementById('ui-vol-sfx');
+  if (uvm) uvm.value = musicVol;
+  if (uvs) uvs.value = sfxVol;
   musicGain.gain.value = musicVol;
   sfxGain.gain.value = sfxVol;
   if (!audioMuted) playClick();
@@ -675,8 +676,10 @@ function updateVolumesUI() {
   sfxVol = parseFloat(document.getElementById('ui-vol-sfx').value);
   musicGain.gain.value = musicVol;
   sfxGain.gain.value = sfxVol;
-  document.getElementById('vol-music').value = musicVol;
-  document.getElementById('vol-sfx').value = sfxVol;
+  const vm = document.getElementById('vol-music');
+  const vs = document.getElementById('vol-sfx');
+  if (vm) vm.value = musicVol;
+  if (vs) vs.value = sfxVol;
   if (!audioMuted) playClick();
 }
 

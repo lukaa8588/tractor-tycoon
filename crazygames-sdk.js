@@ -22,8 +22,8 @@ function initGameSDK(onReady) {
       }
   }
 
-  if (typeof window.CrazyGames === 'undefined' || !window.CrazyGames.SDK || window.CrazyGames.SDK.environment === 'disabled') {
-    console.warn("CrazyGames SDK not found or disabled on this domain. Running in local/mock mode.");
+  if (typeof window.CrazyGames === 'undefined' || !window.CrazyGames.SDK) {
+    console.warn("CrazyGames SDK not found on this domain. Running in local/mock mode.");
     
     // Mock callbacks
     window.showRewardedBooster = (cb) => { 
@@ -47,8 +47,22 @@ function initGameSDK(onReady) {
   // SDK is loaded
   const SDK = window.CrazyGames.SDK;
   
+  // If explicitly disabled by SDK, immediately fallback
+  if (SDK.environment === 'disabled' || location.hostname.includes('github.io')) {
+    console.warn("CrazyGames SDK is disabled on this domain (or github.io). Running in local/mock mode.");
+    window.showRewardedBooster = (cb) => { console.log("Mock rewarded video"); if (cb) cb(); };
+    window.showInterstitialAd = () => { console.log("Mock interstitial ad"); };
+    window.saveProgress = (score, upgLvl, currentDay) => { localStorage.setItem('tractorTycoonSave', JSON.stringify({score, upgLvl, currentDay})); };
+    setTimeout(() => onReady(loadSaveData(), lang), 100);
+    return;
+  }
+
   // Start game loading UI of the portal
-  SDK.game.sdkGameLoadingStart();
+  try {
+      SDK.game.sdkGameLoadingStart();
+  } catch (e) {
+      console.warn("SDK loading start failed", e);
+  }
   
   console.log("CrazyGames SDK initialized");
 
@@ -106,19 +120,25 @@ function initGameSDK(onReady) {
   };
 
   // Show Interstitial on initial load
-  SDK.ad.requestAd('midgame', {
-    adStarted: () => {
-      console.log("Initial midgame ad started");
-    },
-    adFinished: () => {
-      console.log("Initial midgame ad finished");
-      SDK.game.sdkGameLoadingStop();
-      onReady(loadSaveData(), lang);
-    },
-    adError: (err) => {
-      console.error("Initial midgame ad error", err);
-      SDK.game.sdkGameLoadingStop();
-      onReady(loadSaveData(), lang);
-    }
-  });
+  try {
+    SDK.ad.requestAd('midgame', {
+      adStarted: () => {
+        console.log("Initial midgame ad started");
+      },
+      adFinished: () => {
+        console.log("Initial midgame ad finished");
+        try { SDK.game.sdkGameLoadingStop(); } catch(e){}
+        onReady(loadSaveData(), lang);
+      },
+      adError: (err) => {
+        console.error("Initial midgame ad error", err);
+        try { SDK.game.sdkGameLoadingStop(); } catch(e){}
+        onReady(loadSaveData(), lang);
+      }
+    });
+  } catch (err) {
+    console.error("Failed to request initial ad", err);
+    try { SDK.game.sdkGameLoadingStop(); } catch(e){}
+    onReady(loadSaveData(), lang);
+  }
 }

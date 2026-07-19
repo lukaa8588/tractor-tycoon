@@ -22,95 +22,132 @@ function initGameSDK(onReady) {
       }
   }
 
-  if (typeof window.CrazyGames === 'undefined' || !window.CrazyGames.SDK) {
-    console.warn("CrazyGames SDK not found on this domain. Running in local/mock mode.");
-    
-    // Mock callbacks
+  // Helper: setup mock mode (no SDK available)
+  function setupMockMode() {
     window.cgGameplayStart = () => { console.log("Mock gameplay start"); };
-    window.cgGameplayStop = () => { console.log("Mock gameplay stop"); };
-    window.showRewardedBooster = (cb) => { 
-        console.log("Mock rewarded video"); 
-        if (cb) cb(); 
+    window.cgGameplayStop  = () => { console.log("Mock gameplay stop"); };
+    window.showRewardedBooster = (cb) => {
+        console.log("Mock rewarded video");
+        if (cb) cb();
     };
-    window.showInterstitialAd = () => {
-        console.log("Mock interstitial ad");
-    };
+    window.showInterstitialAd = () => { console.log("Mock interstitial ad"); };
     window.saveProgress = (score, upgLvl, currentDay) => {
         localStorage.setItem('tractorTycoonSave', JSON.stringify({score, upgLvl, currentDay}));
     };
-    
-    // Slight delay to ensure the game doesn't load instantly before fonts
-    setTimeout(() => {
-      onReady(loadSaveData(), lang);
-    }, 100);
-    return;
   }
 
-  // SDK is loaded
-  const SDK = window.CrazyGames.SDK;
-  
-  // If explicitly disabled by SDK, immediately fallback
-  if (SDK.environment === 'disabled' || location.hostname.includes('github.io')) {
-    console.warn("CrazyGames SDK is disabled on this domain (or github.io). Running in local/mock mode.");
-    window.cgGameplayStart = () => { console.log("Mock gameplay start"); };
-    window.cgGameplayStop = () => { console.log("Mock gameplay stop"); };
-    window.showRewardedBooster = (cb) => { console.log("Mock rewarded video"); if (cb) cb(); };
-    window.showInterstitialAd = () => { console.log("Mock interstitial ad"); };
-    window.saveProgress = (score, upgLvl, currentDay) => { localStorage.setItem('tractorTycoonSave', JSON.stringify({score, upgLvl, currentDay})); };
+  // If SDK script was not loaded at all
+  if (typeof window.CrazyGames === 'undefined' || !window.CrazyGames.SDK) {
+    console.warn("CrazyGames SDK not found. Running in mock mode.");
+    setupMockMode();
     setTimeout(() => onReady(loadSaveData(), lang), 100);
     return;
   }
 
-  // Start game loading UI of the portal
-  try {
-      SDK.game.sdkGameLoadingStart();
-  } catch (e) {
-      console.warn("SDK loading start failed", e);
+  const SDK = window.CrazyGames.SDK;
+
+  // If running on github.io - mock mode
+  if (location.hostname.includes('github.io')) {
+    console.warn("GitHub Pages detected. Running in mock mode.");
+    setupMockMode();
+    setTimeout(() => onReady(loadSaveData(), lang), 100);
+    return;
   }
-  
-  console.log("CrazyGames SDK initialized");
 
-  window.cgGameplayStart = () => {
-    try { SDK.game.gameplayStart(); } catch(e) { console.warn("gameplayStart error", e); }
-  };
-  window.cgGameplayStop = () => {
-    try { SDK.game.gameplayStop(); } catch(e) { console.warn("gameplayStop error", e); }
-  };
+  // --- SDK v3 initialization (async) ---
+  SDK.init().then(() => {
 
-  // Global save function
-  window.saveProgress = (score, upgLvl, currentDay) => {
-    const data = { score, upgLvl, currentDay };
-    localStorage.setItem('tractorTycoonSave', JSON.stringify(data));
-  };
+    console.log("CrazyGames SDK v3 initialized");
 
-  // Global rewarded ad function
-  window.showRewardedBooster = (onSuccess) => {
-    /* TEMPORARY AD DISABLE FOR BASIC LAUNCH
-    SDK.ad.requestAd('rewarded', { ... });
-    */
-    console.log("Mock rewarded video for Basic Launch");
-    if (onSuccess) onSuccess();
-  };
+    // Notify portal that game is loading
+    try { SDK.game.sdkGameLoadingStart(); } catch(e) { console.warn("sdkGameLoadingStart failed", e); }
 
-  // Global interstitial ad function
-  window.showInterstitialAd = () => {
-    /* TEMPORARY AD DISABLE FOR BASIC LAUNCH
-    SDK.ad.requestAd('midgame', { ... });
-    */
-    console.log("Mock interstitial ad for Basic Launch");
-  };
+    // --- Gameplay tracking ---
+    window.cgGameplayStart = () => {
+      try { SDK.game.gameplayStart(); } catch(e) { console.warn("gameplayStart error", e); }
+    };
+    window.cgGameplayStop = () => {
+      try { SDK.game.gameplayStop(); } catch(e) { console.warn("gameplayStop error", e); }
+    };
 
-  // Show Interstitial on initial load
-  try {
-    /* TEMPORARY AD DISABLE FOR BASIC LAUNCH
-    SDK.ad.requestAd('midgame', { ... });
-    */
-    console.log("Mock Initial midgame ad for Basic Launch");
-    try { SDK.game.sdkGameLoadingStop(); } catch(e){}
-    onReady(loadSaveData(), lang);
-  } catch (err) {
-    console.error("Failed to request initial ad", err);
-    try { SDK.game.sdkGameLoadingStop(); } catch(e){}
-    onReady(loadSaveData(), lang);
-  }
+    // --- Save function ---
+    window.saveProgress = (score, upgLvl, currentDay) => {
+      const data = { score, upgLvl, currentDay };
+      localStorage.setItem('tractorTycoonSave', JSON.stringify(data));
+    };
+
+    // --- Rewarded ad ---
+    window.showRewardedBooster = (onSuccess) => {
+      SDK.ad.requestAd('rewarded', {
+        adStarted: () => {
+          if (window.cgGameplayStop) window.cgGameplayStop();
+          if (typeof audioCtx !== 'undefined' && audioCtx.state === 'running') {
+              audioCtx.suspend();
+          }
+        },
+        adFinished: () => {
+          if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
+              audioCtx.resume();
+          }
+          if (onSuccess) onSuccess();
+          if (window.cgGameplayStart) window.cgGameplayStart();
+        },
+        adError: (err) => {
+          console.error("Rewarded ad error", err);
+          if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
+              audioCtx.resume();
+          }
+          // Give reward even on error so player isn't punished
+          if (onSuccess) onSuccess();
+        }
+      });
+    };
+
+    // --- Interstitial ad ---
+    window.showInterstitialAd = () => {
+      SDK.ad.requestAd('midgame', {
+        adStarted: () => {
+          if (window.cgGameplayStop) window.cgGameplayStop();
+          if (typeof audioCtx !== 'undefined' && audioCtx.state === 'running') {
+              audioCtx.suspend();
+          }
+        },
+        adFinished: () => {
+          if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
+              audioCtx.resume();
+          }
+          if (window.cgGameplayStart) window.cgGameplayStart();
+        },
+        adError: (err) => {
+          console.warn("Interstitial ad error", err);
+          if (typeof audioCtx !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
+              audioCtx.resume();
+          }
+        }
+      });
+    };
+
+    // --- Initial midgame ad on load ---
+    SDK.ad.requestAd('midgame', {
+      adStarted: () => {
+        console.log("Initial midgame ad started");
+      },
+      adFinished: () => {
+        console.log("Initial midgame ad finished");
+        try { SDK.game.sdkGameLoadingStop(); } catch(e){}
+        onReady(loadSaveData(), lang);
+      },
+      adError: (err) => {
+        console.error("Initial midgame ad error", err);
+        try { SDK.game.sdkGameLoadingStop(); } catch(e){}
+        onReady(loadSaveData(), lang);
+      }
+    });
+
+  }).catch((err) => {
+    // SDK init failed - fallback to mock mode
+    console.error("CrazyGames SDK v3 init failed, falling back to mock mode", err);
+    setupMockMode();
+    setTimeout(() => onReady(loadSaveData(), lang), 100);
+  });
 }

@@ -256,6 +256,9 @@
       max-height:85vh;overflow-y:auto;overflow-x:hidden;
     }
     #dev-panel.open{display:flex}
+    @media (pointer: coarse), (max-width: 768px) {
+      #dev-panel, #dev-panel.open { display: none !important; }
+    }
     #dev-panel h2{color:#d0a0ff;text-align:center;margin-bottom:8px;font-size:1.4rem}
     .dev-row{display:flex;justify-content:space-between;align-items:center;gap:16px}
     .dev-slider{flex:1;cursor:pointer}
@@ -1199,23 +1202,30 @@ let showHitboxes = false;
 window.devTractorRadius = 14;
 window.devCutterWidth = 0;
 
-  let touchCount = 0;
-  let lastTouch = 0;
-  document.addEventListener('touchstart', (e) => {
-    const now = Date.now();
-    if (now - lastTouch < 400) {
-      touchCount++;
-      if (touchCount >= 2) {
-        touchCount = 0;
-        if (typeof toggleDevPanel === 'function') toggleDevPanel();
+  // Dev panel: triple tap - только на ПК, не на мобильных
+  const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  if (!isMobileDevice) {
+    let touchCount = 0;
+    let lastTouch = 0;
+    document.addEventListener('touchstart', (e) => {
+      const now = Date.now();
+      if (now - lastTouch < 400) {
+        touchCount++;
+        if (touchCount >= 2) {
+          touchCount = 0;
+          if (typeof toggleDevPanel === 'function') toggleDevPanel();
+        }
+      } else {
+        touchCount = 1;
       }
-    } else {
-      touchCount = 1;
-    }
-    lastTouch = now;
-  });
+      lastTouch = now;
+    });
+  }
 
 function toggleDevPanel() {
+  // Запрет открытия на мобильных устройствах
+  const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  if (isMobileDevice) return;
   try { playClick(); } catch(e) {}
   devPanelOpen = !devPanelOpen;
   document.getElementById('dev-panel').classList.toggle('open', devPanelOpen);

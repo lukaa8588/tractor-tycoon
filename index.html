@@ -458,60 +458,8 @@
 <script>
 'use strict';
 
-// ── МУЛЬТИЯЗЫЧНОСТЬ ──────────────────────────────────────────
+// ── MULTILANGUAGE (English only) ──────────────────────────────────────────
 const i18n = {
-  ru: {
-    title: "Трактор Магнат",
-    hay: "сена",
-    shopBtn: "Прокачка",
-    mapBtn: "Карта",
-    mapTitle: "🗺️ Карта",
-    shopTitle: "🛒 Прокачка",
-    boosterBtn: "📺 Реклама: +1000 🌾",
-    maxLabel: "МАКС",
-    buyHay: "сена",
-    statSpeed: "Скорость",
-    statWidth: "Ширина",
-    statFertilizer: "Бонус сена",
-    statStamina: "Выносливость",
-    statBonus: "Сена с блока",
-    statAutopilot: "Ботов",
-    statBotSpeed: "Скор. ботов",
-    statLand: "Территория",
-    restBtn: "⛺ Отдохнуть",
-    newGameBtn: "🔄 Новая игра",
-    newGameConfirm: "Начать новую игру? Весь прогресс будет сброшен.",
-    dayText: "День",
-    nightText: "Ночь...",
-    settingsTitle: "⚙️ Настройки",
-    musicVol: "Музыка",
-    sfxVol: "Звуки",
-    vibration: "Вибрация",
-    langToggle: "Язык",
-    closeBtn: "Закрыть",
-    upgrades: {
-      speed: { name: "Двигатель", desc: "Увеличивает скорость трактора" },
-      width: { name: "Косилка",   desc: "Увеличивает ширину скоса" },
-      stamina: { name: "Бак",     desc: "Увеличивает запас хода" },
-      bonus: { name: "Амбар",     desc: "Ещё больше сена с каждого блока" },
-      autopilot: { name: "Тракторист", desc: "Нанимает бота-тракториста" },
-      land: { name: "Расширение фермы", desc: "Вырубает лес, открывая новые культуры" },
-      botSpeed: { name: "Скор. Ботов", desc: "Делает ботов быстрее" }
-    },
-    questsTitle: "📜 Доска Заказов",
-    questCompletedTitle: "🏆 ВЫ ПОБЕДИЛИ!",
-    questCompletedDesc: "Вы выполнили все заказы и стали настоящим Сельскохозяйственным Магнатом!",
-    questCostStr: "сена",
-    questBtnDo: "Выполнить заказ",
-    questBtnNoMoney: "Не хватает сена",
-    questPopupMsg: "ЗАКАЗ ВЫПОЛНЕН!",
-    quests: [
-      { title: "Городской зоопарк", desc: "Зоопарку срочно нужна подстилка из чистого сена для вольеров со слонами.", reward: "Награда: навсегда +1 сено с блока" },
-      { title: "Местный Лорд", desc: "Лорду нужно кормить огромный табун лошадей.", reward: "Награда: Максимум ботов увеличен с 3 до 5" },
-      { title: "Король", desc: "Королевские амбары пусты! Зима близко.", reward: "Награда: Ваш трактор окрашивается в ЗОЛОТОЙ цвет" },
-      { title: "Мега-заказ Империи", desc: "Построить запасы на зиму для всей страны.", reward: "Титул Магната (Полная победа в игре!)" }
-    ]
-  },
   en: {
     title: "Tractor Tycoon",
     hay: "hay",
@@ -566,7 +514,7 @@ const i18n = {
   }
 };
 
-let currentLang = 'ru'; // Default to Russian
+let currentLang = 'en'; // English only
 
 function t(key, subKey) {
   if (subKey) return i18n[currentLang][key][subKey];
@@ -598,7 +546,7 @@ function updateLanguage(lang) {
   const mps = getAutopilotMPS();
   if (mpsDisp && mps > 0) {
     mpsDisp.style.display = 'block';
-    mpsDisp.textContent = `+${mps} 🌾/${currentLang==='ru'?'сек':'s'}`;
+    mpsDisp.textContent = `+${mps} 🌾/s`;
   }
   
   if (shopOpen) renderShop();

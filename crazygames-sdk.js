@@ -14,12 +14,10 @@ function initGameSDK(onReady) {
   };
 
   // Determine language
-  let lang = 'ru'; // Default to Russian as per project base
+  let lang = 'en'; // English only
   if (navigator && navigator.language) {
       const parsedLang = navigator.language.substring(0, 2);
-      if (parsedLang === 'en' || parsedLang === 'ru') {
-          lang = parsedLang;
-      }
+      if (parsedLang === 'en') lang = 'en';
   }
 
   // Helper: setup mock mode (no SDK available)

@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#0d1a0a">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -13,6 +13,18 @@
   <style>
     *{margin:0;padding:0;box-sizing:border-box}
     body{background:#0d1a0a;overflow:hidden;font-family:'Segoe UI',sans-serif}
+
+    /* Force landscape — show rotate message in portrait */
+    #rotate-overlay{
+      display:none;
+      position:fixed;top:0;left:0;width:100%;height:100%;
+      background:#0d1a0a;z-index:9999;
+      flex-direction:column;align-items:center;justify-content:center;
+      color:#fff;font-size:1.4rem;text-align:center;gap:20px;
+    }
+    @media (orientation: portrait) and (max-width: 900px) {
+      #rotate-overlay { display:flex !important; }
+    }
     canvas{display:block}
 
     /* ── HUD ── */
@@ -316,6 +328,10 @@
   <script src="crazygames-sdk.js"></script>
 </head>
 <body>
+<div id="rotate-overlay">
+  <div style="font-size:3rem">📱➡️</div>
+  <div>Please rotate your device<br>to landscape mode</div>
+</div>
 <canvas id="c"></canvas>
 
 <!-- ── Джойстик ── -->
@@ -2475,6 +2491,15 @@ function drawMinimap() {
 
 // Обновляем мини-карту каждые 200мс (не каждый кадр — экономим ресурсы)
 setInterval(() => { if (mapOpen) drawMinimap(); }, 200);
+
+// Lock to landscape on mobile
+if (screen.orientation && screen.orientation.lock) {
+  const tryLock = () => {
+    screen.orientation.lock('landscape').catch(() => {});
+  };
+  document.addEventListener('click', tryLock, { once: true });
+  document.addEventListener('touchstart', tryLock, { once: true });
+}
 
 if (typeof initGameSDK === 'function') {
   initGameSDK((cloudData, lang) => {

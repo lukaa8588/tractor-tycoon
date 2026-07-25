@@ -1240,17 +1240,26 @@ const jKnob = document.getElementById('joystick-knob');
 
 // MULTITOUCH: joystick listeners on document so buttons always receive their own taps
 document.addEventListener('touchstart', (e) => {
-  if (shopOpen || questsOpen || mapOpen || settingsOpen) return;
-  if (joyActive) return;
   const touch = e.changedTouches[0];
-  // Skip if the touch landed on any interactive UI element
   const el = document.elementFromPoint(touch.clientX, touch.clientY);
   if (!el) return;
+
+  // If joystick already active and second finger taps a button — click it manually
+  if (joyActive) {
+    const btn = el.closest('button');
+    if (btn) { btn.click(); }
+    return;
+  }
+
+  if (shopOpen || questsOpen || mapOpen || settingsOpen) return;
+
+  // Skip if the touch landed on any interactive UI element
   const isUI = el.closest('button') || el.closest('input') || el.closest('select')
     || el.closest('#shop') || el.closest('#settings-modal')
     || el.closest('#quests-modal') || el.closest('#minimap-wrap')
     || el.closest('#dev-panel') || el.closest('.night-overlay');
   if (isUI) return;
+
   jTouchId = touch.identifier;
   joyActive = true;
   jBaseX = touch.clientX;

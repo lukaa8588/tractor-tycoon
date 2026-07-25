@@ -342,7 +342,7 @@
 </div>
 
 <div id="hud" style="flex-direction: column; gap: 0;">
-  <div style="display:flex; align-items:center; gap:8px;">🌾 <span id="sc">0</span><span class="lbl" id="lbl-hay">сена</span></div>
+  <div style="display:flex; align-items:center; gap:8px;">🌾 <span id="sc">0</span><span class="lbl" id="lbl-hay">hay</span></div>
   <div id="mps-display" style="font-size: 1.1rem; color: #a0e060; display: none; font-weight: bold; margin-top: -2px;">+0 🌾/сек</div>
 </div>
 <div id="day-label"></div>
@@ -428,7 +428,7 @@
   <p style="font-size:12px;margin:5px 0;text-align:center;color:#aaa;">Загрузите свою картинку!</p>
   <select id="tex-type" style="width:100%;margin-bottom:10px;padding:5px;background:#333;color:#fff;border:1px solid #a060ff;">
     <option value="dirt">Земля (подложка)</option>
-    <option value="hay">Сено</option>
+    <option value="hay">Hay</option>
     <option value="corn">Кукуруза</option>
     <option value="sun">Подсолнух</option>
     <option value="forest">Лес (Деревья)</option>
@@ -458,11 +458,6 @@
       <div class="balance">🌾 <span id="bal">0</span></div>
       <button class="shop-close" onclick="toggleShop()">✕</button>
     </div>
-  </div>
-  <div style="padding: 0 16px;">
-    <button id="booster-btn-text" class="buy-btn" style="width: 100%; justify-content: center; background: rgba(255,180,30,.2); border-color: rgba(255,180,30,.4); color: #f0c030;" onclick="triggerBooster()">
-      📺 Реклама: +1000 🌾
-    </button>
   </div>
   <div class="shop-list" id="shop-list"></div>
 </div>
@@ -542,7 +537,7 @@ function updateLanguage(lang) {
   document.getElementById('map-btn').title = t('mapBtn');
   document.getElementById('map-title').textContent = t('mapTitle');
   document.getElementById('shop-title').textContent = t('shopTitle');
-  document.getElementById('booster-btn-text').textContent = t('boosterBtn');
+  const boosterBtn = document.getElementById('booster-btn-text'); if (boosterBtn) boosterBtn.textContent = t('boosterBtn');
   let restBtn = document.getElementById('rest-btn');
   if(restBtn) restBtn.title = t('restBtn');
   document.getElementById('quests-btn').title = t('questsTitle');
@@ -745,7 +740,7 @@ const UPGRADES = [
     maxLevel:2,
     cost:[87750, 300000],
     statKey:'statLand',
-    statFn:(lvl)=>lvl===0?'Сено':lvl===1?'Кукуруза':'Подсолнухи',
+    statFn:(lvl)=>lvl===0?'Hay':lvl===1?'Corn':'Sunflowers',
   },
 
   {
@@ -1243,7 +1238,9 @@ const jBase = document.getElementById('joystick-base');
 const jKnob = document.getElementById('joystick-knob');
 
 jZone.addEventListener('touchstart', (e) => {
-  if (joyActive || shopOpen) return;
+  // Multitouch: allow joystick only if no active joystick touch, ignore extra fingers
+  if (shopOpen) return;
+  if (joyActive) return; // already tracking a touch
   const t = e.changedTouches[0];
   jTouchId = t.identifier;
   joyActive = true;
@@ -1254,7 +1251,7 @@ jZone.addEventListener('touchstart', (e) => {
   jBase.style.top = jBaseY + 'px';
   jKnob.style.transform = 'translate(-50%, -50%)';
   joyDX = 0; joyDY = 0;
-}, {passive: false});
+}, {passive: true});
 
 jZone.addEventListener('touchmove', (e) => {
   if (!joyActive) return;
@@ -1288,6 +1285,17 @@ function stopJoy(e) {
 }
 jZone.addEventListener('touchend', stopJoy);
 jZone.addEventListener('touchcancel', stopJoy);
+
+// Stop music when user leaves the page
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (typeof masterGain !== 'undefined') masterGain.gain.value = 0;
+  } else {
+    if (typeof masterGain !== 'undefined' && typeof audioMuted !== 'undefined' && !audioMuted) {
+      masterGain.gain.value = 1;
+    }
+  }
+});
 
 // ── CANVAS MOVED UP ──
 // ── ХЭШ ─────────────────────────────────────────────────────

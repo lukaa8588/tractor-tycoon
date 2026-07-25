@@ -162,7 +162,8 @@
     /* ── Джойстик ── */
     #joystick-zone {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      z-index: 5; touch-action: none;
+      z-index: 5; touch-action: pan-y;
+      pointer-events: auto;
     }
     #joystick-base {
       position: absolute; width: 100px; height: 100px;
@@ -1238,14 +1239,17 @@ const jBase = document.getElementById('joystick-base');
 const jKnob = document.getElementById('joystick-knob');
 
 jZone.addEventListener('touchstart', (e) => {
-  // Multitouch: allow joystick only if no active joystick touch, ignore extra fingers
-  if (shopOpen) return;
-  if (joyActive) return; // already tracking a touch
-  const t = e.changedTouches[0];
-  jTouchId = t.identifier;
+  // Multitouch: skip if touch landed on a UI element (button, modal, etc)
+  if (shopOpen || questsOpen || mapOpen || settingsOpen) return;
+  if (joyActive) return;
+  const touch = e.changedTouches[0];
+  // Check if touch is on a UI element
+  const el = document.elementFromPoint(touch.clientX, touch.clientY);
+  if (el && (el.tagName === 'BUTTON' || el.tagName === 'INPUT' || el.tagName === 'SELECT' || el.closest('button') || el.closest('.shop') || el.closest('#settings-modal') || el.closest('#quests-modal') || el.closest('#minimap-wrap') || el.closest('.corner-btn') || el.closest('#dev-panel'))) return;
+  jTouchId = touch.identifier;
   joyActive = true;
-  jBaseX = t.clientX;
-  jBaseY = t.clientY;
+  jBaseX = touch.clientX;
+  jBaseY = touch.clientY;
   jBase.style.display = 'block';
   jBase.style.left = jBaseX + 'px';
   jBase.style.top = jBaseY + 'px';
